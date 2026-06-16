@@ -13,10 +13,12 @@ class Parser:
         pointsFiles: list[str] | None = None
     ) -> None:
 
-        self.pointsPaths: list[Path]
+        self.tour: str = ""
+        self.players: list[str] = []
+        self.pointsPaths: list[Path] = []
         self.matchesPath: Path
-        self.points = pd.DataFrame
-        self.matches = pd.DataFrame
+        self.points = pd.DataFrame()
+        self.matches = pd.DataFrame()
 
         if tour not in {"w", "m"}:
             raise ValueError("tour must be 'w' or 'm'")
@@ -26,13 +28,16 @@ class Parser:
         if len(pointsFiles) == 0:
             raise ValueError("pointsFiles must contain at least one filename")
         matchesFile = f"charting-{tour}-matches.csv"
+        
+        self.tour = tour
+        self.players = players
 
-        self.verifyPaths(tour, pointsFiles, matchesFile)
+        self.verifyPaths(pointsFiles, matchesFile)
         self.loadPoints()
         self.loadMatches()
 #         self.verifyPlayers()
 
-    def verifyPaths(self, tour: str, pointsFiles: list[str], matchesFile: str) -> None:
+    def verifyPaths(pointsFiles: list[str], matchesFile: str) -> None:
         self.pointsPaths = [self.MCP_DIR / f for f in pointsFiles]
         self.matchesPath = self.MCP_DIR / matchesFile
 
