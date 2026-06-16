@@ -1,0 +1,62 @@
+import pandas as pd
+
+
+
+
+# Adds an event label and calculates the change in game-win probability, delta V, 
+# caused by each point.
+#   df: Point-by-point dataset. Must be created by computeV().
+#   vDict: Maps each game state to the server's game-win probability.
+#   
+def CalculateDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
+    df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
+        # Sort rows by "match_id" and then "Pt"
+        # drop=True: Discard old index numbers
+    
+    # Group all point rows according to their match IDs and then game numbers.
+    # Select the "Pts" column and move the Pts values upward by one row. Therefore,
+    # each row receives the next row's value. For example:
+    # Before:
+    #   Pt   Pts
+    #   1    0-0
+    #   2    15-0
+    #   3    30-0
+    #   4    40-0
+    # After:
+    #   Pt   Pts   next_state
+    #   1    0-0   15-0
+    #   2    15-0  30-0
+    #   3    30-0  40-0
+    #   4    40-0  NaN
+    df["next_state"] = df.groupby(["match_id", "Gm#"])["Pts"].shift(-1)
+    
+    df["V_before"] = df["Pts"].map(vDict)
+    df["V_after"]  = df["next_state"].map(vDict)
+    
+    # For the last point of a game, next_state is missing (NaN), so V_after is also
+    # missing (NaN). Put 1 to V_after if the server won the game, else 0. 
+    df.loc[df["next_state"].isna(),
+           "V_after"] = df.loc[df["next_state"].isna(),
+                               "server_won_game"].astype(float)
+
+    events = [classify_event(f, s) for f, s in zip(df["1st"].tolist(),
+                                                   df["2nd"].tolist())]
+    df["event"] = [e[0] if e else None for e in events]
+    df["perspective"] = [e[1] if e else None for e in events]
+
+    sign = np.where(df["perspective"] == "server", 1.0,
+            np.where(df["perspective"] == "returner", -1.0, np.nan))
+    df["delta_V"] = sign * (df["V_after"] - df["V_before"])
+    return df
+
+if __name__ == "__main__":
+    from constants import playersW, playersM
+    from parser import Parser
+
+    points = Parser("w", playersW).points
+    vDict, vDf, pts = computeV(points)
+    vDfSorted = vDf.sort_values(["game win probability"])
+    print(vDfSorted)
+    
+    pts = CalculateDeltaV(pts, vDict)
+

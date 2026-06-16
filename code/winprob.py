@@ -1,10 +1,9 @@
-from constants import GAME_STATES, playersW, playersM
-from parser import Parser
+from constants import GAME_STATES
 import pandas as pd
 
 # Compute the probability that the server eventually wins the current game for each
 # game state such as "0-0" and "15-0". 
-#   df: Point-by-point dataset. Each row represents one point. C.f. Parser.points.
+#   df: Point-by-point dataset. Each row represents one point. Obtained via Parser.points.
 #   
 def computeV(df: pd.DataFrame):
     # Divide df (point rows) into groups. All points with the same match ID and
@@ -50,8 +49,7 @@ def computeV(df: pd.DataFrame):
     grouped = df.groupby("Pts")["server_won_game"]
 
     # Apply two aggregation functions to every game-state group. Obtain a df like:
-    #        count  sum
-    # Pts
+    # Pts    count  sum
     # 0-0       3    2
     # 15-0      2    2    
     stats = grouped.agg(["count", "sum"])
@@ -64,9 +62,14 @@ def computeV(df: pd.DataFrame):
 
 
 if __name__ == "__main__":
+    from constants import playersW, playersM
+    from parser import Parser
+    
     points = Parser("w", playersW).points
     vDict, vDf, pts = computeV(points)
     vDfSorted = vDf.sort_values(["game win probability"])
     print(vDfSorted)
+    
+    
 
 
