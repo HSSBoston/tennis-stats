@@ -1,12 +1,8 @@
 from pathlib import Path
 import pandas as pd
-from constants import GAME_STATES
+from constants import GAME_STATES, MCP_DIR
 
 class Parser:
-    CURRENT_DIR = Path(__file__).parent
-    MCP_DIR     = CURRENT_DIR / "data" / "tennis_MatchChartingProject"
-    OUTPUT_DIR  = CURRENT_DIR / "output"
-        
     def __init__(self,
         tour: str = "w",
         players: list[str] | None = None,
@@ -37,9 +33,9 @@ class Parser:
         self.loadMatches()
 #         self.verifyPlayers()
 
-    def verifyPaths(pointsFiles: list[str], matchesFile: str) -> None:
-        self.pointsPaths = [self.MCP_DIR / f for f in pointsFiles]
-        self.matchesPath = self.MCP_DIR / matchesFile
+    def verifyPaths(self, pointsFiles: list[str], matchesFile: str) -> None:
+        self.pointsPaths = [MCP_DIR / f for f in pointsFiles]
+        self.matchesPath = MCP_DIR / matchesFile
 
         requiredPaths = self.pointsPaths + [self.matchesPath]
         for path in requiredPaths:
