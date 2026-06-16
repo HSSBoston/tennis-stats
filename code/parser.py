@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional
+import pandas as pd
 
 CURRENT_DIR = Path(__file__).parent
 MCP_DIR = CURRENT_DIR / "data" / "tennis_MatchChartingProject"
@@ -7,7 +8,12 @@ OUTPUT_DIR = CURRENT_DIR / "output"
 
 
 
-
+def loadPointsFiles(paths: Path) -> pd.DataFrame:
+    frames = [pd.read_csv(p, low_memory=False, dtype=str) for p in paths]
+    df = pd.concat(frames, ignore_index=True)
+    for col in ("Pt", "Svr", "PtWinner"):
+        df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+    return df
 
 def run(tour: str = "w",
         pointsFiles: Optional[list] = None,
@@ -35,7 +41,10 @@ def run(tour: str = "w",
 #         if path.is_file():
 #             print(path)
         if not path.is_file():
-            raise FileNotFoundError(f"Path does not exist: {path}") 
+            raise FileNotFoundError(f"Path does not exist: {path}")
+    
+    pts = loadPointsFiles(pointsPaths)
+        
 
 
 if __name__ == "__main__":
