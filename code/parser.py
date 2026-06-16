@@ -51,8 +51,12 @@ class Parser:
                 # errors="coerce": replacing invalid value with NaN, not raising an exception
                 # "Int64": converting NaN to Pandas' nullable integer (pd.NA)
 #         print(df.head())
-        self.points = df[df["Pts"].isin(GAME_STATES)]
-        print(self.points.head())
+        df = df[df["Pts"].isin(GAME_STATES)]
+        df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
+            # Sort rows by "match_id" and then "Pt".
+        self.points = df
+#         print(self.points.head())
+        print(len(self.points), "points loaded")
         
     def loadMatches(self) -> None:
         self.matches = pd.read_csv(self.matchesPath, dtype=str)
@@ -68,4 +72,5 @@ if __name__ == "__main__":
                      "Alexander Zverev", "Andrey Rublev", "Casper Ruud",
                      "Hubert Hurkacz", "Rafael Nadal"]
 
-    parser = Parser("w", playersW) 
+    parser = Parser("w", playersW)
+
