@@ -57,17 +57,16 @@ def computeV(df: pd.DataFrame):
     stats = grouped.agg(["count", "sum"])
     
     stats["game win probability"] = stats["sum"] / stats["count"]
-    stats = stats.reindex(GAME_STATES)
+    vDf = stats.reindex(GAME_STATES)
     
-    Vdict = stats["game win probability"].to_dict()
-    return Vdict, df, stats
+    vDict = stats["game win probability"].to_dict()
+    return vDict, vDf, df
 
 
 if __name__ == "__main__":
     points = Parser("w", playersW).points
-    Vdict, df, stats = computeV(points)
-    print(Vdict)
-    print(df)
-    print(stats)
+    vDict, vDf, pts = computeV(points)
+    vDfSorted = vDf.sort_values(["game win probability"])
+    print(vDfSorted)
 
 
