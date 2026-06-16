@@ -4,6 +4,17 @@ PRJ_DIR = Path(__file__).parent
 MCP_DIR     = PRJ_DIR / "data" / "tennis_MatchChartingProject"
 OUTPUT_DIR  = PRJ_DIR / "output"
 
+playersW = ["Iga Swiatek", "Aryna Sabalenka", "Coco Gauff",
+                 "Elena Rybakina", "Jessica Pegula", "Mirra Andreeva",
+                 "Ons Jabeur", "Maria Sakkari", "Karolina Pliskova"]
+playersM = ["Novak Djokovic", "Carlos Alcaraz", "Jannik Sinner",
+                 "Daniil Medvedev", "Stefanos Tsitsipas",
+                 "Alexander Zverev", "Andrey Rublev", "Casper Ruud",
+                 "Hubert Hurkacz", "Rafael Nadal"]
+
+
+
+
 # 18 non-terminal game states (server's point first)
 GAME_STATES = [
     "0-0",  "0-15",  "0-30",  "0-40",

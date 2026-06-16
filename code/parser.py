@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-from constants import GAME_STATES, MCP_DIR
+from constants import GAME_STATES, MCP_DIR, playersW, playersM
 
 class Parser:
     def __init__(self,
@@ -53,7 +53,8 @@ class Parser:
 #         print(df.head())
         df = df[df["Pts"].isin(GAME_STATES)]
         df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
-            # Sort rows by "match_id" and then "Pt".
+            # Sort rows by "match_id" and then "Pt"
+            # drop=True: Discard old index numbers
         self.points = df
 #         print(self.points.head())
         print(len(self.points), "points loaded")
@@ -64,13 +65,5 @@ class Parser:
 
 
 if __name__ == "__main__":
-    playersW = ["Iga Swiatek", "Aryna Sabalenka", "Coco Gauff",
-                     "Elena Rybakina", "Jessica Pegula", "Mirra Andreeva",
-                     "Ons Jabeur", "Maria Sakkari", "Karolina Pliskova"]
-    playersM = ["Novak Djokovic", "Carlos Alcaraz", "Jannik Sinner",
-                     "Daniil Medvedev", "Stefanos Tsitsipas",
-                     "Alexander Zverev", "Andrey Rublev", "Casper Ruud",
-                     "Hubert Hurkacz", "Rafael Nadal"]
-
-    parser = Parser("w", playersW)
+    Parser("w", playersW)
 
