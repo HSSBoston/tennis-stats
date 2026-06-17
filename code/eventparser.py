@@ -86,7 +86,7 @@ def classifyEvent(first: str, second: str):
     if first in ("", "S", "R", "P", "Q"):
         return None
 
-    first = stripLetServes(first)
+    first  = stripLetServes(first)
     second = stripLetServes(second)
     
     if first == "":
@@ -96,36 +96,36 @@ def classifyEvent(first: str, second: str):
     if second:
         if isServeFault(second):
             return ("double_fault", "server")
-        rally = second
+        shotSequence = second
     # If the second serve is not recorded (if the first serve is not a fault)
     else:
-        rally = first
+        shotSequence = first
     
-    # In face the first serve is a fault but these cond serve is not recoeded
-    if isServeFault(rally):
+    # In cace the first serve is a fault but second serve is not recoeded
+    if isServeFault(shotSequence):
         return None
     
-    # Remove the serve information from the beginning of rally, leaving only the
+    # Remove the serve information from the beginning of shotSequence, leaving only the
     # shots after the serve. Verify that the remaining code ends with a recognized
     # point-ending symbol.    
-    if rally == "" or rally[0] not in SERVE_DIRECTION:
+    if shotSequence == "" or shotSequence[0] not in SERVE_DIRECTION:
         return None
     i = 1    
-    while i < len(rally) and rally[i] in SERVE_MODIFIER:
-        i += 1
-    after_serve = rally[i:]
-    if not after_serve:
+    if shotSequence[1] in SERVE_MODIFIER:
+        i = 2
+    afterServe = shotSequence[i:]
+    if afterServe == "":
         return None
 
-    last = after_serve[-1]
+    last = afterServe[-1]
     if last not in ENDING_LETTERS:
         return None
 
-    num_rally_shots = sum(1 for c in after_serve if c in SHOT_LETTERS)
-    total_shots = 1 + num_rally_shots                  # serve: rally shots
+    rallyShotCount = sum(1 for c in afterServe if c in SHOT_LETTERS)
+    total_shots = 1 + rallyShotCount                  # serve: rally shots
     last_by_server = (total_shots % 2 == 1)            # odd: server hit it
 
-    if num_rally_shots == 0:
+    if rallyShotCount == 0:
         # Pure serve outcome: ace (`*`) or unreturnable serve winner (`#`)
         if last in ("*", "#"):
             return ("ace_or_winner", "server")
@@ -136,13 +136,13 @@ def classifyEvent(first: str, second: str):
 
     if last == "@":
         # Unforced error — credited (negatively) to the player who hit it
-        if num_rally_shots == 1:
+        if rallyShotCount == 1:
             return ("return_error", "returner")
         return ("unforced_error", "server" if last_by_server else "returner")
 
     if last == "#":
         # Forced error — credited (positively) to the *opponent* who drew it
-        if num_rally_shots == 1:
+        if rallyShotCount == 1:
             return ("return_error", "returner")
         return ("forced_error", "returner" if last_by_server else "server")
 
