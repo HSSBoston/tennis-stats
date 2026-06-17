@@ -122,8 +122,8 @@ def classifyEvent(first: str, second: str):
         return None
 
     rallyShotCount = sum(1 for c in afterServe if c in SHOT_LETTERS)
-    total_shots = 1 + rallyShotCount                  # serve: rally shots
-    last_by_server = (total_shots % 2 == 1)            # odd: server hit it
+    totalShotCount= 1 + rallyShotCount           # serve + rally shots
+    last_by_server = (totalShotCount % 2 == 1)   # odd: server hit the last shot
 
     if rallyShotCount == 0:
         # Pure serve outcome: ace (`*`) or unreturnable serve winner (`#`)
