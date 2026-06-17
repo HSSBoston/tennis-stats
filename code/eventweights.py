@@ -3,7 +3,7 @@ from eventparser import classifyEvent
 
 # Adds an event label and calculates the change in game-win probability, delta V, 
 # caused by each point.
-#   df: Point-by-point dataset. Must be created by computeV().
+#   df: Point-by-point dataset that has been created by winprob.computeV().
 #   vDict: Maps each game state to the server's game-win probability.
 #   
 def computeDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
@@ -60,10 +60,10 @@ def computeDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
 
     return df
 
-#
+# Compute the average delta V for each event type. 
+#   df: Point-by-point dataset that has been created by computeDeltaV().
 #
 def computeW(df: pd.DataFrame) -> pd.DataFrame:
-    """Average ΔV (and count) per event type."""
     valid = df.dropna(subset=["event", "delta_V"])
     w = valid.groupby("event")["delta_V"].agg(["mean", "count"])
     w = w.rename(columns={"mean": "w", "count": "N"}).reindex(EVENT_TYPES)
