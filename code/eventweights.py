@@ -74,6 +74,7 @@ def computeW(df: pd.DataFrame) -> pd.DataFrame:
     #   ace_or_winner   0.18   250
     #   double_fault    -0.16  140
     eventWeights = valid.groupby("event")["delta_V"].agg(["mean", "count"])
+    
     eventWeights = eventWeights.rename(
         columns={"mean": "w", "count": "N"}
     ).reindex(EVENT_TYPES)
