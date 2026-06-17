@@ -92,5 +92,8 @@ if __name__ == "__main__":
     vDfSorted = vDf.sort_values(["game win prob"])
     print(vDfSorted)
     
-    print( computeW( computeDeltaV(pts, vDict) ) )
-
+    weights = computeW( computeDeltaV(pts, vDict) )
+    print(weights)
+    
+    wDict = weights["w"].to_dict()
+    print( wDict )
