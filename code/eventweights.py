@@ -1,5 +1,5 @@
 import pandas as pd
-from eventparser import classifyEvent
+from eventparser import classifyEvent, EVENT_TYPES
 
 # Adds an event label and calculates the change in game-win probability, delta V, 
 # caused by each point.
@@ -60,14 +60,24 @@ def computeDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
 
     return df
 
-# Compute the average delta V for each event type. 
+# Compute the average delta_V for each event type. That average becomes the event's weight w. 
 #   df: Point-by-point dataset that has been created by computeDeltaV().
 #
 def computeW(df: pd.DataFrame) -> pd.DataFrame:
+    # Removes rows that have None/NaN in either/both of the "event" and "delta_V" columns
     valid = df.dropna(subset=["event", "delta_V"])
-    w = valid.groupby("event")["delta_V"].agg(["mean", "count"])
-    w = w.rename(columns={"mean": "w", "count": "N"}).reindex(EVENT_TYPES)
-    return w
+    
+    # Groups rows according to their event types, selects delta_V values from each group,
+    # and then calculate the average delta_V and the number of delta_V observations.
+    # Output df:
+    #   event           mean   count
+    #   ace_or_winner   0.18   250
+    #   double_fault    -0.16  140
+    eventWeights = valid.groupby("event")["delta_V"].agg(["mean", "count"])
+    eventWeights = eventWeights.rename(
+        columns={"mean": "w", "count": "N"}
+    ).reindex(EVENT_TYPES)
+    return eventWeights
 
 
 
@@ -78,8 +88,8 @@ if __name__ == "__main__":
 
     points = Parser("w", playersW).points
     vDict, vDf, pts = computeV(points)
-    vDfSorted = vDf.sort_values(["game win probability"])
+    vDfSorted = vDf.sort_values(["game win prob"])
     print(vDfSorted)
     
-    pts = computeDeltaV(pts, vDict)
+    print( computeW( computeDeltaV(pts, vDict) ) )
 
