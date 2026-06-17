@@ -111,7 +111,7 @@ def classifyEvent(first: str, second: str):
     if shotSequence == "" or shotSequence[0] not in SERVE_DIRECTION:
         return None
     i = 1    
-    if shotSequence[1] in SERVE_MODIFIER:
+    if len(shotSequence) > 1 and shotSequence[1] in SERVE_MODIFIER:
         i = 2
     afterServe = shotSequence[i:]
     if afterServe == "":

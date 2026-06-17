@@ -47,13 +47,17 @@ def CalculateDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
         "server_won_game"].astype(float)
 
     events = [classifyEvent(first, second) for first, second in zip(df["1st"].tolist(),
-                                                                     df["2nd"].tolist())]
-    df["event"] = [e[0] if e else None for e in events]
+                                                                    df["2nd"].tolist())]
+    df["event"]       = [e[0] if e else None for e in events]
     df["perspective"] = [e[1] if e else None for e in events]
+    
+    serverDeltaV = df["V_after"] - df["V_before"]
+    multiplier = df["perspective"].map({
+        "server":    1.0,
+        "returner": -1.0,
+    })
+    df["delta_V"] = multiplier * serverDeltaV
 
-    sign = np.where(df["perspective"] == "server", 1.0,
-            np.where(df["perspective"] == "returner", -1.0, np.nan))
-    df["delta_V"] = sign * (df["V_after"] - df["V_before"])
     return df
 
 if __name__ == "__main__":
@@ -66,5 +70,5 @@ if __name__ == "__main__":
     vDfSorted = vDf.sort_values(["game win probability"])
     print(vDfSorted)
     
-#     pts = CalculateDeltaV(pts, vDict)
+    pts = CalculateDeltaV(pts, vDict)
 
