@@ -78,8 +78,10 @@ def computeW(df: pd.DataFrame) -> pd.DataFrame:
     eventWeights = eventWeights.rename(
         columns={"mean": "w", "count": "N"}
     ).reindex(EVENT_TYPES)
-    return eventWeights
-
+    
+    wDict = eventWeights["w"].to_dict()
+    
+    return wDict, eventWeights
 
 
 if __name__ == "__main__":
@@ -92,8 +94,6 @@ if __name__ == "__main__":
     vDfSorted = vDf.sort_values(["game win prob"])
     print(vDfSorted)
     
-    weights = computeW( computeDeltaV(pts, vDict) )
-    print(weights)
-    
-    wDict = weights["w"].to_dict()
+    wDict, wDf = computeW( computeDeltaV(pts, vDict) )
+    print(wDf)
     print( wDict )

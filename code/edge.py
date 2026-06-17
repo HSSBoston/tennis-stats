@@ -3,48 +3,60 @@
 import pandas as pd
 
 # Compute the EDGE value for a given player
-#   playerName: e.g., "Aryna Sabalenka"
-#   df: Point-by-point data frame that has been created by eventweights.computeW()
-#   matches: Data frame of matches. c.f. dataloader.MCPDataLoader.matches
-#   wDict: Maps each event type to weight
+#   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
+#   df: Point-level data that has been created by eventweights.computeDeltaV()
+#   matches: Match-level data. c.f. dataloader.MCPDataLoader.matches
+#   wDict: Maps each event type to its weight
 #
 def computeEdge(
-    playerNname: str,
+    playerName: str,
     df: pd.DataFrame,
     matches: pd.DataFrame,
-    wDict: dict)
--> Optional[dict]:
-
-    in_matches = matches[
-        (matches["Player 1"] == player_name) |
-        (matches["Player 2"] == player_name)
+    wDict: dict
+) -> dict | None:
+    # Extract rows where the Player 1 or Player 2 column equals playerName
+    # Output with playerName = "Aryna Sabalenka":
+    # match_id                                 Player 1          Player 2
+    # 2026...-Aryna_Sabalenka-Victoria_Mboko   Aryna Sabalenka   Victoria Mboko
+    # 2026...-Iga_Swiatek-Aryna_Sabalenka      Iga Swiatek       Aryna Sabalenka
+    playerMatches= matches.loc[
+        (matches["Player 1"] == playerName) | (matches["Player 2"] == playerName)
     ]
-    if in_matches.empty:
+    if playerMatches.empty:
         return None
 
-    p1_map = dict(zip(in_matches["match_id"], in_matches["Player 1"]))
-    pnum = {mid: (1 if p1_map[mid] == player_name else 2)
-            for mid in in_matches["match_id"]}
+    # Output with playerName = "Aryna Sabalenka": 
+    # { 2026...-Aryna_Sabalenka-Victoria_Mboko, 1,
+    #   2026...-Iga_Swiatek-Aryna_Sabalenka,    2 }
+    matchIdToPlayerNumber = {
+        row["match_id"]: 1 if row["Player 1"] == playerName else 2
+            for _, row in playerMatches.iterrows()
+    }
 
-    sub = df[df["match_id"].isin(pnum)].copy()
-    if sub.empty:
+    df = df.loc[
+        df["match_id"].isin(matchIdToPlayerNumber.keys())
+    ]
+    if df.empty:
         return None
-    sub["player_num"] = sub["match_id"].map(pnum).astype("Int64")
-    sub["is_server"] = sub["player_num"] == sub["Svr"]
+    
+    df["player_num"] = df["match_id"].map(matchIdToPlayerNumber).astype("Int64")
+    df["is_server"] = (df["player_num"] == df["Svr"])
 
-    valid = sub.dropna(subset=["event", "perspective"])
-    owned = (
-        ((valid["perspective"] == "server")   &  valid["is_server"]) |
-        ((valid["perspective"] == "returner") & ~valid["is_server"])
-    )
-    player_pts = valid[owned]
-    N = len(player_pts)
+    df = df.dropna(subset=["event", "perspective"])
+
+    playerPts = df.loc[
+        ( (df["perspective"] == "server")   &  df["is_server"]) |
+        ( (df["perspective"] == "returner") & ~df["is_server"])
+    ]
+    N = len(playerPts)
     if N == 0:
         return None
-    counts = player_pts["event"].value_counts().to_dict()
-    X = sum(w_dict.get(e, 0.0) * c for e, c in counts.items()) / N
-    return {"player": player_name, "X": X, "N": N, "counts": counts,
-            "matches": int(in_matches.shape[0])}
+    
+    counts = playerPts["event"].value_counts().to_dict()
+    X = sum(wDict.get(e, 0.0) * c for e, c in counts.items()) / N
+    
+    return {"player": playerName, "X": X, "N": N, "counts": counts,
+            "matches": int(playerMatches.shape[0])}
 
 
 
@@ -58,14 +70,15 @@ if __name__ == "__main__":
     points  = dl.points
     matches = dl.matches
     
-    vDict, vDf, pts = computeV(points)
+    vDict, vDf, pointsV = computeV(points)
     vDfSorted = vDf.sort_values(["game win prob"])
     print(vDfSorted)
     
-    weights = computeW( computeDeltaV(pts, vDict) )
-    print(weights)
-    
-    wDict = weights["w"].to_dict()
+    pointsDeltaV = computeDeltaV(pointsV, vDict)
+    wDict, wDf = computeW(pointsDeltaV)
+    print(wDf)
 #     print( wDict )
 
-    res = computeEdge(name, pts, matches, w_dict)
+    playerEdge = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
+    print(playerEdge)
+    
