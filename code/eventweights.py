@@ -6,7 +6,7 @@ from eventparser import classifyEvent
 #   df: Point-by-point dataset. Must be created by computeV().
 #   vDict: Maps each game state to the server's game-win probability.
 #   
-def CalculateDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
+def computeDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
     df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
         # Sort rows by "match_id" and then "Pt"
         # drop=True: Discard old index numbers
@@ -60,6 +60,17 @@ def CalculateDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
 
     return df
 
+#
+#
+def computeW(df: pd.DataFrame) -> pd.DataFrame:
+    """Average ΔV (and count) per event type."""
+    valid = df.dropna(subset=["event", "delta_V"])
+    w = valid.groupby("event")["delta_V"].agg(["mean", "count"])
+    w = w.rename(columns={"mean": "w", "count": "N"}).reindex(EVENT_TYPES)
+    return w
+
+
+
 if __name__ == "__main__":
     from constants import playersW, playersM
     from parser import Parser
@@ -70,5 +81,5 @@ if __name__ == "__main__":
     vDfSorted = vDf.sort_values(["game win probability"])
     print(vDfSorted)
     
-    pts = CalculateDeltaV(pts, vDict)
+    pts = computeDeltaV(pts, vDict)
 
