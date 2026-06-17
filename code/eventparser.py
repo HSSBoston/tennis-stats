@@ -125,23 +125,28 @@ def classifyEvent(first: str, second: str):
     totalShotCount= 1 + rallyShotCount           # serve + rally shots
     last_by_server = (totalShotCount % 2 == 1)   # odd: server hit the last shot
 
+    # Service ace (*) or unreturnable winner (#)
     if rallyShotCount == 0:
-        # Pure serve outcome: ace (`*`) or unreturnable serve winner (`#`)
         if last in ("*", "#"):
             return ("ace_or_winner", "server")
         return None
-
+    # Winner
     if last == "*":
-        return ("winner", "server" if last_by_server else "returner")
-
+        if last_by_server:
+            return ("winner", "server")
+        else:
+            return ("winner", "returner")
+    # Unforced error — credited (negatively) to the player who hit it
     if last == "@":
-        # Unforced error — credited (negatively) to the player who hit it
         if rallyShotCount == 1:
             return ("return_error", "returner")
-        return ("unforced_error", "server" if last_by_server else "returner")
-
+        else:
+            if last_by_server:
+                return ("unforced_error", "server")
+            else:
+                return ("unforced_error", "returner")
+    # Forced error — credited (positively) to the opponent who drew it
     if last == "#":
-        # Forced error — credited (positively) to the *opponent* who drew it
         if rallyShotCount == 1:
             return ("return_error", "returner")
         return ("forced_error", "returner" if last_by_server else "server")
