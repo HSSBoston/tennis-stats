@@ -51,12 +51,13 @@ UNUSUAL_SITUATIONS = set("SRPQ")
 ENDING_LETTERS = set("*@#")
 
 EVENT_TYPES = [
-    "ace_or_winner",      # service ace or winner — server perspective
-    "double_fault",       #                       — server perspective
-    "return_error",       # unforced error on return shot — returner perspective
-    "winner",             # rally winner (incl. return winner) — hitter perspective
-    "forced_error_drawn", # forced error drawn — drawer (winner) perspective
-    "unforced_error",     # unforced error during rally — errorer perspective
+    "ace_or_winner",         # service ace or winner — server perspective
+    "double_fault",          #                       — server perspective
+    "forced_return_error_drawn", # forced return error drawn - server perspective
+    "unforced_return_error", #                               — returner perspective
+    "winner",                # rally winner (incl. return winner) — hitter perspective
+    "forced_error_drawn",    # forced error drawn          — drawer (winner) perspective
+    "unforced_error",        # unforced error during rally — errorer perspective
 ]
 
 # Strip the "c" letters that indicate let serves. 
@@ -139,7 +140,7 @@ def classifyEvent(first: str, second: str):
     # Unforced error — credited (negatively) to the player who hit it
     if last == "@":
         if rallyShotCount == 1:
-            return ("return_error", "returner")
+            return ("unforced_return_error", "returner")
         else:
             if lastShotByServer:
                 return ("unforced_error", "server")
@@ -147,33 +148,47 @@ def classifyEvent(first: str, second: str):
                 return ("unforced_error", "returner")
     # Forced error — credited (positively) to the opponent who drew it
     if last == "#":
-        if lastShotByServer:
-            return ("forced_error_drawn", "returner")
+        if rallyShotCount == 1:
+            return ("forced_return_error_drawn", "server")
         else:
-            return ("forced_error_drawn", "server")
-#         if rallyShotCount == 1:
-#             return ("return_error", "returner")
-#         return ("forced_error", "returner" if lastShotByServer else "server")
+            if lastShotByServer:
+                return ("forced_error_drawn", "returner")
+            else:
+                return ("forced_error_drawn", "server")
 
     return None
 
 
 if __name__ == "__main__":
-    FirstSecond = [
-        [["6*", None],              ("ace_or_winner","server")],
-        [["4#", None],              ("ace_or_winner","server")],
-        [["4w", "6d"],              ("double_fault", "server")],
-        [["6d", "6b27b3b3b3b3b3x@"],("unforced_error", "server")],
-        [["4b37y1r3n#", None],      ("forced_error_drawn", "server")],
-        [["4+f28b3@", None],        ("unforced_error", "server")],
-        [["4n", "4b38y1*"],         ("winner", "server")]
-    ]
-
-    for fs in FirstSecond:
-        event = classifyEvent(*fs[0])
-        print( "PASS" if (event == fs[1]) else "FAILED", event)
-
-
+    # ace on first serve
+    assert classifyEvent("6*", None) == ("ace_or_winner","server")
+    # unreturnable winner on first serve
+    assert classifyEvent("4#", None) == ("ace_or_winner","server")
     
+    # ace on second serve
+    assert classifyEvent("4w", "5*") == ("ace_or_winner", "server")
+    # unreturnable winner on second serve
+    assert classifyEvent("6d", "6#") == ("ace_or_winner", "server")
+    
+    # double fault
+    assert classifyEvent("4w", "6d")  == ("double_fault", "server")
+    assert classifyEvent("4n", "5n") == ("double_fault", "server")
 
+    # Forced error on return
+    assert classifyEvent("6b2n#", "") == ("forced_return_error_drawn", "server")
+    assert classifyEvent("6f#", "")  == ("forced_return_error_drawn", "server")
+
+    # Unforced error on return
+    assert classifyEvent("4f3d@", "")  == ("unforced_return_error", "returner")
+    assert classifyEvent("6w", "4b2n@") == ("unforced_return_error", "returner")
+    
+    # rally
+    assert classifyEvent("6d", "6b27b3b3b3b3b3x@") == ("unforced_error", "server")
+    assert classifyEvent("4b37y1r3n#", None) == ("forced_error_drawn", "server")
+    assert classifyEvent("4+f28b3@", None)   == ("unforced_error", "server")
+    assert classifyEvent("4n", "4b38y1*")    == ("winner", "server")
+    assert classifyEvent("4f37f3*", "")      == ("winner", "server")
+    assert classifyEvent("4f37b1f3*", "")    == ("winner", "returner")
+    assert classifyEvent("4f37b1f3n@", "")   == ("unforced_error", "returner")
+    assert classifyEvent("4f37b1f3n#", "")   == ("forced_error_drawn", "server")
 
