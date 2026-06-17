@@ -2,12 +2,17 @@
 
 import pandas as pd
 
-
+# Compute the EDGE value for a given player
+#   playerName: e.g., "Aryna Sabalenka"
+#   df: Point-by-point data frame that has been created by eventweights.computeW()
+#   matches: Data frame of matches. c.f. dataloader.MCPDataLoader.matches
+#   wDict: Maps each event type to weight
+#
 def computeEdge(
     playerNname: str,
     df: pd.DataFrame,
     matches: pd.DataFrame,
-    w_dict: dict)
+    wDict: dict)
 -> Optional[dict]:
 
     in_matches = matches[
