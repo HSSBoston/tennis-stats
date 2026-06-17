@@ -45,7 +45,7 @@ def computeEdge(
 
 if __name__ == "__main__":
     from constants import playersW, playersM
-    from parser import MCPDataLoader
+    from dataloader import MCPDataLoader
     from winprob import computeV
     from eventweights import computeDeltaV, computeW
 
