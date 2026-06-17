@@ -21,8 +21,18 @@ import pandas as pd
 #   t = all trick shots, including behind-the-back, between-the-legs, and "tweeners."
 #
 #   NOT SUPPORTED: q = any unknown shot
-
 SHOT_LETTERS = set("fbrsvzopuylmhijkt")
+
+# 4 = out wide
+# 5 = body
+# 6 = down the T
+# 0 = unknown
+SERVE_DIRECTION = set("4560")
+
+# +: Serve-and-volley attempts
+# =: Took place at the net
+# -: Took place at the baseline
+SERVE_MODIFIER = set("+=-")
 
 # Serve-fault letters
 #   n = net (anything that goes into the net, including net cords that are not lets)
@@ -32,8 +42,7 @@ SHOT_LETTERS = set("fbrsvzopuylmhijkt")
 #   e = unknown type of fault
 #
 #   NOT SUPPORTED: g = foot faults
-
-SERVE_FAULT_CHARS = set("nwdxe")
+SERVE_FAULT_LETTERS = set("nwdxe")
 
 # *: ace, winner
 # @: unforced error
@@ -62,48 +71,47 @@ def isServeFault(code: str) -> bool:
         return False
     if any(c in SHOT_LETTERS for c in code):
         return False
-    return code[-1] in SERVE_FAULT_CHARS
+    return code[-1] in SERVE_FAULT_LETTERS
 
+def normalizeCode(code) -> str:
+    if pd.isna(code):
+        return ""
+    return str(code).strip()
 
 def classifyEvent(first: str, second: str):
-#     if first is None or (isinstance(first, float) and first != first):
-#         first = ""
-#     if second is None or (isinstance(second, float) and second != second):
-#         second = ""
-#     first = str(first).strip()
-#     second = str(second).strip()
-    if first is None or pd.isna(first):
-        first = ""
-    else:
-        first = str(first).strip()
-    if second is None or pd.isna(second):
-        second = ""
-    else:
-        second = str(second).strip()
+    first  = normalizeCode(first)
+    second = normalizeCode(second)
     
     # Exclude "unusual situation" 
     if first in ("", "S", "R", "P", "Q"):
         return None
 
-    f_clean = stripLetServes(first)
-    s_clean = stripLetServes(second)
+    first = stripLetServes(first)
+    second = stripLetServes(second)
     
-    # If the first serve is fault
-    if s_clean:
-        if isServeFault(s_clean):
-            return ("double_fault", "server")
-        rally = s_clean
-    # if the first serve is not fault
-    else:
-        rally = f_clean
-
-    if isServeFault(rally):
+    if first == "":
         return None
 
-    i = 0
-    while i < len(rally) and rally[i].isdigit():
-        i += 1
-    while i < len(rally) and rally[i] in "+=-":
+    # If the second serve is recorded (if the first serve is a fault)
+    if second:
+        if isServeFault(second):
+            return ("double_fault", "server")
+        rally = second
+    # If the second serve is not recorded (if the first serve is not a fault)
+    else:
+        rally = first
+    
+    # In face the first serve is a fault but these cond serve is not recoeded
+    if isServeFault(rally):
+        return None
+    
+    # Remove the serve information from the beginning of rally, leaving only the
+    # shots after the serve. Verify that the remaining code ends with a recognized
+    # point-ending symbol.    
+    if rally == "" or rally[0] not in SERVE_DIRECTION:
+        return None
+    i = 1    
+    while i < len(rally) and rally[i] in SERVE_MODIFIER:
         i += 1
     after_serve = rally[i:]
     if not after_serve:
@@ -143,7 +151,10 @@ def classifyEvent(first: str, second: str):
 
 if __name__ == "__main__":
     FirstSecond = [
-        ["4b37y1r3n#", None]
+        ["4w", "6d"],
+        ["6d", "6b27b3b3b3b3b3x@"], 
+        ["4b37y1r3n#", None],
+        ["4+f28b3@", None]
     ]
 
     for fsPair in FirstSecond:
