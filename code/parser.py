@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 from constants import GAME_STATES, MCP_DIR, playersW, playersM
 
-class Parser:
+class MCPDataLoader:
     def __init__(self,
         tour: str = "w",
         players: list[str] | None = None,
@@ -65,5 +65,5 @@ class Parser:
 
 
 if __name__ == "__main__":
-    Parser("w", playersW)
+    MCPDataLoader("w", playersW)
 

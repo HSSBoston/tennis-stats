@@ -63,9 +63,9 @@ def computeV(df: pd.DataFrame):
 
 if __name__ == "__main__":
     from constants import playersW, playersM
-    from parser import Parser
+    from parser import MCPDataLoader
     
-    points = Parser("w", playersW).points
+    points = MCPDataLoader("w", playersW).points
     vDict, vDf, pts = computeV(points)
     vDfSorted = vDf.sort_values(["game win prob"])
     print(vDfSorted)
