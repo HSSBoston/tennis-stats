@@ -1,32 +1,9 @@
 import pandas as pd
 
-# Shot letters
-#   f = forehand groundstroke (excluding slices, chips, etc.)
-#   b = backhand groundstroke (excluding slices, chips, etc.)
-#   r = forehand slice (including defensive chips, but not drop shots)
-#   s = backhand slice (including defensive chips, but not drop shots)
-#   v = forehand volley
-#   z = backhand volley
-#   o = standard overhead/smash
-#   p = "backhand" overhead/smash
-#   u = forehand drop shot
-#   y = backhand drop shot
-#   l = forehand lob
-#   m = backhand lob
-#   h = forehand half-volley
-#   i = backhand half-volley
-
-#   j = forehand swinging volley
-#   k = backhand swinging volley
-#   t = all trick shots, including behind-the-back, between-the-legs, and "tweeners."
-#
-#   NOT SUPPORTED: q = any unknown shot
-SHOT_LETTERS = set("fbrsvzopuylmhijkt")
-
-# 4 = out wide
-# 5 = body
-# 6 = down the T
-# 0 = unknown
+# 4: out wide
+# 5: body
+# 6: down the T
+# 0: unknown
 SERVE_DIRECTION = set("4560")
 
 # +: Serve-and-volley attempts
@@ -34,38 +11,62 @@ SERVE_DIRECTION = set("4560")
 # -: Took place at the baseline
 SERVE_MODIFIER = set("+=-")
 
-# Serve-fault letters
-#   n = net (anything that goes into the net, including net cords that are not lets)
-#   w = wide (in either direction)
-#   d = deep
-#   x = both wide and deep
-#   e = unknown type of fault
-#
-#   NOT SUPPORTED: g = foot faults
-SERVE_FAULT_LETTERS = set("nwdxe")
+# n: net (anything that goes into the net, including net cords that are not lets)
+# w: wide (in either direction)
+# d: deep
+# x: both wide and deep
+# e: unknown type of fault
+# g: foot faults
+SERVE_FAULT_LETTERS = set("nwdxeg")
 
+# f: forehand groundstroke (excluding slices, chips, etc.)
+# b: backhand groundstroke (excluding slices, chips, etc.)
+# r: forehand slice (including defensive chips, but not drop shots)
+# s: backhand slice (including defensive chips, but not drop shots)
+# v: forehand volley
+# z: backhand volley
+# o: standard overhead/smash
+# p: "backhand" overhead/smash
+# u: forehand drop shot
+# y: backhand drop shot
+# l: forehand lob
+# m: backhand lob
+# h: forehand half-volley
+# i: backhand half-volley
+# j: forehand swinging volley
+# k: backhand swinging volley
+# t: all trick shots, including behind-the-back, between-the-legs, and "tweeners."
+# q: any unknown shot
+SHOT_LETTERS = set("fbrsvzopuylmhijktq")
+
+# S: Point to the server   (in 1st serve cell)
+# R: Point to the returner (in 1st serve cell)
+# P: Point penalty against the server   (in 1st serve cell)
+# Q: Point penalty against the returner (in 1st serve cell)
+UNUSUAL_SITUATIONS = set("SRPQ")
+    
 # *: ace, winner
 # @: unforced error
 # #: forced error
 ENDING_LETTERS = set("*@#")
 
 EVENT_TYPES = [
-    "ace_or_winner",   # ace or service winner — server perspective
-    "double_fault",    # both serves faulted — server perspective
-    "return_error",    # error on the return shot only — returner perspective
-    "winner",          # rally winner (incl. return winner) — hitter perspective
-    "forced_error",    # forced error drawn — drawer (winner) perspective
-    "unforced_error",  # unforced error during rally — errorer perspective
+    "ace_or_winner",      # service ace or winner — server perspective
+    "double_fault",       #                       — server perspective
+    "return_error",       # unforced error on return shot — returner perspective
+    "winner",             # rally winner (incl. return winner) — hitter perspective
+    "forced_error_drawn", # forced error drawn — drawer (winner) perspective
+    "unforced_error",     # unforced error during rally — errorer perspective
 ]
 
 # Strip the "c" letters that indicate let serves. 
 # 
-def stripLetServes(s: str) -> str:
-    return s.lstrip("c")
+def stripLetServes(code: str) -> str:
+    return code.lstrip("c")
 
 # Returns True if the serve is a fault, False otherwise
 #
-def isServeFault(code: str) -> bool:
+def isServeFault(code) -> bool:
     code = stripLetServes(code)
     if code == "":
         return False
@@ -74,6 +75,7 @@ def isServeFault(code: str) -> bool:
     return code[-1] in SERVE_FAULT_LETTERS
 
 def normalizeCode(code) -> str:
+    # if code == None or numpy.NaN 
     if pd.isna(code):
         return ""
     return str(code).strip()
@@ -82,13 +84,11 @@ def classifyEvent(first: str, second: str):
     first  = normalizeCode(first)
     second = normalizeCode(second)
     
-    # Exclude "unusual situation" 
-    if first in ("", "S", "R", "P", "Q"):
+    if first == "" or first in UNUSUAL_SITUATIONS:
         return None
 
     first  = stripLetServes(first)
     second = stripLetServes(second)
-    
     if first == "":
         return None
 
@@ -122,8 +122,8 @@ def classifyEvent(first: str, second: str):
         return None
 
     rallyShotCount = sum(1 for c in afterServe if c in SHOT_LETTERS)
-    totalShotCount= 1 + rallyShotCount           # serve + rally shots
-    lastShotByServer = (totalShotCount % 2 == 1)   # odd: server hit the last shot
+    totalShotCount= 1 + rallyShotCount            # serve + rally shots
+    lastShotByServer = (totalShotCount % 2 == 1)  # odd: server hit the last shot
 
     # Service ace (*) or unreturnable winner (#)
     if rallyShotCount == 0:
@@ -147,23 +147,31 @@ def classifyEvent(first: str, second: str):
                 return ("unforced_error", "returner")
     # Forced error — credited (positively) to the opponent who drew it
     if last == "#":
-        if rallyShotCount == 1:
-            return ("return_error", "returner")
-        return ("forced_error", "returner" if lastShotByServer else "server")
+        if lastShotByServer:
+            return ("forced_error_drawn", "returner")
+        else:
+            return ("forced_error_drawn", "server")
+#         if rallyShotCount == 1:
+#             return ("return_error", "returner")
+#         return ("forced_error", "returner" if lastShotByServer else "server")
 
     return None
 
 
 if __name__ == "__main__":
     FirstSecond = [
-        ["4w", "6d"],
-        ["6d", "6b27b3b3b3b3b3x@"], 
-        ["4b37y1r3n#", None],
-        ["4+f28b3@", None]
+        [["6*", None],              ("ace_or_winner","server")],
+        [["4#", None],              ("ace_or_winner","server")],
+        [["4w", "6d"],              ("double_fault", "server")],
+        [["6d", "6b27b3b3b3b3b3x@"],("unforced_error", "server")],
+        [["4b37y1r3n#", None],      ("forced_error_drawn", "server")],
+        [["4+f28b3@", None],        ("unforced_error", "server")],
+        [["4n", "4b38y1*"],         ("winner", "server")]
     ]
 
-    for fsPair in FirstSecond:
-        print( classifyEvent(*fsPair) )
+    for fs in FirstSecond:
+        event = classifyEvent(*fs[0])
+        print( "PASS" if (event == fs[1]) else "FAILED", event)
 
 
     

@@ -1,7 +1,5 @@
 import pandas as pd
-
-
-
+from eventparser import classifyEvent
 
 # Adds an event label and calculates the change in game-win probability, delta V, 
 # caused by each point.
@@ -29,18 +27,27 @@ def CalculateDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
     #   3    30-0  40-0
     #   4    40-0  NaN
     df["next_state"] = df.groupby(["match_id", "Gm#"])["Pts"].shift(-1)
-    
+
+    # After:
+    #   Pt   Pts   next_state   V_before  V_after
+    #   1    0-0   15-0         0.66      0.79
+    #   2    15-0  30-0         ...       ...
+    #   3    30-0  40-0         ...       ...
+    #   4    40-0  NaN          ...       NaN
     df["V_before"] = df["Pts"].map(vDict)
     df["V_after"]  = df["next_state"].map(vDict)
     
     # For the last point of a game, next_state is missing (NaN), so V_after is also
     # missing (NaN). Put 1 to V_after if the server won the game, else 0. 
-    df.loc[df["next_state"].isna(),
-           "V_after"] = df.loc[df["next_state"].isna(),
-                               "server_won_game"].astype(float)
+    df.loc[
+        df["next_state"].isna(),
+        "V_after"
+    ] = df.loc[
+        df["next_state"].isna(),
+        "server_won_game"].astype(float)
 
-    events = [classify_event(f, s) for f, s in zip(df["1st"].tolist(),
-                                                   df["2nd"].tolist())]
+    events = [classifyEvent(first, second) for first, second in zip(df["1st"].tolist(),
+                                                                     df["2nd"].tolist())]
     df["event"] = [e[0] if e else None for e in events]
     df["perspective"] = [e[1] if e else None for e in events]
 
@@ -52,11 +59,12 @@ def CalculateDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
 if __name__ == "__main__":
     from constants import playersW, playersM
     from parser import Parser
+    from winprob import computeV
 
     points = Parser("w", playersW).points
     vDict, vDf, pts = computeV(points)
     vDfSorted = vDf.sort_values(["game win probability"])
     print(vDfSorted)
     
-    pts = CalculateDeltaV(pts, vDict)
+#     pts = CalculateDeltaV(pts, vDict)
 
