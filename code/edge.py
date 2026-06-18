@@ -53,7 +53,8 @@ def computeEdge(
     if totalPoints == 0:
         return None    
 
-    # Removes rows that have None/NaN in either/both of the "event" and "perspective" columns
+    # Removes rows that have None/NaN in at least one of the "svr", "event" and
+    # "perspective" columns
     df = df.dropna(subset=["Svr", "event", "perspective"])
     classifiedPoints = len(df)
     if classifiedPoints == 0:
@@ -89,28 +90,29 @@ def computeEdge(
         wDict[event] * count
         for event, count in eventCountsDict.items()
     )
-    edge      = edgeNumerator / totalPoints
-    edge2     = edgeNumerator / classifiedPoints
-    edge3     = edgeNumerator / attributedPoints
+    edgePerTotalPoint      = edgeNumerator / totalPoints
+    edgePerClassifiedPoint = edgeNumerator / classifiedPoints
+    edgePerAttributedPoint = edgeNumerator / attributedPoints
     coverage  = classifiedPoints / totalPoints
     eventRate = attributedPoints / totalPoints
     
-    return edge, {
-        "player": playerName,
-        "EDGE": edge,
-        "coverage": coverage,
-        "EDGE2": edge2,
-        "EDGE3": edge3,
+    return edgePerTotalPoint, {
+        "player":    playerName,
+        "EDGE":      edge,
+        "coverage":  coverage,
+        "EDGE2":     edgePerClassifiedPoint,
+        "EDGE3":     edgePerAttributedPoint,
         "eventRate": eventRate,
-        "points": totalPoints,
-        "matches": len(playerMatches),
-        "counts": eventCountsDict,
+        "points":    totalPoints,
+        "matches":   len(playerMatches),
+        "counts":    eventCountsDict,
     }
 
 if __name__ == "__main__":
     from dataloader import MCPDataLoader
     from winprob import computeV
     from eventweights import computeDeltaV, computeW
+    from pprint import pprint
 
     dl = MCPDataLoader("w")
     points  = dl.points
@@ -127,5 +129,5 @@ if __name__ == "__main__":
 
     edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
     print(edge)
-    print(summary)
+    pprint(summary)
     
