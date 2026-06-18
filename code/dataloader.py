@@ -1,16 +1,14 @@
 from pathlib import Path
 import pandas as pd
-from constants import GAME_STATES, MCP_DIR, playersW, playersM
+from constants import GAME_STATES, MCP_DIR
 
 class MCPDataLoader:
     def __init__(self,
         tour: str = "w",
-        players: list[str] | None = None,
         pointsFiles: list[str] | None = None
     ) -> None:
 
         self.tour: str = ""
-        self.players: list[str] = []
         self.pointsPaths: list[Path] = []
         self.matchesPath: Path
         self.points = pd.DataFrame()
@@ -26,12 +24,10 @@ class MCPDataLoader:
         matchesFile = f"charting-{tour}-matches.csv"
         
         self.tour = tour
-        self.players = players
 
         self.verifyPaths(pointsFiles, matchesFile)
         self.loadPoints()
         self.loadMatches()
-#         self.verifyPlayers()
 
     def verifyPaths(self, pointsFiles: list[str], matchesFile: str) -> None:
         self.pointsPaths = [MCP_DIR / f for f in pointsFiles]
@@ -65,5 +61,5 @@ class MCPDataLoader:
 
 
 if __name__ == "__main__":
-    MCPDataLoader("w", playersW)
+    MCPDataLoader("w")
 

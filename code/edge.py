@@ -13,7 +13,7 @@ def computeEdge(
     df: pd.DataFrame,
     matches: pd.DataFrame,
     wDict: dict
-) -> dict | None:
+) -> tuple[float, dict] | None:
     # Extract rows where the Player 1 or Player 2 column equals playerName
     # Output with playerName = "Aryna Sabalenka":
     # match_id                                 Player 1          Player 2
@@ -33,40 +33,86 @@ def computeEdge(
             for _, row in playerMatches.iterrows()
     }
 
+    # Extract point-level rows where playerName played 
     df = df.loc[
         df["match_id"].isin(matchIdToPlayerNumber.keys())
     ]
     if df.empty:
         return None
-    
+
+    # Add "player_num" and "is_server" columns to the point-level data frame
+    #   player_num (1 or 2) of playerName
+    #   is_server (1 or 0): whether playerName serves (1) or not (0)
+    # Output with playerName = "Aryna Sabalenka":
+    #   match_id                                 Gm#   Pt   Svr   player_num   is_server
+    #   2026...-Aryna_Sabalenka-Victoria_Mboko   1     1    1     1            1
+    #   2026...-Iga_Swiatek-Aryna_Sabalenka      1     1    1     2            0
     df["player_num"] = df["match_id"].map(matchIdToPlayerNumber).astype("Int64")
     df["is_server"] = (df["player_num"] == df["Svr"])
+    totalPoints = len(df)
+    if totalPoints == 0:
+        return None    
 
-    df = df.dropna(subset=["event", "perspective"])
-
+    # Removes rows that have None/NaN in either/both of the "event" and "perspective" columns
+    df = df.dropna(subset=["Svr", "event", "perspective"])
+    classifiedPoints = len(df)
+    if classifiedPoints == 0:
+        return None
+    
+    # Extract point-level rows where
+    #   (1) the event belongs to the server   and playerName serves, OR
+    #   (2) the event belongs to the returner and playerName returns
+    # These two cases (two types of points) are used to compute EDGE. In other words,
+    # other cases are ignored; e.g., the event belongs to the server (e.g. the oponent's ace)
+    # and playerName returns
     playerPts = df.loc[
         ( (df["perspective"] == "server")   &  df["is_server"]) |
         ( (df["perspective"] == "returner") & ~df["is_server"])
     ]
-    N = len(playerPts)
-    if N == 0:
+    attributedPoints = len(playerPts)
+    if attributedPoints == 0:
         return None
     
-    counts = playerPts["event"].value_counts().to_dict()
-    X = sum(wDict.get(e, 0.0) * c for e, c in counts.items()) / N
+    # Count each event type
+    # value_counts() produces a data frame like:
+    #   ace_or_winner  50
+    #   double_fault   10
+    #   unforced_error 20
+    eventCountsDict = playerPts["event"].value_counts().to_dict()
     
-    return {"player": playerName, "X": X, "N": N, "counts": counts,
-            "matches": int(playerMatches.shape[0])}
+    missingEvents = set(eventCountsDict) - set(wDict)
+    if missingEvents:
+        raise ValueError(f"Missing weights for event types: {sorted(missingEvents)}"
+    )
 
-
+    edgeNumerator = sum(
+        wDict[event] * count
+        for event, count in eventCountsDict.items()
+    )
+    edge      = edgeNumerator / totalPoints
+    edge2     = edgeNumerator / classifiedPoints
+    edge3     = edgeNumerator / attributedPoints
+    coverage  = classifiedPoints / totalPoints
+    eventRate = attributedPoints / totalPoints
+    
+    return edge, {
+        "player": playerName,
+        "EDGE": edge,
+        "coverage": coverage,
+        "EDGE2": edge2,
+        "EDGE3": edge3,
+        "eventRate": eventRate,
+        "points": totalPoints,
+        "matches": len(playerMatches),
+        "counts": eventCountsDict,
+    }
 
 if __name__ == "__main__":
-    from constants import playersW, playersM
     from dataloader import MCPDataLoader
     from winprob import computeV
     from eventweights import computeDeltaV, computeW
 
-    dl = MCPDataLoader("w", playersW)
+    dl = MCPDataLoader("w")
     points  = dl.points
     matches = dl.matches
     
@@ -79,6 +125,7 @@ if __name__ == "__main__":
     print(wDf)
 #     print( wDict )
 
-    playerEdge = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
-    print(playerEdge)
+    edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
+    print(edge)
+    print(summary)
     
