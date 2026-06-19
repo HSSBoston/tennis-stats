@@ -29,23 +29,18 @@ print(wDf)
 
 rows = []
 for name in players:
-    res = compute_player_X(name, pts, matches, w_dict)
-    if res is None:
+    edge, summary = computeEdge(name, pointsDeltaV, matches, wDict)
+    if edge is None:
         print(f"  {name}: not enough data — skipped.")
         continue
-    rows.append(res)
-    print(f"  {name:<22}  X = {res['X']:+.4f}   "
-          f"(N = {res['N']:,} pts, {res['matches']} matches)")
-
-if not rows:
-    print("\nNo players had usable data. Exiting.")
-    return
+    rows.append(edge)
+    print(f"{name:<22}  {edge}")
 
 
 
-edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
-print(edge)
-pprint(summary)
+# edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
+# print(edge)
+# pprint(summary)
 
 
 
