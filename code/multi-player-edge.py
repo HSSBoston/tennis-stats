@@ -51,7 +51,7 @@ for name in players:
         continue
     rows.append(edge)
     print(f"{name:<22} {edge:.4f}")
-# 
+
 # OUT_DIR.mkdir(exist_ok=True)
 # V_stats.to_csv(OUT_DIR / f"V_states_{tour}.csv")
 # w.to_csv(OUT_DIR / f"w_events_{tour}.csv")
@@ -68,12 +68,6 @@ for name in players:
 #              OUT_DIR / f"X_players_{tour}.png")
 # 
 # print(f"\nWrote tables and plots to: {OUT_DIR}/")
-
-
-
-# edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
-# print(edge)
-# pprint(summary)
 
 
 
