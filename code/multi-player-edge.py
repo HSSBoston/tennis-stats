@@ -52,22 +52,24 @@ for name in players:
     rows.append(edge)
     print(f"{name:<22} {edge:.4f}")
 
-# OUT_DIR.mkdir(exist_ok=True)
-# V_stats.to_csv(OUT_DIR / f"V_states_{tour}.csv")
-# w.to_csv(OUT_DIR / f"w_events_{tour}.csv")
-# pd.DataFrame([{**{k: v for k, v in r.items() if k != "counts"},
-#                **{f"count_{k}": v for k, v in r["counts"].items()}}
-#               for r in rows]).to_csv(
-#     OUT_DIR / f"X_players_{tour}.csv", index=False)
-# 
-# _save_plot_V(V_stats, f"V(s) — {label} reference population (2020s MCP)",
-#              OUT_DIR / f"V_states_{tour}.png")
-# _save_plot_w(w, f"w(e) — average ΔV per event — {label} (2020s MCP)",
-#              OUT_DIR / f"w_events_{tour}.png")
-# _save_plot_X(rows, f"X — tennis wOBA-style score — {label}",
-#              OUT_DIR / f"X_players_{tour}.png")
-# 
-# print(f"\nWrote tables and plots to: {OUT_DIR}/")
+OUT_DIR.mkdir(exist_ok=True)
+vDf.to_csv(OUT_DIR / f"v-values.csv")
+wDf.to_csv(OUT_DIR / f"w_events_{tour}.csv")
+
+
+pd.DataFrame([{**{k: v for k, v in r.items() if k != "counts"},
+               **{f"count_{k}": v for k, v in r["counts"].items()}}
+              for r in rows]).to_csv(
+    OUT_DIR / f"X_players_{tour}.csv", index=False)
+
+_save_plot_V(V_stats, f"V(s) — {label} reference population (2020s MCP)",
+             OUT_DIR / f"V_states_{tour}.png")
+_save_plot_w(w, f"w(e) — average ΔV per event — {label} (2020s MCP)",
+             OUT_DIR / f"w_events_{tour}.png")
+_save_plot_X(rows, f"X — tennis wOBA-style score — {label}",
+             OUT_DIR / f"X_players_{tour}.png")
+
+print(f"\nWrote tables and plots to: {OUT_DIR}/")
 
 
 
