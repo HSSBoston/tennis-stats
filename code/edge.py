@@ -98,7 +98,7 @@ def computeEdge(
     
     return edgePerTotalPoint, {
         "player":    playerName,
-        "EDGE":      edge,
+        "EDGE":      edgePerTotalPoint,
         "coverage":  coverage,
         "EDGE2":     edgePerClassifiedPoint,
         "EDGE3":     edgePerAttributedPoint,
