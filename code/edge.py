@@ -23,7 +23,7 @@ def computeEdge(
         (matches["Player 1"] == playerName) | (matches["Player 2"] == playerName)
     ]
     if playerMatches.empty:
-        return None
+        return (None, None)
 
     # Output with playerName = "Aryna Sabalenka": 
     # { 2026...-Aryna_Sabalenka-Victoria_Mboko, 1,
@@ -38,7 +38,7 @@ def computeEdge(
         df["match_id"].isin(matchIdToPlayerNumber.keys())
     ]
     if df.empty:
-        return None
+        return (None, None)
 
     # Add "player_num" and "is_server" columns to the point-level data frame
     #   player_num (1 or 2) of playerName
@@ -51,14 +51,14 @@ def computeEdge(
     df["is_server"] = (df["player_num"] == df["Svr"])
     totalPoints = len(df)
     if totalPoints == 0:
-        return None    
+        return (None, None)    
 
     # Removes rows that have None/NaN in at least one of the "svr", "event" and
     # "perspective" columns
     df = df.dropna(subset=["Svr", "event", "perspective"])
     classifiedPoints = len(df)
     if classifiedPoints == 0:
-        return None
+        return (None, None)
     
     # Extract point-level rows where
     #   (1) the event belongs to the server   and playerName serves, OR
@@ -72,7 +72,7 @@ def computeEdge(
     ]
     attributedPoints = len(playerPts)
     if attributedPoints == 0:
-        return None
+        return (None, None)
     
     # Count each event type
     # value_counts() produces a data frame like:
