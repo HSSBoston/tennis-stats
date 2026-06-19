@@ -76,8 +76,7 @@ def isServeFault(code) -> bool:
     return code[-1] in SERVE_FAULT_LETTERS
 
 def normalizeCode(code) -> str:
-    # if code == None or numpy.NaN 
-    if pd.isna(code):
+    if pd.isna(code): # if code == None or numpy.NaN 
         return ""
     return str(code).strip()
 
