@@ -51,7 +51,7 @@ UNUSUAL_SITUATIONS = set("SRPQ")
 ENDING_LETTERS = set("*@#")
 
 EVENT_TYPES = [
-    "ace_or_winner",         # service ace or winner — server perspective
+    "ace",         # service ace or winner — server perspective
     "double_fault",          #                       — server perspective
     "forced_return_error_drawn", # forced return error drawn - server perspective
     "unforced_return_error", #                               — returner perspective
@@ -128,7 +128,7 @@ def classifyEvent(first: str, second: str):
     # Service ace (*) or unreturnable winner (#)
     if rallyShotCount == 0:
         if last in ("*", "#"):
-            return ("ace_or_winner", "server")
+            return ("ace", "server")
         return None
     # Winner
     if last == "*":
@@ -160,14 +160,14 @@ def classifyEvent(first: str, second: str):
 
 if __name__ == "__main__":
     # ace on first serve
-    assert classifyEvent("6*", None) == ("ace_or_winner","server")
+    assert classifyEvent("6*", None) == ("ace","server")
     # unreturnable winner on first serve
-    assert classifyEvent("4#", None) == ("ace_or_winner","server")
+    assert classifyEvent("4#", None) == ("ace","server")
     
     # ace on second serve
-    assert classifyEvent("4w", "5*") == ("ace_or_winner", "server")
+    assert classifyEvent("4w", "5*") == ("ace", "server")
     # unreturnable winner on second serve
-    assert classifyEvent("6d", "6#") == ("ace_or_winner", "server")
+    assert classifyEvent("6d", "6#") == ("ace", "server")
     
     # double fault
     assert classifyEvent("4w", "6d")  == ("double_fault", "server")
