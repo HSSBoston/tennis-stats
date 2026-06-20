@@ -152,6 +152,13 @@ outputDf = pd.DataFrame([
     for r in rows
 ])
 
+playersCountBefore = len(outputDf)
+outputDf = outputDf[outputDf["matches"] >= 5]
+playersCountAfter = len(outputDf)
+print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
+print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<5")
+print("f{len(outputDf)} players included")
+
 outputDf = outputDf.sort_values("EDGE", ascending=False)
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
 print(f"Output written to: {OUTPUT_DIR}")
