@@ -5,7 +5,7 @@ import pandas as pd
 # game state such as "0-0" and "15-0". 
 #   df: Point-by-point dataset. Each row represents one point. Obtained via Parser.points.
 #   
-def computeV(df: pd.DataFrame):
+def computeGameWinExpectancy(df: pd.DataFrame):
     # Divide df (point rows) into groups. All points with the same match ID and
     # game number are treated as one tennis game.
     grouped = df.groupby(["match_id", "Gm#"])
@@ -54,10 +54,10 @@ def computeV(df: pd.DataFrame):
     # 15-0      2    2    
     stats = grouped.agg(["count", "sum"])
     
-    stats["game win prob"] = stats["sum"] / stats["count"]
+    stats["game win expectancy"] = stats["sum"] / stats["count"]
     vDf = stats.reindex(GAME_STATES)
     
-    vDict = stats["game win prob"].to_dict()
+    vDict = stats["game win expectancy"].to_dict()
     return vDict, vDf, df
 
 
@@ -65,9 +65,9 @@ if __name__ == "__main__":
     from dataloader import MCPDataLoader
     
     points = MCPDataLoader("w").points
-    vDict, vDf, pts = computeV(points)
-    vDfSorted = vDf.sort_values(["game win prob"])
-    print(vDfSorted)
+    gweDict, gweDf, pts = computeGameWinExpectancy(points)
+    gweDfSorted = gweDf.sort_values(["game win expectancy"])
+    print(gweDfSorted)
     
     
 
