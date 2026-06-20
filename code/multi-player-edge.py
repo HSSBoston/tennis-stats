@@ -50,7 +50,7 @@ for name in players:
         print(f"  {name}: not enough data — skipped.")
         continue
     rows.append(edge)
-    print(f"{name:<22} {edge:.4f}")
+    print(f"{name:<22} {edge:.5f}")
 
 OUT_DIR.mkdir(exist_ok=True)
 vDf.to_csv(OUT_DIR / f"v-values.csv")
