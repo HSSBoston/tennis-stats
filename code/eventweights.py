@@ -6,7 +6,7 @@ from eventparser import classifyEvent, EVENT_TYPES
 #   df: Point-by-point dataset that has been created by winprob.computeV().
 #   vDict: Maps each game state to the server's game-win probability.
 #   
-def computeDeltaV(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
+def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
     df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
         # Sort rows by "match_id" and then "Pt"
         # drop=True: Discard old index numbers
@@ -86,13 +86,13 @@ def computeW(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
     from dataloader import MCPDataLoader
-    from winprob import computeV
+    from expectancy import computeGameWinExpectancy
 
     points = MCPDataLoader("w").points
-    vDict, vDf, pts = computeV(points)
-    vDfSorted = vDf.sort_values(["game win prob"])
-    print(vDfSorted)
+    gweDict, gweDf, pts = computeGameWinExpectancy(points)
+    gweDfSorted = gweDf.sort_values(["game win expectancy"])
+    print(gweDfSorted)
     
-    wDict, wDf = computeW( computeDeltaV(pts, vDict) )
+    wDict, wDf = computeW( computeDeltaGameWinExpectancy(pts, gweDict) )
     print(wDf)
     print( wDict )
