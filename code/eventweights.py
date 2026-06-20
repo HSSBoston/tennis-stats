@@ -63,7 +63,7 @@ def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame
 # Compute the average delta_V for each event type. That average becomes the event's weight w. 
 #   df: Point-by-point dataset that has been created by computeDeltaV().
 #
-def computeW(df: pd.DataFrame) -> pd.DataFrame:
+def computeEventWeights(df: pd.DataFrame) -> pd.DataFrame:
     # Removes rows that have None/NaN in either/both of the "event" and "delta_V" columns
     valid = df.dropna(subset=["event", "delta_V"])
     
@@ -93,6 +93,6 @@ if __name__ == "__main__":
     gweDfSorted = gweDf.sort_values(["game win expectancy"])
     print(gweDfSorted)
     
-    wDict, wDf = computeW( computeDeltaGameWinExpectancy(pts, gweDict) )
+    wDict, wDf = computeEventWeights( computeDeltaGameWinExpectancy(pts, gweDict) )
     print(wDf)
     print(wDict)

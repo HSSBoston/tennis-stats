@@ -110,24 +110,24 @@ def computeEdge(
 
 if __name__ == "__main__":
     from dataloader import MCPDataLoader
-    from winprob import computeV
-    from eventweights import computeDeltaV, computeW
+    from expectancy import computeGameWinExpectancy
+    from eventweights import computeDeltaGameWinExpectancy, computeEventWeights
     from pprint import pprint
 
     dl = MCPDataLoader("w")
     points  = dl.points
     matches = dl.matches
     
-    vDict, vDf, pointsV = computeV(points)
-    vDfSorted = vDf.sort_values(["game win prob"])
-    print(vDfSorted)
+    gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
+    gweDfSorted = gweDf.sort_values(["game win expectancy"])
+    print(gweDfSorted)
     
-    pointsDeltaV = computeDeltaV(pointsV, vDict)
-    wDict, wDf = computeW(pointsDeltaV)
+    pointsDeltaGwe = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
+    wDict, wDf = computeEventWeights(pointsDeltaGwe)
     print(wDf)
 #     print( wDict )
 
-    edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaV, matches, wDict)
+    edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaGwe, matches, wDict)
     print(edge)
     pprint(summary)
     
