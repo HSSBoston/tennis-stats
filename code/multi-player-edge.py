@@ -6,6 +6,7 @@ from constants import OUTPUT_DIR
 from pprint import pprint
 import pandas as pd
 
+# WTA ranking as of 06/15/2026
 players = [
     "Aryna Sabalenka",
     "Elena Rybakina",
@@ -27,6 +28,36 @@ players = [
     "Sorana Cirstea",
     "Ekaterina Alexandrova",
     "Anna Kalinskaya",
+    "Maja Chwalinska",
+    "Leylah Fernandez",
+    "Clara Tauson",
+    "Elise Mertens",
+    "Emma Navarro",
+    "Anastasia Potapova",
+    "Marie Bouzkova",
+    "Madison Keys",
+    "Ann Li",
+    "Hailey Baptiste",
+    "Emma Raducanu",
+    "Xinyu Wang",
+    "Donna Vekic",
+    "Katerina Siniakova",
+    "Alexandra Eala",
+    "Cristina Bucsa",
+    "Liudmila Samsonova",
+    "Jelena Ostapenko",
+    "Barbora Krejcikova",
+    "Jaqueline Cristian",
+    "Maria Sakkari",
+    "Laura Siegemund",
+    "Janice Tjen",
+    "McCartney Kessler",
+    "Magdalena Frech",
+    "Elisabetta Cocciaretto",
+    "Sara Bejlek",
+    "Magda Linette",
+    "Marketa Vondrousova",
+    "Dayana Yastremska",
 ]
 
 dl = MCPDataLoader("w")
