@@ -110,6 +110,8 @@ players100 = [
     "Emiliana Arango",
 ]
 
+players = players100[:50]
+
 dl = MCPDataLoader("w")
 points  = dl.points
 matches = dl.matches
@@ -125,7 +127,7 @@ print(wDf)
 
 
 rows = []
-for index, name in enumerate(players100):
+for index, name in enumerate(players):
     ranking = index + 1
     edge, summary = computeEdge(name, pointsDeltaGwe, matches, wDict)
     if edge is None:
@@ -155,7 +157,7 @@ outputDf = pd.DataFrame([
 playersCountBefore = len(outputDf)
 outputDf = outputDf[outputDf["matches"] >= 5]
 playersCountAfter = len(outputDf)
-print(f"{len(players100)-playersCountBefore} players excluded due to insufficient data")
+print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<5")
 print(f"{len(outputDf)} players included")
 
