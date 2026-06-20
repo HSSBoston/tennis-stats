@@ -95,4 +95,4 @@ if __name__ == "__main__":
     
     wDict, wDf = computeW( computeDeltaGameWinExpectancy(pts, gweDict) )
     print(wDf)
-    print( wDict )
+    print(wDict)
