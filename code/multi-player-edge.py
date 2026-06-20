@@ -1,6 +1,6 @@
 from dataloader import MCPDataLoader
-from winprob import computeV
-from eventweights import computeDeltaV, computeW
+from expectancy import computeGameWinExpectancy
+from eventweights import computeDeltaGameWinExpectancy, computeEventWeights
 from edge import computeEdge
 from constants import OUTPUT_DIR
 from pprint import pprint
@@ -64,19 +64,19 @@ dl = MCPDataLoader("w")
 points  = dl.points
 matches = dl.matches
 
-vDict, vDf, pointsV = computeV(points)
-vDfSorted = vDf.sort_values(["game win prob"])
-print(vDfSorted)
+gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
+gweDfSorted = gweDf.sort_values(["game win expectancy"])
+print(gweDfSorted)
 
-pointsDeltaV = computeDeltaV(pointsV, vDict)
-wDict, wDf = computeW(pointsDeltaV)
+pointsDeltaGwe = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
+wDict, wDf = computeEventWeights(pointsDeltaGwe)
 print(wDf)
 #     print( wDict )
 
 
 rows = []
 for name in players:
-    edge, summary = computeEdge(name, pointsDeltaV, matches, wDict)
+    edge, summary = computeEdge(name, pointsDeltaGwe, matches, wDict)
     if edge is None:
         print(f"  {name}: not enough data — skipped.")
         continue
@@ -84,7 +84,7 @@ for name in players:
     print(f"{name:<22} {edge:.5f}")
 
 OUTPUT_DIR.mkdir(exist_ok=True)
-vDf.to_csv(OUTPUT_DIR / f"v-game-expectancy.csv")
+gweDf.to_csv(OUTPUT_DIR / f"v-game-expectancy.csv")
 wDf.to_csv(OUTPUT_DIR / f"w-event-weights.csv")
 
 # Create a DataFrame from rows, while turning each row’s nested "events" dictionary
