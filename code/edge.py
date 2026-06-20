@@ -105,7 +105,7 @@ def computeEdge(
         "eventRate": eventRate,
         "points":    totalPoints,
         "matches":   len(playerMatches),
-        "counts":    eventCountsDict,
+        "events":    eventCountsDict,
     }
 
 if __name__ == "__main__":
