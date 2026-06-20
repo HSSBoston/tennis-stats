@@ -125,7 +125,7 @@ print(wDf)
 
 
 rows = []
-for name in players:
+for index, name in enumerate(players):
     edge, summary = computeEdge(name, pointsDeltaGwe, matches, wDict)
     if edge is None:
         print(f"  {name}: not enough data — skipped.")
