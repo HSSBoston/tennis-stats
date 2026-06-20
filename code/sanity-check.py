@@ -126,10 +126,12 @@ print(wDf)
 
 rows = []
 for index, name in enumerate(players):
+    ranking = index + 1
     edge, summary = computeEdge(name, pointsDeltaGwe, matches, wDict)
     if edge is None:
         print(f"  {name}: not enough data — skipped.")
         continue
+    summary["wta rank"] = ranking
     rows.append(summary)
     print(f"{name:<22} {edge:.5f}")
 
@@ -149,5 +151,7 @@ outputDf = pd.DataFrame([
     }
     for r in rows
 ])
-outputDf.to_csv(OUTPUT_DIR / "edge-players.csv", index=False)
+
+outputDf = outputDf.sort_values("EDGE", ascending=False)
+outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
 print(f"Output written to: {OUTPUT_DIR}")
