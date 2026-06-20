@@ -3,7 +3,6 @@ from winprob import computeV
 from eventweights import computeDeltaV, computeW
 from edge import computeEdge
 from constants import OUTPUT_DIR
-
 from pprint import pprint
 
 players = [
