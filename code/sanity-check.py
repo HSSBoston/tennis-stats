@@ -7,7 +7,7 @@ from pprint import pprint
 import pandas as pd
 
 # WTA ranking as of 06/15/2026
-players = [
+players100 = [
     "Aryna Sabalenka",
     "Elena Rybakina",
     "Iga Swiatek",
@@ -125,7 +125,7 @@ print(wDf)
 
 
 rows = []
-for index, name in enumerate(players):
+for index, name in enumerate(players100):
     ranking = index + 1
     edge, summary = computeEdge(name, pointsDeltaGwe, matches, wDict)
     if edge is None:
