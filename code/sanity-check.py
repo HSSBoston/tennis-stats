@@ -155,7 +155,7 @@ outputDf = pd.DataFrame([
 ])
 
 playersCountBefore = len(outputDf)
-outputDf = outputDf[outputDf["matches"] >= 5]
+outputDf = outputDf[outputDf["matches"] >= 27]
 playersCountAfter = len(outputDf)
 print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<5")
