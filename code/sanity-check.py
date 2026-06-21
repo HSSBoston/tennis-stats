@@ -110,7 +110,7 @@ players100 = [
     "Emiliana Arango",
 ]
 
-players = players100[:50]
+players = players100
 
 dl = MCPDataLoader("w")
 points  = dl.points
@@ -133,7 +133,7 @@ for index, name in enumerate(players):
     if edge is None:
         print(f"  {name}: not enough data — skipped.")
         continue
-    summary["wta rank"] = wtaRank
+    summary["wta_rank"] = wtaRank
     rows.append(summary)
     print(f"{name:<22} {edge:.5f}")
 
