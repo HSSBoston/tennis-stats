@@ -7,7 +7,7 @@ from pprint import pprint
 import pandas as pd
 
 # WTA ranking as of 06/15/2026
-players100 = [ 
+players = [ 
     "Aryna Sabalenka",
     "Elena Rybakina",
     "Iga Swiatek",
@@ -110,7 +110,9 @@ players100 = [
     "Emiliana Arango",
 ]
 
-players = players100
+MIN_MATCHES = 14
+TOP_EDGE_N = 20
+TOP_WTA_N = 50
 
 dl = MCPDataLoader("w")
 points  = dl.points
@@ -155,20 +157,34 @@ outputDf = pd.DataFrame([
 ])
 
 playersCountBefore = len(outputDf)
-outputDf = outputDf[outputDf["matches"] >= 26]
+outputDf = outputDf[outputDf["matches"] >= MIN_MATCHES]
 playersCountAfter = len(outputDf)
 print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
-print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<26")
-print(f"{len(outputDf)} players included")
+print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<{MIN_MATCHES}")
+
+numEligiblePlayers = len(outputDf)
+print(f"{numEligiblePlayers} eligible players w/ #matches>={MIN_MATCHES}")
+numEligibleInsideWtaTop50 = (
+    outputDf.loc[:, "wta_rank"] <= TOP_WTA_N
+).sum()
+print(f"{numEligibleInsideWtaTop50} eligible players within top WTA {TOP_WTA_N}")
 
 outputDf = outputDf.sort_values("EDGE", ascending=False).reset_index(drop=True)
 outputDf["edge_rank"] = outputDf.index + 1
 
-edgeTop20Df = outputDf.loc[outputDf["edge_rank"] <= 20]
+edgeTop20Df = outputDf.loc[outputDf["edge_rank"] <= TOP_EDGE_N].copy()
 numEdgeTop20InsideWtaTop50 = (
-    edgeTop20Df.loc[:, "wta_rank"] <= 50
+    edgeTop20Df.loc[:, "wta_rank"] <= TOP_WTA_N
 ).sum()
+
 print(f"{numEdgeTop20InsideWtaTop50}")
+print(
+    f"Eligible players inside WTA top {TOP_WTA_N}: "
+    f"{numEligibleInsideWtaTop50}/{numEligiblePlayers}"
+)
+
+
+
 
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=True)
 print(f"Output written to: {OUTPUT_DIR}")
