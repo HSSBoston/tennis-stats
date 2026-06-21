@@ -161,6 +161,14 @@ print(f"{len(players)-playersCountBefore} players excluded due to insufficient d
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<5")
 print(f"{len(outputDf)} players included")
 
-outputDf = outputDf.sort_values("EDGE", ascending=False)
+outputDf = outputDf.sort_values("EDGE", ascending=False).reset_index(drop=True)
+outputDf["edge_rank"] = outputDf.index + 1
+
+edgeTop20Df = outputDf.loc[outputDf["edge rank"] <= 20]
+numEdgeTop20InsideWtaTop50 = (
+    edgeTop20Df.loc[:, "wta_rank"] <= 50
+).sum()
+
+
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
 print(f"Output written to: {OUTPUT_DIR}")
