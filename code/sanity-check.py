@@ -155,10 +155,10 @@ outputDf = pd.DataFrame([
 ])
 
 playersCountBefore = len(outputDf)
-outputDf = outputDf[outputDf["matches"] >= 27]
+outputDf = outputDf[outputDf["matches"] >= 26]
 playersCountAfter = len(outputDf)
 print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
-print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<5")
+print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<26")
 print(f"{len(outputDf)} players included")
 
 outputDf = outputDf.sort_values("EDGE", ascending=False).reset_index(drop=True)
