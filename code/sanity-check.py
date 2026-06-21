@@ -120,11 +120,11 @@ matches = dl.matches
 
 gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
 gweDfSorted = gweDf.sort_values(["game win expectancy"])
-print(gweDfSorted)
+# print(gweDfSorted)
 
 pointsDeltaGwe = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
 wDict, wDf = computeEventWeights(pointsDeltaGwe)
-print(wDf)
+# print(wDf)
 #     print( wDict )
 
 
@@ -137,7 +137,7 @@ for index, name in enumerate(players):
         continue
     summary["wta_rank"] = wtaRank
     rows.append(summary)
-    print(f"{name:<22} {edge:.5f}")
+#     print(f"{name:<22} {edge:.5f}")
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 gweDf.to_csv(OUTPUT_DIR / f"v-game-expectancy.csv")
@@ -163,7 +163,7 @@ print(f"{len(players)-playersCountBefore} players excluded due to insufficient d
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<{MIN_MATCHES}")
 
 numEligiblePlayers = len(outputDf)
-print(f"{numEligiblePlayers} eligible players with #matches>={MIN_MATCHES}")
+print(f"\n{numEligiblePlayers} eligible players with #matches>={MIN_MATCHES}")
 numEligibleInsideWtaTop50 = (
     outputDf.loc[:, "wta_rank"] <= TOP_WTA_N
 ).sum()
@@ -177,7 +177,7 @@ numEdgeTop20InsideWtaTop50 = (
     edgeTop20Df.loc[:, "wta_rank"] <= TOP_WTA_N
 ).sum()
 print(
-    f"EDGE top {TOP_EDGE_N} players inside WTA top {TOP_WTA_N}: "
+    f"\nEDGE top {TOP_EDGE_N} players inside WTA top {TOP_WTA_N}: "
     f"{numEdgeTop20InsideWtaTop50}/{len(edgeTop20Df)}"
 )
 
@@ -194,8 +194,8 @@ playersOutsideTop50 = edgeTop20Df.loc[
     ["edge_rank", "player", "EDGE", "wta_rank", "matches"]
 ]
 
-print("EDGE top 20 players outside WTA top 50:")
+print("\nEDGE top 20 players outside WTA top 50:")
 print(playersOutsideTop50)
 
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=True)
-print(f"Output written to: {OUTPUT_DIR}")
+print(f"\nOutput written to: {OUTPUT_DIR}")
