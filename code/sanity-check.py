@@ -163,11 +163,11 @@ print(f"{len(players)-playersCountBefore} players excluded due to insufficient d
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<{MIN_MATCHES}")
 
 numEligiblePlayers = len(outputDf)
-print(f"{numEligiblePlayers} eligible players w/ #matches>={MIN_MATCHES}")
+print(f"{numEligiblePlayers} eligible players with #matches>={MIN_MATCHES}")
 numEligibleInsideWtaTop50 = (
     outputDf.loc[:, "wta_rank"] <= TOP_WTA_N
 ).sum()
-print(f"{numEligibleInsideWtaTop50} eligible players within top WTA {TOP_WTA_N}")
+print(f"{numEligibleInsideWtaTop50} eligible players inside WTA top {TOP_WTA_N}")
 
 outputDf = outputDf.sort_values("EDGE", ascending=False).reset_index(drop=True)
 outputDf["edge_rank"] = outputDf.index + 1
@@ -176,15 +176,26 @@ edgeTop20Df = outputDf.loc[outputDf["edge_rank"] <= TOP_EDGE_N].copy()
 numEdgeTop20InsideWtaTop50 = (
     edgeTop20Df.loc[:, "wta_rank"] <= TOP_WTA_N
 ).sum()
-
-print(f"{numEdgeTop20InsideWtaTop50}")
 print(
-    f"Eligible players inside WTA top {TOP_WTA_N}: "
-    f"{numEligibleInsideWtaTop50}/{numEligiblePlayers}"
+    f"EDGE top {TOP_EDGE_N} players inside WTA top {TOP_WTA_N}: "
+    f"{numEdgeTop20InsideWtaTop50}/{len(edgeTop20Df)}"
 )
 
+expectedRandomOverlap = (
+    TOP_EDGE_N * numEligibleInsideWtaTop50 / numEligiblePlayers
+)
+print(
+    f"Expected overlap under random selection from eligible players: "
+    f"{expectedRandomOverlap:.2f}/{TOP_EDGE_N}"
+)
 
+playersOutsideTop50 = edgeTop20Df.loc[
+    edgeTop20Df["wta_rank"] > TOP_WTA_N,
+    ["edge_rank", "player", "EDGE", "wta_rank", "matches"]
+]
 
+print("EDGE top 20 players outside WTA top 50:")
+print(playersOutsideTop50)
 
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=True)
 print(f"Output written to: {OUTPUT_DIR}")
