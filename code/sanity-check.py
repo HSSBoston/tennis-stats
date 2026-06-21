@@ -170,5 +170,5 @@ numEdgeTop20InsideWtaTop50 = (
 ).sum()
 print(f"{numEdgeTop20InsideWtaTop50}")
 
-outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
+outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=True)
 print(f"Output written to: {OUTPUT_DIR}")
