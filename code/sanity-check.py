@@ -110,7 +110,7 @@ players = [
     "Emiliana Arango",
 ]
 
-MIN_MATCHES = 16
+MIN_MATCHES = 10
 TOP_EDGE_N = 20
 TOP_WTA_N = 50
 
@@ -194,7 +194,7 @@ playersOutsideTop50 = edgeTop20Df.loc[
     ["edge_rank", "player", "EDGE", "wta_rank", "matches"]
 ]
 
-print("\nEDGE top 20 players outside WTA top 50:")
+print(f"\nEDGE top {TOP_EDGE_N} players outside WTA top {TOP_WTA_N}:")
 print(playersOutsideTop50)
 
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
