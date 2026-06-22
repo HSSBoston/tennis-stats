@@ -112,8 +112,8 @@ players = [
 ]
 
 MIN_MATCHES = 5
-TOP_EDGE_N = 10
-TOP_WTA_N = 30
+TOP_EDGE_N = 20
+TOP_WTA_N = 20
 
 dl = MCPDataLoader("w")
 points  = dl.points
