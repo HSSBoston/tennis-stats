@@ -205,7 +205,7 @@ lowEdgeHighWtaDf = outputDf.loc[
 print(lowEdgeHighWtaDf)
 
 correlation, pValue = spearmanr(outputDf["edge_rank"], outputDf["wta_rank"])
-print(f"Spearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
+print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
 print(f"p-value: {pValue:.4f}")
 
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
