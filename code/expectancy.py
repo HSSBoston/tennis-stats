@@ -46,7 +46,7 @@ def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.D
     df = df.merge(
         gameResults[["match_id", "Gm#", "server_won_game"]],
         on=["match_id", "Gm#"], # Match rows from the two DataFrames with both match_id and Gm#
-        how="left") # Keep all rows from the left DataFrame, which is the original df
+        how="left") # Keep all rows from the left DataFrame, which is "df"
     
     # Group all point rows according to their "Pts" game states and select the
     # "server_won_game" column. 
@@ -72,6 +72,7 @@ if __name__ == "__main__":
     gweDict, gweDf, pts = computeGameWinExpectancy(points)
     
     print(gweDict)
+    print(gweDf)
     
     gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
     print(gweDfSorted)
