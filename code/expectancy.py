@@ -19,7 +19,7 @@ def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.D
     #   match_A     1      1        1
     #   match_A     2      2        1
     gameResults = grouped.agg(
-        server = ("Svr", "first"),
+        server      = ("Svr", "first"),
         game_winner = ("PtWinner", "last"),
     ).reset_index()
     
