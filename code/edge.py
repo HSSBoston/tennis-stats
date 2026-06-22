@@ -88,9 +88,11 @@ def computeEdge(
 
     positiveNumerator = 0.0
     negativeNumerator = 0.0
+    eventEdgeDict = {}
 
     for event, count in eventCountsDict.items():
         contribution = wDict[event] * count
+        eventEdgeDict[event] = contribution / totalPoints
         if contribution > 0:
             positiveNumerator += contribution
         elif contribution < 0:
@@ -102,7 +104,7 @@ def computeEdge(
     edgePerAttributedPoint = edgeNumerator / attributedPoints
 
     positiveEdge = positiveNumerator / totalPoints
-    negativeEdge = abs(negativeNumerator / totalPoints)
+    negativeEdge = negativeNumerator / totalPoints
 
     coverage  = classifiedPoints / totalPoints
     eventRate = attributedPoints / totalPoints
@@ -112,13 +114,14 @@ def computeEdge(
         "EDGE":          edgePerTotalPoint,
         "positive_EDGE": positiveEdge,
         "negative_EDGE": negativeEdge,
-        "coverage":  coverage,
-        "EDGE2":     edgePerClassifiedPoint,
-        "EDGE3":     edgePerAttributedPoint,
-        "eventRate": eventRate,
-        "points":    totalPoints,
-        "matches":   len(playerMatches),
-        "events":    eventCountsDict,
+        "event_EDGE":    eventEdgeDict,
+        "coverage":      coverage,
+        "EDGE2":         edgePerClassifiedPoint,
+        "EDGE3":         edgePerAttributedPoint,
+        "eventRate":     eventRate,
+        "points":        totalPoints,
+        "matches":       len(playerMatches),
+        "event_counts":  eventCountsDict,
     }
 
 if __name__ == "__main__":
