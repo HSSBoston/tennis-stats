@@ -24,15 +24,15 @@ def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.D
     ).reset_index()
     
     # Determine if the server won each game. Insert a new column "server_won", and
-    # put 1 or 0 (1 if the server won a game). Obtain a df like:
+    # put 1 or 0 in there (1 if the server won a game). Obtain a df like:
     #   match_id   Gm#   server   game_winner   server_won_game
-    #   match_A      1       1         1            1
-    #   match_A      2       2         1            0
+    #   match_A     1      1        1            1
+    #   match_A     2      2        1            0
     gameResults["server_won_game"] = (
         gameResults["server"] == gameResults["game_winner"]
     ).astype(int)
     
-    # Attach the game result to the original df. For example:
+    # Add game results to the original df. For example:
     # Before (original df):
     #   match_id   Gm#   Pt   Pts
     #   match_A      1    1   0-0
@@ -45,8 +45,8 @@ def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.D
     #   match_A      1    3  30-0        1
     df = df.merge(
         gameResults[["match_id", "Gm#", "server_won_game"]],
-        on=["match_id", "Gm#"],
-        how="left")
+        on=["match_id", "Gm#"], # Match rows from the two DataFrames with both match_id and Gm#
+        how="left") # Keep all rows from the left DataFrame, which is the original df
     
     # Group all point rows according to their "Pts" game states and select the
     # "server_won_game" column. 
