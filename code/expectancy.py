@@ -1,19 +1,23 @@
 from constants import GAME_STATES
 import pandas as pd
 
-# Compute the probability that the server eventually wins the current game for each
-# game state such as "0-0" and "15-0". 
-#   df: Point-by-point dataset. Each row represents one point. Obtained via Parser.points.
-#   
-def computeGameWinExpectancy(df: pd.DataFrame):
+# Compute the game win expectancy (i.e. probability that the server eventually wins
+# the current game for each game state such as "0-0" and "15-0". 
+#   df: Point-by-point dataset from the MCP project. Each row represents one point.
+#       Obtain the dataset via DataLoader.points.
+#   Returns:
+#     vDict: 
+#     vDf:
+#     df:
+def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     # Divide df (point rows) into groups. All points with the same match ID and
     # game number are treated as one tennis game.
     grouped = df.groupby(["match_id", "Gm#"])
     
     # Identify the server and game winner in each game. Obtain a df like: 
     #   match_id   Gm#   server   game_winner
-    #   match_A      1       1            1
-    #   match_A      2       2            1
+    #   match_A     1      1        1
+    #   match_A     2      2        1
     gameResults = grouped.agg(
         server = ("Svr", "first"),
         game_winner = ("PtWinner", "last"),
@@ -54,10 +58,10 @@ def computeGameWinExpectancy(df: pd.DataFrame):
     # 15-0      2    2    
     stats = grouped.agg(["count", "sum"])
     
-    stats["game win expectancy"] = stats["sum"] / stats["count"]
+    stats["game_win_expectancy"] = stats["sum"] / stats["count"]
     vDf = stats.reindex(GAME_STATES)
     
-    vDict = stats["game win expectancy"].to_dict()
+    vDict = stats["game_win_expectancy"].to_dict()
     return vDict, vDf, df
 
 
@@ -66,9 +70,8 @@ if __name__ == "__main__":
     
     points = MCPDataLoader("w").points
     gweDict, gweDf, pts = computeGameWinExpectancy(points)
-    gweDfSorted = gweDf.sort_values(["game win expectancy"])
+    
+    print(gweDict)
+    
+    gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
     print(gweDfSorted)
-    
-    
-
-
