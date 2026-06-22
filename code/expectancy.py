@@ -6,8 +6,9 @@ import pandas as pd
 #   df: Point-by-point dataset from the MCP project. Each row represents one point.
 #       Obtain the dataset via DataLoader.points.
 #   Returns:
-#     vDict: 
-#     vDf:
+#     vDict: Maps each game state and its game win expectancy
+#     vDf:   DataFrame with columns=["Pts", "game_win_expectancy", ...] where "Pts" means
+#            game state
 #     df:
 def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     # Divide df (point rows) into groups. All points with the same match ID and
@@ -76,3 +77,6 @@ if __name__ == "__main__":
     
     gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
     print(gweDfSorted)
+    
+    print(pts)
+    
