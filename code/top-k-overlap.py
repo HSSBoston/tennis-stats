@@ -151,8 +151,10 @@ wDf.to_csv(OUTPUT_DIR / f"w-event-weights.csv")
 #     Sabalenka   0.33   0.99       207   145
 outputDf = pd.DataFrame([
     {
-        **{key: value   for key, value   in r.items() if key != "events"},
-        **{event: count for event, count in r["events"].items()}
+        **{key: value
+           for key, value in r.items() if (key != "event_counts") and (key != "event_EDGE")},
+        **{ev+"_edge": evEdge for ev, evEdge in r["event_EDGE"].items()},
+        **{ev+"_count": count for ev, count in r["event_counts"].items()}
     }
     for r in rows
 ])
@@ -208,5 +210,5 @@ correlation, pValue = spearmanr(outputDf["edge_rank"], outputDf["wta_rank"])
 print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
 print(f"p-value: {pValue:.4f}")
 
-outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
-print(f"\nOutput written to: {OUTPUT_DIR}")
+outputDf.to_csv(OUTPUT_DIR / "top-k-coverage.csv", index=False)
+print(f"\nOutput written to: {OUTPUT_DIR}/top-k-coverage.csv")
