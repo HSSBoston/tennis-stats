@@ -128,7 +128,6 @@ wDict, wDf = computeEventWeights(pointsDeltaGwe)
 # print(wDf)
 #     print( wDict )
 
-
 rows = []
 for index, name in enumerate(players):
     wtaRank = index + 1
