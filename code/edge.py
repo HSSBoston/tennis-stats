@@ -1,6 +1,7 @@
 # EDGE - Event-Driven Gain in Expectancy
 
 import pandas as pd
+from constants import OUTPUT_DIR
 
 # Compute the EDGE value for a given player
 #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
@@ -124,6 +125,37 @@ def computeEdge(
         "event_counts": eventCountsDict,
     }
 
+def computeEdgeDataFrame(
+    players: list[str],
+    df: pd.DataFrame,
+    matches: pd.DataFrame,
+    wDict: dict
+) -> pd.DataFrame | None:
+    rows = []
+    for name in players:
+        edge, summary = computeEdge(name, df, matches, wDict)
+        if edge is None:
+            print(f"  {name}: not enough data — skipped.")
+            continue
+        rows.append(summary)
+        print(f"{name:<22} {edge:.5f}")
+
+    # Create a DataFrame from rows, while turning each row’s nested "events" dictionary
+    # into separate columns.
+    #   Example output:
+    #     player      EDGE   coverage   ace   double_faults ...
+    #     Sabalenka   0.33   0.99       207   145
+    outputDf = pd.DataFrame([
+        {
+            **{key: value
+               for key, value in r.items() if (key != "event_counts") and (key != "event_EDGE_contrib")},
+            **{ev+"_edge": evEdge for ev, evEdge in r["event_EDGE_contrib"].items()},
+            **{ev+"_count": count for ev, count in r["event_counts"].items()}
+        }
+        for r in rows
+    ])
+    return outputDf
+            
 if __name__ == "__main__":
     from dataloader import MCPDataLoader
     from expectancy import computeGameWinExpectancy
@@ -146,4 +178,9 @@ if __name__ == "__main__":
     edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaGwe, matches, wDict)
     print(edge)
     pprint(summary)
+    
+    outputDf = computeEdgeMultiPlayers(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
+    print(outputDf)
+    
+    
     
