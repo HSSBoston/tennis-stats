@@ -94,8 +94,9 @@ wDf.to_csv(OUTPUT_DIR / f"w-event-weights.csv")
 #     Sabalenka   0.33   0.99       207   145
 outputDf = pd.DataFrame([
     {
-        **{key: value   for key, value   in r.items() if key != "events"},
-        **{ev+"edge": evEdge for ev, evEdge in r["event_counts"].items()},
+        **{key: value
+           for key, value in r.items() if (key != "event_counts") or (key != "event_EDGE")},
+        **{ev+"edge": evEdge for ev, evEdge in r["event_EDGE"].items()},
         **{ev+"count": count for ev, count in r["event_counts"].items()}
     }
     for r in rows
