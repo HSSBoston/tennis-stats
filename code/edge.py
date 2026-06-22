@@ -179,7 +179,7 @@ if __name__ == "__main__":
     print(edge)
     pprint(summary)
     
-    outputDf = computeEdgeMultiPlayers(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
+    outputDf = computeEdgeDataFrame(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
     print(outputDf)
     
     
