@@ -86,19 +86,32 @@ def computeEdge(
         raise ValueError(f"Missing weights for event types: {sorted(missingEvents)}"
     )
 
-    edgeNumerator = sum(
-        wDict[event] * count
-        for event, count in eventCountsDict.items()
-    )
+    positiveNumerator = 0.0
+    negativeNumerator = 0.0
+
+    for event, count in eventCountsDict.items():
+        contribution = wDict[event] * count
+        if contribution > 0:
+            positiveNumerator += contribution
+        elif contribution < 0:
+            negativeNumerator += contribution
+
+    edgeNumerator = positiveNumerator + negativeNumerator
     edgePerTotalPoint      = edgeNumerator / totalPoints
     edgePerClassifiedPoint = edgeNumerator / classifiedPoints
     edgePerAttributedPoint = edgeNumerator / attributedPoints
+
+    positiveEdge = positiveNumerator / totalPoints
+    negativeEdge = abs(negativeNumerator / totalPoints)
+
     coverage  = classifiedPoints / totalPoints
     eventRate = attributedPoints / totalPoints
     
     return edgePerTotalPoint, {
-        "player":    playerName,
-        "EDGE":      edgePerTotalPoint,
+        "player":        playerName,
+        "EDGE":          edgePerTotalPoint,
+        "positive_EDGE": positiveEdge,
+        "negative_EDGE": negativeEdge,
         "coverage":  coverage,
         "EDGE2":     edgePerClassifiedPoint,
         "EDGE3":     edgePerAttributedPoint,

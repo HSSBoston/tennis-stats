@@ -5,6 +5,7 @@ from edge import computeEdge
 from constants import OUTPUT_DIR
 from pprint import pprint
 import pandas as pd
+from scipy.stats import spearmanr
 
 # WTA ranking as of 06/15/2026
 players = [ 
@@ -110,8 +111,8 @@ players = [
     "Emiliana Arango",
 ]
 
-MIN_MATCHES = 25
-TOP_EDGE_N = 20
+MIN_MATCHES = 5
+TOP_EDGE_N = 10
 TOP_WTA_N = 30
 
 dl = MCPDataLoader("w")
@@ -189,13 +190,23 @@ print(
     f"{expectedRandomOverlap:.2f}/{TOP_EDGE_N}"
 )
 
-playersOutsideTop50 = edgeTop20Df.loc[
-    edgeTop20Df["wta_rank"] > TOP_WTA_N,
+print(f"\nEDGE top {TOP_EDGE_N} players outside WTA top {TOP_WTA_N}:")
+highEdgeLowWtaDf = outputDf.loc[
+    (outputDf["edge_rank"] <= TOP_EDGE_N) & (outputDf["wta_rank"] > TOP_WTA_N),
     ["edge_rank", "player", "EDGE", "wta_rank", "matches"]
 ]
+print(highEdgeLowWtaDf)
 
-print(f"\nEDGE top {TOP_EDGE_N} players outside WTA top {TOP_WTA_N}:")
-print(playersOutsideTop50)
+print(f"\nWTA top {TOP_EDGE_N} players outside EDGE top {TOP_WTA_N}")
+lowEdgeHighWtaDf = outputDf.loc[
+    (outputDf["edge_rank"] > TOP_WTA_N) & (outputDf["wta_rank"] <= TOP_EDGE_N),
+    ["edge_rank", "player", "EDGE", "wta_rank", "matches"]
+]
+print(lowEdgeHighWtaDf)
+
+correlation, pValue = spearmanr(outputDf["edge_rank"], outputDf["wta_rank"])
+print(f"Spearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
+print(f"p-value: {pValue:.4f}")
 
 outputDf.to_csv(OUTPUT_DIR / "sanity-check.csv", index=False)
 print(f"\nOutput written to: {OUTPUT_DIR}")
