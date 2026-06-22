@@ -95,9 +95,10 @@ wDf.to_csv(OUTPUT_DIR / f"w-event-weights.csv")
 outputDf = pd.DataFrame([
     {
         **{key: value   for key, value   in r.items() if key != "events"},
-        **{event: count for event, count in r["events"].items()}
+        **{ev+"edge": evEdge for ev, evEdge in r["event_counts"].items()},
+        **{ev+"count": count for ev, count in r["event_counts"].items()}
     }
     for r in rows
 ])
 outputDf.to_csv(OUTPUT_DIR / "edge-players.csv", index=False)
-print(f"Output written to: {OUTPUT_DIR}")
+print(f"Output written to: {OUTPUT_DIR}/edge-players.csv")
