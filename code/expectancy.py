@@ -9,7 +9,7 @@ import pandas as pd
 #     vDict: Maps each game state and its game win expectancy
 #     vDf:   DataFrame with columns=["Pts", "game_win_expectancy", ...] where "Pts" means
 #            game state
-#     df:
+#     df:    The input DataFrame + an extra column "server_won_game" (1 or 0)
 def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     # Divide df (point rows) into groups. All points with the same match ID and
     # game number are treated as one tennis game.
@@ -60,11 +60,22 @@ def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.D
     stats = grouped.agg(["count", "sum"])
     
     stats["game_win_expectancy"] = stats["sum"] / stats["count"]
-    vDf = stats.reindex(GAME_STATES)
+    vDf = stats.reindex(GAME_STATES).reset_index()
     
     vDict = stats["game_win_expectancy"].to_dict()
     return vDict, vDf, df
 
+    # Examples:
+    # vDict = {'0-0': 0.66, '0-15': 0.49, ...}
+    # vDf:
+    #   Pts  count  sum      game_win_expectancy
+    #   0-0  50865  33760.0  0.663718
+    #   0-15 21558  10523.0  0.488125
+    # df: 
+    #   match_id   Gm#   Pt   Pts   server_won_game
+    #   match_A      1    1   0-0        1
+    #   match_A      1    2  15-0        1
+    #   match_A      1    3  30-0        1
 
 if __name__ == "__main__":
     from dataloader import MCPDataLoader

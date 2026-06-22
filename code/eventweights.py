@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     points = MCPDataLoader("w").points
     gweDict, gweDf, pts = computeGameWinExpectancy(points)
-    gweDfSorted = gweDf.sort_values(["game win expectancy"])
+    gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
     print(gweDfSorted)
     
     wDict, wDf = computeEventWeights( computeDeltaGameWinExpectancy(pts, gweDict) )

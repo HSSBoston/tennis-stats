@@ -120,7 +120,7 @@ points  = dl.points
 matches = dl.matches
 
 gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
-gweDfSorted = gweDf.sort_values(["game win expectancy"])
+gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
 # print(gweDfSorted)
 
 pointsDeltaGwe = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
