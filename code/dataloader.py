@@ -47,12 +47,11 @@ class MCPDataLoader:
                 # errors="coerce": replacing invalid value with NaN, not raising an exception
                 # "Int64": converting NaN to Pandas' nullable integer (pd.NA)
 #         print(df.head())
-        df = df[df["Pts"].isin(GAME_STATES)]
+        df = df.loc[ df["Pts"].isin(GAME_STATES) ]
         df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
             # Sort rows by "match_id" and then "Pt"
             # drop=True: Discard old index numbers
         self.points = df
-#         print(self.points.head())
         print(len(self.points), "points loaded")
         
     def loadMatches(self) -> None:
@@ -61,5 +60,7 @@ class MCPDataLoader:
 
 
 if __name__ == "__main__":
-    MCPDataLoader("w")
+    dataLoader = MCPDataLoader("w")
+    print(dataLoader.points.head())
+
 
