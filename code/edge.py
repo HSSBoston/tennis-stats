@@ -110,18 +110,18 @@ def computeEdge(
     eventRate = attributedPoints / totalPoints
     
     return edgePerTotalPoint, {
-        "player":        playerName,
-        "EDGE":          edgePerTotalPoint,
-        "positive_EDGE": positiveEdge,
-        "negative_EDGE": negativeEdge,
-        "event_EDGE":    eventEdgeDict,
-        "coverage":      coverage,
-        "EDGE2":         edgePerClassifiedPoint,
-        "EDGE3":         edgePerAttributedPoint,
-        "eventRate":     eventRate,
-        "points":        totalPoints,
-        "matches":       len(playerMatches),
-        "event_counts":  eventCountsDict,
+        "player":             playerName,
+        "EDGE":               edgePerTotalPoint,
+        "positive_EDGE":      positiveEdge,
+        "negative_EDGE":      negativeEdge,
+        "event_EDGE_contrib": eventEdgeDict,
+        "coverage":     coverage,
+        "EDGE2":        edgePerClassifiedPoint,
+        "EDGE3":        edgePerAttributedPoint,
+        "eventRate":    eventRate,
+        "points":       totalPoints,
+        "matches":      len(playerMatches),
+        "event_counts": eventCountsDict,
     }
 
 if __name__ == "__main__":

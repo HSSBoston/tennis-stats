@@ -152,8 +152,8 @@ wDf.to_csv(OUTPUT_DIR / f"w-event-weights.csv")
 outputDf = pd.DataFrame([
     {
         **{key: value
-           for key, value in r.items() if (key != "event_counts") and (key != "event_EDGE")},
-        **{ev+"_edge": evEdge for ev, evEdge in r["event_EDGE"].items()},
+           for key, value in r.items() if (key != "event_counts") and (key != "event_EDGE_contrib")},
+        **{ev+"_edge": evEdge for ev, evEdge in r["event_EDGE_contrib"].items()},
         **{ev+"_count": count for ev, count in r["event_counts"].items()}
     }
     for r in rows
@@ -210,5 +210,5 @@ correlation, pValue = spearmanr(outputDf["edge_rank"], outputDf["wta_rank"])
 print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
 print(f"p-value: {pValue:.4f}")
 
-outputDf.to_csv(OUTPUT_DIR / "top-k-coverage.csv", index=False)
-print(f"\nOutput written to: {OUTPUT_DIR}/top-k-coverage.csv")
+outputDf.to_csv(OUTPUT_DIR / "top-k-overlap.csv", index=False)
+print(f"\nOutput written to: {OUTPUT_DIR}/top-k-overlap .csv")
