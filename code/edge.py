@@ -65,8 +65,8 @@ def computeEdge(
     # other cases are ignored; e.g., the event belongs to the server and playerName
     # returns (e.g. the oponent's ace)
     playerPts = df.loc[
-        ( (df["perspective"] == "server")   &  df["is_server"]) |
-        ( (df["perspective"] == "returner") & ~df["is_server"])
+        ( (df["perspective"] == "server")   & (df["is_server"] == 1) ) |
+        ( (df["perspective"] == "returner") & (df["is_server"] == 0) )
     ]
     attributedPoints = len(playerPts)
     if attributedPoints == 0:
