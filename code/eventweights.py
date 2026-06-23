@@ -73,10 +73,10 @@ def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame
 #   eventWeights:
 #
 def computeEventWeights(df: pd.DataFrame) -> pd.DataFrame:
-    # Removes rows that have None/NaN in either/both of the "event" and "delta_V" columns
+    # Remove rows that have None/NaN in either/both of the "event" and "delta_V" columns
     valid = df.dropna(subset=["event", "delta_V"])
     
-    # Groups rows according to their event types, selects delta_V values from each group,
+    # Group rows according to their event types, selects delta_V values from each group,
     # and then calculate the average delta_V and the number of delta_V observations.
     # Output df:
     #   event           mean   count
