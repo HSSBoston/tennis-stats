@@ -32,7 +32,7 @@ def computeEdge(
             for _, row in playerMatches.iterrows()
     }
 
-    # Extract point-level rows where playerName played 
+    # Extract point-level rows where playerName played
     df = df.loc[
         df["match_id"].isin(matchIdToPlayerNumber.keys())
     ]
