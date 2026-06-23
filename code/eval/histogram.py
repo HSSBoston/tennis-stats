@@ -6,6 +6,7 @@ from dataloader import MCPDataLoader
 from edge import EdgeCalc
 import pandas as pd
 from pprint import pprint
+import matplotlib.pyplot as plt
 
 # WTA top 100 players as of 06/15/2026
 players = [ 
@@ -112,11 +113,12 @@ players = [
 ]
 
 MIN_MATCHES = 15
+EDGE_SCALE = 1000
 
 dl = MCPDataLoader("w")
 calc = EdgeCalc(dl.points, dl.matches)
 
-outputDict, outputDf = calc.playersEdge(players)
+_, outputDf = calc.playersEdge(players)
 # print(f"{len(outputDict)} of {len(players)} players evaluated")
 
 wtaRanks = pd.DataFrame(list(range(1, len(players)+1)),
@@ -130,5 +132,24 @@ outputDf = outputDf[outputDf["matches"] >= MIN_MATCHES]
 playersCountAfter = len(outputDf)
 print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<{MIN_MATCHES}")
+print(f"{playersCountBefore} players evaluated")
 
-pprint(outputDict)
+scaledEdgeValues = outputDf["EDGE"] * EDGE_SCALE
+      
+plt.figure(figsize=(8, 5))
+plt.hist(edgeValues, bins=12, edgecolor="black")
+
+plt.axvline(scaledEdgeValues.mean(), linestyle="--", linewidth=1.5,
+            label=f"Mean = {scaledEdgeValues.mean():.2f}")
+
+plt.axvline(scaledEdgeValues.median(), linestyle=":", linewidth=1.5,
+            label=f"Median = {scaledEdgeValues.median():.2f}")
+
+plt.title(f"Distribution of Player EDGE Values\nWTA Top 100, matches >= {MIN_MATCHES}")
+plt.xlabel(f"EDGE × {EDGE_SCALE}")
+plt.ylabel("Number of players")
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
