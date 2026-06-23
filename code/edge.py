@@ -12,7 +12,7 @@ def computeEdge(
     df: pd.DataFrame,
     matches: pd.DataFrame,
     wDict: dict
-) -> tuple[float, dict] | None:
+) -> tuple[float, dict]:
     # Extract rows where the Player 1 or Player 2 column equals playerName
     # Output with playerName = "Aryna Sabalenka":
     # match_id                                 Player 1          Player 2
@@ -123,7 +123,7 @@ def computeEdge(
         "event_counts": eventCountsDict,
     }
 
-def computeEdgeDataFrame(
+def computePlayersEdge(
     players: list[str],
     df: pd.DataFrame,
     matches: pd.DataFrame,
@@ -138,11 +138,11 @@ def computeEdgeDataFrame(
         rows.append(summary)
         print(f"{name:<22} {edge:.5f}")
 
-    # Create a DataFrame from rows, while turning each row’s nested "events" dictionary
-    # into separate columns.
+    # Create a DataFrame from rows, while turning each row’s nested dictionaries into
+    # separate columns.
     #   Example output:
-    #     player      EDGE   coverage   ace   double_faults ...
-    #     Sabalenka   0.33   0.99       207   145
+    #     player      EDGE   coverage  ace_edge  double_faults_edge ...
+    #     Sabalenka   0.33   0.99      207       145
     outputDf = pd.DataFrame([
         {
             **{key: value
