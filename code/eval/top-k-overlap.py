@@ -1,7 +1,10 @@
+import pathlib, sys
+PRJ_DIR = pathlib.Path(__file__).parents[1] # 2 levels up
+sys.path.append(str(PRJ_DIR))
+
 from dataloader import MCPDataLoader
 from edge import EdgeCalc
 from constants import OUTPUT_DIR
-from pprint import pprint
 import pandas as pd
 from scipy.stats import spearmanr
 
@@ -117,13 +120,13 @@ dl = MCPDataLoader("w")
 calc = EdgeCalc(dl.points, dl.matches)
 
 outputDict, outputDf = calc.playersEdge(players)
-print(f"{len(outputDict)} of {len(players)} players evaluated")
+# print(f"{len(outputDict)} of {len(players)} players evaluated")
 
 wtaRanks = pd.DataFrame(list(range(1, len(players)+1)),
                         columns = ["wta_rank"])                        
 outputDf = pd.concat([outputDf, wtaRanks], axis=1)
 outputDf = outputDf.dropna(subset=["player"])
-print(outputDf)
+# print(outputDf)
 
 playersCountBefore = len(outputDf)
 outputDf = outputDf[outputDf["matches"] >= MIN_MATCHES]

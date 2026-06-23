@@ -32,8 +32,8 @@ class EdgeCalc:
     # Compute EDGE for a given player
     #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
     # Returns:
-    #   edgePerTotalPoint:
-    #   summaryDic: 
+    #   edgePerTotalPoint: EDGE
+    #   summaryDict:
     #   summaryDf: 
     #
     def edge(self,
@@ -170,6 +170,9 @@ class EdgeCalc:
 
     # Compute EDGE for multiple players
     #   players: List of player names e.g. ["Aryna Sabalenka", , "Iga Swiatek"]
+    # Returns:
+    #   outputDict:
+    #   outputDf: 
     #
     def playersEdge(self,
         players: list[str]

@@ -1,7 +1,11 @@
+import pathlib, sys
+PRJ_DIR = pathlib.Path(__file__).parents[1] # 2 levels up
+sys.path.append(str(PRJ_DIR))
+
 from dataloader import MCPDataLoader
 from edge import EdgeCalc
-import pandas as pd
 from constants import OUTPUT_DIR
+import pandas as pd
 from pprint import pprint
 
 # WTA top 50 players as of 06/15/2026
