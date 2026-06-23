@@ -112,7 +112,7 @@ players = [
     "Emiliana Arango",
 ]
 
-MIN_MATCHES = 15
+MIN_MATCHES = 10
 EDGE_SCALE = 1000
 
 dl = MCPDataLoader("w")
@@ -132,21 +132,61 @@ outputDf = outputDf[outputDf["matches"] >= MIN_MATCHES]
 playersCountAfter = len(outputDf)
 print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<{MIN_MATCHES}")
-print(f"{playersCountBefore} players evaluated")
+print(f"{playersCountAfter} players included in histogram")
+print()
 
 scaledEdgeValues = outputDf["EDGE"] * EDGE_SCALE
-      
+meanEdge   = scaledEdgeValues.mean()
+medianEdge = scaledEdgeValues.median()
+minEdge    = scaledEdgeValues.min()
+maxEdge    = scaledEdgeValues.max()
+print(f"Mean:   {meanEdge:.2f}")
+print(f"Median: {medianEdge:.2f}")
+print(f"Min:    {minEdge:.2f}")
+print(f"Max:    {maxEdge:.2f}")
+print(f"Range:  {maxEdge-minEdge:.2f}")
+
+outputDf["scaled_EDGE"] = scaledEdgeValues
+q1  = outputDf["scaled_EDGE"].quantile(0.25)
+q3  = outputDf["scaled_EDGE"].quantile(0.75)
+iqr = q3 - q1
+lowerBound = q1 - 1.5 * iqr
+upperBound = q3 + 1.5 * iqr
+
+outlierDf = outputDf[
+    (outputDf["scaled_EDGE"] < lowerBound) | (outputDf["scaled_EDGE"] > upperBound)
+]
+print()
+print("IQR outlier check")
+print(f"Q1:          {q1:.2f}")
+print(f"Q3:          {q3:.2f}")
+print(f"IQR:         {iqr:.2f}")
+print(f"Lower bound: {lowerBound:.2f}")
+print(f"Upper bound: {upperBound:.2f}")
+print(f"# outliers:  {len(outlierDf)}")
+
+if len(outlierDf) > 0:
+    print()
+    print("Outlier players:")
+    print(
+        outlierDf[["player", "wta_rank", "matches", "scaled_EDGE"]]
+        .sort_values("scaled_EDGE", ascending=False)
+        .to_string(index=False)
+    )
+else:
+    print("No IQR-based outliers found")
+
 plt.figure(figsize=(8, 5))
-plt.hist(edgeValues, bins=12, edgecolor="black")
+plt.hist(scaledEdgeValues, bins=11, edgecolor="black")
 
-plt.axvline(scaledEdgeValues.mean(), linestyle="--", linewidth=1.5,
-            label=f"Mean = {scaledEdgeValues.mean():.2f}")
+plt.axvline(meanEdge, linestyle="--", linewidth=1.5,
+            label=f"Mean = {meanEdge:.2f}")
 
-plt.axvline(scaledEdgeValues.median(), linestyle=":", linewidth=1.5,
-            label=f"Median = {scaledEdgeValues.median():.2f}")
+plt.axvline(medianEdge, linestyle=":", linewidth=1.5,
+            label=f"Median = {medianEdge:.2f}")
 
-plt.title(f"Distribution of Player EDGE Values\nWTA Top 100, matches >= {MIN_MATCHES}")
-plt.xlabel(f"EDGE × {EDGE_SCALE}")
+plt.title(f"Distribution of Player EDGE Values\n WTA Top 100, matches >= {MIN_MATCHES}, n={len(scaledEdgeValues)}")
+plt.xlabel("Scaled EDGE value (EDGE × 1000)")
 plt.ylabel("Number of players")
 plt.legend()
 
