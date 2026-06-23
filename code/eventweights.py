@@ -5,7 +5,10 @@ from eventparser import classifyEvent, EVENT_TYPES
 # caused by each point.
 #   df: Point-by-point DataFrame that has been created by expectancy.computeGameWinExpectancy()
 #   vDict: Maps each game state to the server's game win expectancy
-#   
+# Returns:
+#   df:    Input DataFrame + extra columns "next_state", "V_before", "V_after",
+#          "event", "perspective", "delta_V"
+#
 def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
     # Sort rows by "match_id" and then "Pt"
     df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
@@ -59,6 +62,8 @@ def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame
     df["delta_V"] = multiplier * serverDeltaV
 
     return df
+
+
 
 # Compute the average delta_V for each event type. That average becomes the event's weight w. 
 #   df: Point-by-point dataset that has been created by computeDeltaV().
