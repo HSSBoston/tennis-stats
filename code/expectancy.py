@@ -6,10 +6,11 @@ import pandas as pd
 #   df: Point-by-point dataset from the MCP project. Each row represents one point.
 #       Obtain the dataset via DataLoader.points.
 #   Returns:
-#     vDict: Maps each game state and its game win expectancy
+#     vDict: Maps each game state to the server's game win expectancy
 #     vDf:   DataFrame with columns=["Pts", "game_win_expectancy", ...] where "Pts" means
 #            game state
-#     df:    The input DataFrame + an extra column "server_won_game" (1 or 0)
+#     df:    Original (MCP) DataFrame + an extra column "server_won_game" (1 or 0)
+#
 def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     # Divide df (point rows) into groups. All points with the same match ID and
     # game number are treated as one tennis game.

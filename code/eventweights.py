@@ -1,10 +1,10 @@
 import pandas as pd
 from eventparser import classifyEvent, EVENT_TYPES
 
-# Adds an event label and calculates the change in game-win probability, delta V, 
+# Add an event label and calculates the change in game win expectancy (delta V) 
 # caused by each point.
-#   df: Point-by-point dataset that has been created by winprob.computeV().
-#   vDict: Maps each game state to the server's game-win probability.
+#   df: Point-by-point DataFrame that has been created by expectancy.computeGameWinExpectancy()
+#   vDict: Maps each game state to the server's game win expectancy
 #   
 def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
     df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
