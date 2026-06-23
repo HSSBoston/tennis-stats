@@ -201,7 +201,9 @@ plt.axvline(
     upperBound, linestyle="--", linewidth=1.5,
     label=f"Upper bound: {upperBound:.2f}" )
 
-plt.title(f"Distribution of Player EDGE Values\n WTA Top 100, matches >= {MIN_MATCHES}, n={len(scaledEdgeValues)}")
+plt.title(
+    f"Distribution of Player EDGE Values\n"
+    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(scaledEdgeValues)}" )
 plt.xlabel("Scaled EDGE value (EDGE × 1000)")
 plt.ylabel("Number of players")
 plt.legend()

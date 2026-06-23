@@ -7,6 +7,8 @@ from edge import EdgeCalc
 from constants import OUTPUT_DIR
 import pandas as pd
 from scipy.stats import spearmanr
+import matplotlib.pyplot as plt
+import numpy as np
 
 # WTA top 100 players as of 06/15/2026
 players = [ 
@@ -113,6 +115,7 @@ players = [
 ]
 
 MIN_MATCHES = 10
+EDGE_SCALE = 1000
 
 dl = MCPDataLoader("w")
 calc = EdgeCalc(dl.points, dl.matches)
@@ -140,5 +143,37 @@ correlation, pValue = spearmanr(outputDf["edge_rank"], outputDf["wta_rank"])
 print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
 print(f"p-value: {pValue:.4f}")
 
+outputDf["scaled_EDGE"] = outputDf["EDGE"] * EDGE_SCALE
 outputDf.to_csv(OUTPUT_DIR / "wta-rank-corr.csv", index=False)
 print(f"\nOutput written to: {OUTPUT_DIR}/wta-rank-corr.csv")
+
+plt.figure(figsize=(8, 6))
+
+plt.scatter(
+    outputDf["scaled_EDGE"],
+    outputDf["wta_rank"],
+#     alpha=0.75
+)
+
+# Trend line
+slope, intercept = np.polyfit(outputDf["scaled_EDGE"], outputDf["wta_rank"], 1)
+xLine = np.linspace(outputDf["scaled_EDGE"].min(), outputDf["scaled_EDGE"].max(), 100)
+yLine = slope * xLine + intercept
+
+plt.plot(
+    xLine, yLine, linestyle="--",
+    linewidth=1.5, color ="red" )
+
+# WTA rank #1 should appear at the top
+plt.gca().invert_yaxis()
+
+plt.title(
+    f"EDGE Value vs WTA Rank\n"
+    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}, "
+    f"Spearman ρ={correlation:.3f}" )
+plt.xlabel("Scaled EDGE value (EDGE × 1000)")
+plt.ylabel("WTA rank")
+
+plt.tight_layout()
+plt.show()
+
