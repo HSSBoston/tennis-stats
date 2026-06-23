@@ -65,9 +65,12 @@ def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame
     return df
 
 
-
-# Compute the average delta_V for each event type. That average becomes the event's weight w. 
-#   df: Point-by-point dataset that has been created by computeDeltaV().
+# Compute the average game-win expectancy (delta_V) for each event type. That average
+# becomes the event's weight w. 
+#   df: Point-by-point DataFrame that has been created by computeDeltaGameWinExpectancy()
+# Returns:
+#   wDict:
+#   eventWeights:
 #
 def computeEventWeights(df: pd.DataFrame) -> pd.DataFrame:
     # Removes rows that have None/NaN in either/both of the "event" and "delta_V" columns
