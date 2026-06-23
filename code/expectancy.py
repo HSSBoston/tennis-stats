@@ -61,7 +61,7 @@ def computeGameWinExpectancy(df: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.D
     stats = grouped.agg(["count", "sum"])
     
     stats["game_win_expectancy"] = stats["sum"] / stats["count"]
-    vDf = stats.reindex(GAME_STATES).reset_index()
+    vDf = stats.reindex(GAME_STATES)
     
     vDict = stats["game_win_expectancy"].to_dict()
     return vDict, vDf, df
