@@ -1,17 +1,22 @@
-import pandas as pd
+from dataloader import MCPDataLoader
+from expectancy import computeGameWinExpectancy
+from eventweights import computeDeltaGameWinExpectancy, computeEventWeights
 
 # Compute EDGE for a given player
 #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
-#   df:         Point-level data that has been created by eventweights.computeDeltaV()
-#   matches:    Match-level data. c.f. dataloader.MCPDataLoader.matches
-#   wDict:      Maps each event type to its weight
+#   points:     Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
+#   matches:    Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
 #
 def computeEdge(
     playerName: str,
-    df: pd.DataFrame,
-    matches: pd.DataFrame,
-    wDict: dict
+    points: pd.DataFrame,
+    matches: pd.DataFrame
 ) -> tuple[float, dict]:
+    
+    gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
+    df = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
+    wDict, wDf = computeEventWeights(df)
+    
     # Extract rows where the Player 1 or Player 2 column equals playerName
     # Output with playerName = "Aryna Sabalenka":
     # match_id                                 Player 1          Player 2
@@ -98,8 +103,8 @@ def computeEdge(
 
     edgeNumerator = positiveNumerator + negativeNumerator
     edgePerTotalPoint      = edgeNumerator / totalPoints
-    edgePerClassifiedPoint = edgeNumerator / classifiedPoints
-    edgePerAttributedPoint = edgeNumerator / attributedPoints
+#     edgePerClassifiedPoint = edgeNumerator / classifiedPoints
+#     edgePerAttributedPoint = edgeNumerator / attributedPoints
 
     positiveEdge = positiveNumerator / totalPoints
     negativeEdge = negativeNumerator / totalPoints
@@ -113,12 +118,12 @@ def computeEdge(
         "positive_EDGE":      positiveEdge,
         "negative_EDGE":      negativeEdge,
         "event_EDGE_contrib": eventEdgeDict,
-        "coverage":     coverage,
-        "EDGE2":        edgePerClassifiedPoint,
-        "EDGE3":        edgePerAttributedPoint,
-        "eventRate":    eventRate,
+#         "EDGE2":        edgePerClassifiedPoint,
+#         "EDGE3":        edgePerAttributedPoint,
         "points":       totalPoints,
         "matches":      len(playerMatches),
+        "coverage":     coverage,
+        "eventRate":    eventRate,
         "event_counts": eventCountsDict,
     }
 
@@ -154,30 +159,16 @@ def computePlayersEdge(
     return outputDf
             
 if __name__ == "__main__":
-    from dataloader import MCPDataLoader
-    from expectancy import computeGameWinExpectancy
-    from eventweights import computeDeltaGameWinExpectancy, computeEventWeights
     from pprint import pprint
 
     dl = MCPDataLoader("w")
     points  = dl.points
     matches = dl.matches
-    
-    gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
-    gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
-    print(gweDfSorted)
-    
-    pointsDeltaGwe = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
-    wDict, wDf = computeEventWeights(pointsDeltaGwe)
-    print(wDf)
-#     print( wDict )
 
-    edge, summary = computeEdge("Aryna Sabalenka", pointsDeltaGwe, matches, wDict)
+    edge, summary = computeEdge("Aryna Sabalenka", points, matches)
     print(edge)
     pprint(summary)
     
-    outputDf = computePlayersEdge(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
-    print(outputDf)
-    
-    
+#     outputDf = computePlayersEdge(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
+#     print(outputDf)
     
