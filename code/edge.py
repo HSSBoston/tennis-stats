@@ -1,5 +1,4 @@
 import pandas as pd
-from constants import OUTPUT_DIR
 
 # Compute EDGE for a given player
 #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
@@ -177,7 +176,7 @@ if __name__ == "__main__":
     print(edge)
     pprint(summary)
     
-    outputDf = computeEdgeDataFrame(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
+    outputDf = computePlayersEdge(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
     print(outputDf)
     
     
