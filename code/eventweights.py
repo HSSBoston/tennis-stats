@@ -3,8 +3,9 @@ from eventparser import classifyEvent, EVENT_TYPES
 
 # Add an event label and calculates the change in game win expectancy (delta V) 
 # caused by each point.
-#   df: Point-by-point DataFrame that has been created by expectancy.computeGameWinExpectancy()
-#       Original (MCP) DataFrame + an extra column "server_won_game"
+#   df:    Point-by-point DataFrame that has been created by
+#          expectancy.computeGameWinExpectancy(). Original (MCP) DataFrame +
+#          an extra column "server_won_game"
 #   vDict: Maps each game state to the server's game win expectancy
 # Returns:
 #   df: Input DataFrame + extra columns "next_state", "V_before", "V_after",
