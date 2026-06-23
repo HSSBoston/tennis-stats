@@ -138,13 +138,16 @@ print()
 scaledEdgeValues = outputDf["EDGE"] * EDGE_SCALE
 meanEdge   = scaledEdgeValues.mean()
 medianEdge = scaledEdgeValues.median()
+stdEdge = scaledEdgeValues.std()
 minEdge    = scaledEdgeValues.min()
 maxEdge    = scaledEdgeValues.max()
-print(f"Mean:   {meanEdge:.2f}")
-print(f"Median: {medianEdge:.2f}")
-print(f"Min:    {minEdge:.2f}")
-print(f"Max:    {maxEdge:.2f}")
-print(f"Range:  {maxEdge-minEdge:.2f}")
+print(f"Mean:    {meanEdge:.2f}")
+print(f"Median:  {medianEdge:.2f}")
+print(f"Std dev: {stdEdge:.2f}")
+print(f"Min:     {minEdge:.2f}")
+print(f"Max:     {maxEdge:.2f}")
+print(f"Range:   {maxEdge-minEdge:.2f}")
+
 
 outputDf["scaled_EDGE"] = scaledEdgeValues
 q1  = outputDf["scaled_EDGE"].quantile(0.25)
@@ -179,11 +182,25 @@ else:
 plt.figure(figsize=(8, 5))
 plt.hist(scaledEdgeValues, bins=11, edgecolor="black")
 
-plt.axvline(meanEdge, linestyle="--", linewidth=1.5,
-            label=f"Mean = {meanEdge:.2f}")
+plt.axvspan(
+    q1, q3, alpha=0.15,
+    label=f"IQR: {q1:.2f}–{q3:.2f}" )
 
-plt.axvline(medianEdge, linestyle=":", linewidth=1.5,
-            label=f"Median = {medianEdge:.2f}")
+plt.axvline(
+    lowerBound, linestyle="--", linewidth=1.5,
+    label=f"Lower bound: {lowerBound:.2f}" )
+
+plt.axvline(
+    upperBound, linestyle="--", linewidth=1.5,
+    label=f"Upper bound: {upperBound:.2f}" )
+
+plt.axvline(
+    meanEdge, linestyle="-", linewidth=1.5,
+    label=f"Mean: {meanEdge:.2f}" )
+
+plt.axvline(
+    medianEdge, linestyle=":", linewidth=1.5,
+    label=f"Median: {medianEdge:.2f}" )
 
 plt.title(f"Distribution of Player EDGE Values\n WTA Top 100, matches >= {MIN_MATCHES}, n={len(scaledEdgeValues)}")
 plt.xlabel("Scaled EDGE value (EDGE × 1000)")
