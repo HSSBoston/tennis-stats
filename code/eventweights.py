@@ -7,11 +7,11 @@ from eventparser import classifyEvent, EVENT_TYPES
 #   vDict: Maps each game state to the server's game win expectancy
 #   
 def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
+    # Sort rows by "match_id" and then "Pt"
     df = df.sort_values(["match_id", "Pt"]).reset_index(drop=True)
-        # Sort rows by "match_id" and then "Pt"
         # drop=True: Discard old index numbers
     
-    # Group all point rows according to their match IDs and then game numbers.
+    # Group all point rows according to their match IDs and game numbers.
     # Select the "Pts" column and move the Pts values upward by one row. Therefore,
     # each row receives the next row's value. For example:
     # Before:
