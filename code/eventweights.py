@@ -7,8 +7,8 @@ from eventparser import classifyEvent, EVENT_TYPES
 #       Original (MCP) DataFrame + an extra column "server_won_game"
 #   vDict: Maps each game state to the server's game win expectancy
 # Returns:
-#   df:    Input DataFrame + extra columns "next_state", "V_before", "V_after",
-#          "event", "perspective", "delta_V"
+#   df: Input DataFrame + extra columns "next_state", "V_before", "V_after",
+#       "event", "perspective", "delta_V"
 #
 def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
     # Sort rows by "match_id" and then "Pt"
@@ -69,8 +69,10 @@ def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame
 # becomes the event's weight w. 
 #   df: Point-by-point DataFrame that has been created by computeDeltaGameWinExpectancy()
 # Returns:
-#   wDict:
-#   eventWeights:
+#   wDict:        Maps each event type to average game-win expectancy (delta_V)
+#   eventWeights: DataFrame with columns=["event", "game_win_expectancy", ...] where
+#                 "event" means event type and "game_win_expectancy" means average
+#                 game-win expectancy (delta_V)
 #
 def computeEventWeights(df: pd.DataFrame) -> pd.DataFrame:
     # Remove rows that have None/NaN in either/both of the "event" and "delta_V" columns
@@ -89,8 +91,14 @@ def computeEventWeights(df: pd.DataFrame) -> pd.DataFrame:
     ).reindex(EVENT_TYPES)
     
     wDict = eventWeights["w"].to_dict()
-    
     return wDict, eventWeights
+
+    # Examples:
+    # wDict = {'ace': 0.14, 'double_fault': -0.19, ...}
+    # eventWeights: 
+    #   event          w      N
+    #   ace            0.14   100
+    #   double_fault   -0.19  50
 
 
 if __name__ == "__main__":
