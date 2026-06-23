@@ -39,20 +39,20 @@ def computeEdge(
     if df.empty:
         return (None, None)
 
-    # Add "player_num" and "is_server" columns to the point-level data frame
+    # Add "player_num" and "is_server" columns to the point-level DataFrame
     #   player_num (1 or 2) of playerName
     #   is_server (1 or 0): whether playerName serves (1) or not (0)
     # Output with playerName = "Aryna Sabalenka":
-    #   match_id                                 Gm#   Pt   Svr   player_num   is_server
-    #   2026...-Aryna_Sabalenka-Victoria_Mboko   1     1    1     1            1
-    #   2026...-Iga_Swiatek-Aryna_Sabalenka      1     1    1     2            0
+    #   match_id                                Gm#  Pt  Svr  player_num  is_server
+    #   2026...-Aryna_Sabalenka-Victoria_Mboko  1    1   1    1           1
+    #   2026...-Iga_Swiatek-Aryna_Sabalenka     1    1   1    2           0
     df["player_num"] = df["match_id"].map(matchIdToPlayerNumber).astype("Int64")
     df["is_server"] = (df["player_num"] == df["Svr"])
     totalPoints = len(df)
     if totalPoints == 0:
         return (None, None)    
 
-    # Removes rows that have None/NaN in at least one of the "svr", "event" and
+    # Remove rows that have None/NaN in at least one of the "svr", "event" and
     # "perspective" columns
     df = df.dropna(subset=["Svr", "event", "perspective"])
     classifiedPoints = len(df)
@@ -63,8 +63,8 @@ def computeEdge(
     #   (1) the event belongs to the server   and playerName serves, OR
     #   (2) the event belongs to the returner and playerName returns
     # These two cases (two types of points) are used to compute EDGE. In other words,
-    # other cases are ignored; e.g., the event belongs to the server (e.g. the oponent's ace)
-    # and playerName returns
+    # other cases are ignored; e.g., the event belongs to the server and playerName
+    # returns (e.g. the oponent's ace)
     playerPts = df.loc[
         ( (df["perspective"] == "server")   &  df["is_server"]) |
         ( (df["perspective"] == "returner") & ~df["is_server"])
