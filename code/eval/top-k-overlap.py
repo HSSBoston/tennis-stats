@@ -112,7 +112,7 @@ players = [
     "Emiliana Arango",
 ]
 
-MIN_MATCHES = 5
+MIN_MATCHES = 10
 TOP_EDGE_N = 20
 TOP_WTA_N = 20
 
@@ -180,4 +180,4 @@ print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}
 print(f"p-value: {pValue:.4f}")
 
 outputDf.to_csv(OUTPUT_DIR / "top-k-overlap.csv", index=False)
-print(f"\nOutput written to: {OUTPUT_DIR}/top-k-overlap .csv")
+print(f"\nOutput written to: {OUTPUT_DIR}/top-k-overlap.csv")

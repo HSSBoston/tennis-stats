@@ -4,9 +4,9 @@ sys.path.append(str(PRJ_DIR))
 
 from dataloader import MCPDataLoader
 from edge import EdgeCalc
+from constants import OUTPUT_DIR
 import pandas as pd
-from pprint import pprint
-import matplotlib.pyplot as plt
+from scipy.stats import spearmanr
 
 # WTA top 100 players as of 06/15/2026
 players = [ 
@@ -113,12 +113,11 @@ players = [
 ]
 
 MIN_MATCHES = 10
-EDGE_SCALE = 1000
 
 dl = MCPDataLoader("w")
 calc = EdgeCalc(dl.points, dl.matches)
 
-_, outputDf = calc.playersEdge(players)
+outputDict, outputDf = calc.playersEdge(players)
 # print(f"{len(outputDict)} of {len(players)} players evaluated")
 
 wtaRanks = pd.DataFrame(list(range(1, len(players)+1)),
@@ -132,80 +131,14 @@ outputDf = outputDf[outputDf["matches"] >= MIN_MATCHES]
 playersCountAfter = len(outputDf)
 print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<{MIN_MATCHES}")
-print(f"{playersCountAfter} players included in histogram")
-print()
 
-scaledEdgeValues = outputDf["EDGE"] * EDGE_SCALE
-meanEdge   = scaledEdgeValues.mean()
-medianEdge = scaledEdgeValues.median()
-stdEdge = scaledEdgeValues.std()
-minEdge    = scaledEdgeValues.min()
-maxEdge    = scaledEdgeValues.max()
-print(f"Mean:    {meanEdge:.2f}")
-print(f"Median:  {medianEdge:.2f}")
-print(f"Std dev: {stdEdge:.2f}")
-print(f"Min:     {minEdge:.2f}")
-print(f"Max:     {maxEdge:.2f}")
-print(f"Range:   {maxEdge-minEdge:.2f}")
+outputDf = outputDf.sort_values("EDGE", ascending=False).reset_index(drop=True)
+outputDf["edge_rank"] = outputDf.index + 1
+print(len(outputDf), "players evaluated")
 
+correlation, pValue = spearmanr(outputDf["edge_rank"], outputDf["wta_rank"])
+print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
+print(f"p-value: {pValue:.4f}")
 
-outputDf["scaled_EDGE"] = scaledEdgeValues
-q1  = outputDf["scaled_EDGE"].quantile(0.25)
-q3  = outputDf["scaled_EDGE"].quantile(0.75)
-iqr = q3 - q1
-lowerBound = q1 - 1.5 * iqr
-upperBound = q3 + 1.5 * iqr
-
-outlierDf = outputDf[
-    (outputDf["scaled_EDGE"] < lowerBound) | (outputDf["scaled_EDGE"] > upperBound) ]
-print()
-print("IQR outlier check")
-print(f"Q1:          {q1:.2f}")
-print(f"Q3:          {q3:.2f}")
-print(f"IQR:         {iqr:.2f}")
-print(f"Lower bound: {lowerBound:.2f}")
-print(f"Upper bound: {upperBound:.2f}")
-print(f"# outliers:  {len(outlierDf)}")
-
-if len(outlierDf) > 0:
-    print()
-    print("Outlier players:")
-    print(
-        outlierDf[["player", "wta_rank", "matches", "scaled_EDGE"]]
-        .sort_values("scaled_EDGE", ascending=False)
-        .to_string(index=False)
-    )
-else:
-    print("No IQR-based outliers found")
-
-plt.figure(figsize=(8, 5))
-plt.hist(scaledEdgeValues, bins=11, edgecolor="black")
-
-plt.axvline(
-    meanEdge, linestyle="-", linewidth=1.5,
-    label=f"Mean: {meanEdge:.2f}" )
-
-plt.axvline(
-    medianEdge, linestyle=":", linewidth=1.5,
-    label=f"Median: {medianEdge:.2f}" )
-
-plt.axvspan(
-    q1, q3, alpha=0.15,
-    label=f"IQR: {q1:.2f}–{q3:.2f}" )
-
-plt.axvline(
-    lowerBound, linestyle="--", linewidth=1.5,
-    label=f"Lower bound: {lowerBound:.2f}" )
-
-plt.axvline(
-    upperBound, linestyle="--", linewidth=1.5,
-    label=f"Upper bound: {upperBound:.2f}" )
-
-plt.title(f"Distribution of Player EDGE Values\n WTA Top 100, matches >= {MIN_MATCHES}, n={len(scaledEdgeValues)}")
-plt.xlabel("Scaled EDGE value (EDGE × 1000)")
-plt.ylabel("Number of players")
-plt.legend()
-
-plt.tight_layout()
-plt.show()
-
+outputDf.to_csv(OUTPUT_DIR / "wta-rank-corr.csv", index=False)
+print(f"\nOutput written to: {OUTPUT_DIR}/wta-rank-corr.csv")
