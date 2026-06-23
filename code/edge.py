@@ -1,13 +1,11 @@
-# EDGE - Event-Driven Gain in Expectancy
-
 import pandas as pd
 from constants import OUTPUT_DIR
 
-# Compute the EDGE value for a given player
+# Compute EDGE for a given player
 #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
-#   df: Point-level data that has been created by eventweights.computeDeltaV()
-#   matches: Match-level data. c.f. dataloader.MCPDataLoader.matches
-#   wDict: Maps each event type to its weight
+#   df:         Point-level data that has been created by eventweights.computeDeltaV()
+#   matches:    Match-level data. c.f. dataloader.MCPDataLoader.matches
+#   wDict:      Maps each event type to its weight
 #
 def computeEdge(
     playerName: str,
