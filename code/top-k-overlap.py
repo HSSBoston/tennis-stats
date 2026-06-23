@@ -1,13 +1,11 @@
 from dataloader import MCPDataLoader
-from expectancy import computeGameWinExpectancy
-from eventweights import computeDeltaGameWinExpectancy, computeEventWeights
-from edge import computeEdge
+from edge import EdgeCalc
 from constants import OUTPUT_DIR
 from pprint import pprint
 import pandas as pd
 from scipy.stats import spearmanr
 
-# WTA ranking as of 06/15/2026
+# WTA top 100 players as of 06/15/2026
 players = [ 
     "Aryna Sabalenka",
     "Elena Rybakina",
@@ -116,47 +114,16 @@ TOP_EDGE_N = 20
 TOP_WTA_N = 20
 
 dl = MCPDataLoader("w")
-points  = dl.points
-matches = dl.matches
+calc = EdgeCalc(dl.points, dl.matches)
 
-gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
-gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
-# print(gweDfSorted)
+outputDict, outputDf = calc.playersEdge(players)
+print(f"{len(outputDict)} of {len(players)} players evaluated")
 
-pointsDeltaGwe = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
-wDict, wDf = computeEventWeights(pointsDeltaGwe)
-# print(wDf)
-#     print( wDict )
-
-rows = []
-for index, name in enumerate(players):
-    wtaRank = index + 1
-    edge, summary = computeEdge(name, pointsDeltaGwe, matches, wDict)
-    if edge is None:
-        print(f"  {name}: not enough data — skipped.")
-        continue
-    summary["wta_rank"] = wtaRank
-    rows.append(summary)
-#     print(f"{name:<22} {edge:.5f}")
-
-OUTPUT_DIR.mkdir(exist_ok=True)
-gweDf.to_csv(OUTPUT_DIR / f"v-game-expectancy.csv")
-wDf.to_csv(OUTPUT_DIR / f"w-event-weights.csv")
-
-# Create a DataFrame from rows, while turning each row’s nested "events" dictionary
-# into separate columns.
-#   Example output:
-#     player      EDGE   coverage   ace   double_faults ...
-#     Sabalenka   0.33   0.99       207   145
-outputDf = pd.DataFrame([
-    {
-        **{key: value
-           for key, value in r.items() if (key != "event_counts") and (key != "event_EDGE_contrib")},
-        **{ev+"_edge": evEdge for ev, evEdge in r["event_EDGE_contrib"].items()},
-        **{ev+"_count": count for ev, count in r["event_counts"].items()}
-    }
-    for r in rows
-])
+wtaRanks = pd.DataFrame(list(range(1, len(players)+1)),
+                        columns = ["wta_rank"])                        
+outputDf = pd.concat([outputDf, wtaRanks], axis=1)
+outputDf = outputDf.dropna(subset=["player"])
+print(outputDf)
 
 playersCountBefore = len(outputDf)
 outputDf = outputDf[outputDf["matches"] >= MIN_MATCHES]

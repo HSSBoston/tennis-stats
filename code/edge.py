@@ -5,23 +5,24 @@ from constants import OUTPUT_DIR
 import pandas as pd
 
 class EdgeCalc:
+
     #   points:  Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
-    #   matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches    
+    #   matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
+    #
     def __init__(self,
         points: pd.DataFrame,
         matches: pd.DataFrame
     ) -> None:
-        self.matches = matches
-        
-        #   df: original MCP data + extra columns "server_won_game", "next_state",
+        #   deltaGwePoints: original MCP data + extra columns "server_won_game", "next_state",
         #       "V_before", "V_after", "event", "perspective", "delta_V"
         #   wDict: Maps each event type to average game-win expectancy (delta_V)
-        self.df:    pd.DataFrame
-        self.wDict: dict
-
+        self.deltaGwePoints: pd.DataFrame
+        self.wDict:   dict
+        self.matches: pd.DataFrame = matches
+        
         gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
-        self.df = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
-        self.wDict, wDf = computeEventWeights(self.df)
+        self.deltaGwePoints = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
+        self.wDict, wDf = computeEventWeights(self.deltaGwePoints)
         
         OUTPUT_DIR.mkdir(exist_ok=True)
         gweDf.to_csv(OUTPUT_DIR / "v-game-expectancy.csv")
@@ -30,8 +31,14 @@ class EdgeCalc:
 
     # Compute EDGE for a given player
     #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
+    # Returns:
+    #   edgePerTotalPoint:
+    #   summaryDic: 
+    #   summaryDf: 
     #
-    def computeEdge(self, playerName: str) -> tuple[float | None, dict | None]:
+    def edge(self,
+        playerName: str
+    ) -> tuple[float | None, dict | None, pd.DataFrame | None]:       
         # Extract rows where the Player 1 or Player 2 column equals playerName
         # Output with playerName = "Aryna Sabalenka":
         # match_id                                 Player 1          Player 2
@@ -41,7 +48,7 @@ class EdgeCalc:
             (self.matches["Player 1"] == playerName) | (self.matches["Player 2"] == playerName)
         ]
         if playerMatches.empty:
-            return (None, None)
+            return (None, None, None)
 
         # Output with playerName = "Aryna Sabalenka": 
         # { 2026...-Aryna_Sabalenka-Victoria_Mboko, 1,
@@ -52,11 +59,12 @@ class EdgeCalc:
         }
 
         # Extract point-level rows where playerName played
-        self.df = self.df.loc[
-            self.df["match_id"].isin(matchIdToPlayerNumber.keys())
+        df = self.deltaGwePoints.copy()
+        df = df.loc[
+            df["match_id"].isin(matchIdToPlayerNumber.keys())
         ]
-        if self.df.empty:
-            return (None, None)
+        if df.empty:
+            return (None, None, None)
 
         # Add "player_num" and "is_server" columns to the point-level DataFrame
         #   player_num (1 or 2) of playerName
@@ -65,18 +73,18 @@ class EdgeCalc:
         #   match_id                                Gm#  Pt  Svr  player_num  is_server
         #   2026...-Aryna_Sabalenka-Victoria_Mboko  1    1   1    1           1
         #   2026...-Iga_Swiatek-Aryna_Sabalenka     1    1   1    2           0
-        self.df["player_num"] = self.df["match_id"].map(matchIdToPlayerNumber).astype("Int64")
-        self.df["is_server"] = (self.df["player_num"] == self.df["Svr"])
-        totalPoints = len(self.df)
+        df["player_num"] = df["match_id"].map(matchIdToPlayerNumber).astype("Int64")
+        df["is_server"] = (df["player_num"] == df["Svr"])
+        totalPoints = len(df)
         if totalPoints == 0:
-            return (None, None)    
+            return (None, None, None)    
 
         # Remove rows that have None/NaN in at least one of the "svr", "event" and
         # "perspective" columns
-        self.df = self.df.dropna(subset=["Svr", "event", "perspective"])
-        classifiedPoints = len(self.df)
+        df = df.dropna(subset=["Svr", "event", "perspective"])
+        classifiedPoints = len(df)
         if classifiedPoints == 0:
-            return (None, None)
+            return (None, None, None)
         
         # Extract point-level rows where
         #   (1) the event belongs to the server   and playerName serves, OR
@@ -84,13 +92,13 @@ class EdgeCalc:
         # These two cases (two types of points) are used to compute EDGE. In other words,
         # other cases are ignored; e.g., the event belongs to the server and playerName
         # returns (e.g. the oponent's ace)
-        playerPts = self.df.loc[
-            ( (self.df["perspective"] == "server")   & (self.df["is_server"] == 1) ) |
-            ( (self.df["perspective"] == "returner") & (self.df["is_server"] == 0) )
+        playerPts = df.loc[
+            ( (df["perspective"] == "server")   & (df["is_server"] == 1) ) |
+            ( (df["perspective"] == "returner") & (df["is_server"] == 0) )
         ]
         attributedPoints = len(playerPts)
         if attributedPoints == 0:
-            return (None, None)
+            return (None, None, None)
         
         # Count each event type
         # value_counts() produces a data frame like:
@@ -142,8 +150,8 @@ class EdgeCalc:
             "event_counts": eventCountsDict,
         }
 
-        # Create a DataFrame from summaryDic, while turning each row’s nested dictionaries into
-        # separate columns.
+        # Create a DataFrame from summaryDic, turning/flattening summaryDic's
+        # nested dictionaries into separate columns
         #   Example output:
         #     player      EDGE   coverage  ace_edge  double_faults_edge ...
         #     Sabalenka   0.33   0.99      207       145
@@ -163,32 +171,22 @@ class EdgeCalc:
     # Compute EDGE for multiple players
     #   players: List of player names e.g. ["Aryna Sabalenka", , "Iga Swiatek"]
     #
-    def computePlayersEdge(self, players: list[str]) -> pd.DataFrame | None:
+    def playersEdge(self,
+        players: list[str]
+    ) -> tuple[ dict | None, pd.DataFrame | None]:
         
-        rows = []
+        outputDict = {}
+        outputDf   = pd.DataFrame()
+        
         for name in players:
-            edge, summary = computeEdge(name, df, matches, wDict)
+            edge, _, summaryDf = self.edge(name)
             if edge is None:
                 print(f"  {name}: not enough data — skipped.")
                 continue
-            rows.append(summary)
-            print(f"{name:<22} {edge:.5f}")
-
-        # Create a DataFrame from rows, while turning each row’s nested dictionaries into
-        # separate columns.
-        #   Example output:
-        #     player      EDGE   coverage  ace_edge  double_faults_edge ...
-        #     Sabalenka   0.33   0.99      207       145
-        outputDf = pd.DataFrame([
-            {
-                **{key: value
-                   for key, value in r.items() if (key != "event_counts") and (key != "event_EDGE_contrib")},
-                **{ev+"_edge": evEdge for ev, evEdge in r["event_EDGE_contrib"].items()},
-                **{ev+"_count": count for ev, count in r["event_counts"].items()}
-            }
-            for r in rows
-        ])
-        return outputDf
+            outputDict[name] = edge
+            outputDf = pd.concat([outputDf, summaryDf], axis=0, ignore_index=True)
+        
+        return outputDict, outputDf
             
 if __name__ == "__main__":
     from pprint import pprint
@@ -196,11 +194,15 @@ if __name__ == "__main__":
     dl = MCPDataLoader("w")
     calc = EdgeCalc(dl.points, dl.matches)
     
-    edge, summaryDic, summaryDf = calc.computeEdge("Aryna Sabalenka")
+    edge, summaryDic, summaryDf = calc.edge("Aryna Sabalenka")
     print(edge)
     pprint(summaryDic)
     print(summaryDf)
     
-#     outputDf = computePlayersEdge(["Aryna Sabalenka", "Iga Swiatek"], pointsDeltaGwe, matches, wDict)
-#     print(outputDf)
+    outputDict, outputDf = calc.playersEdge(
+        ["Aryna Sabalenka",
+         "Iga Swiatek",
+         "Naomi Osaka"])
+    print(outputDict)
+    print(outputDf)
     
