@@ -1,5 +1,7 @@
+from constants import EVENT_TYPES
+from eventparser import classifyEvent
 import pandas as pd
-from eventparser import classifyEvent, EVENT_TYPES
+
 
 # Add an event label and calculates the change in game win expectancy (delta V) 
 # caused by each point.

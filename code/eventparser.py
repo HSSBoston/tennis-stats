@@ -1,3 +1,4 @@
+from constants import EVENT_TYPES
 import pandas as pd
 
 # 4: out wide
@@ -49,16 +50,6 @@ UNUSUAL_SITUATIONS = set("SRPQ")
 # @: unforced error
 # #: forced error
 ENDING_LETTERS = set("*@#")
-
-EVENT_TYPES = [
-    "ace",         # service ace or winner — server perspective
-    "double_fault",          #                       — server perspective
-    "forced_return_error_drawn", # forced return error drawn - server perspective
-    "unforced_return_error", #                               — returner perspective
-    "winner",                # rally winner (incl. return winner) — hitter perspective
-    "forced_error_drawn",    # forced error drawn          — drawer (winner) perspective
-    "unforced_error",        # unforced error during rally — errorer perspective
-]
 
 # Strip the "c" letters that indicate let serves. 
 # 
