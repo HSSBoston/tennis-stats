@@ -3,14 +3,14 @@ PRJ_DIR = pathlib.Path(__file__).parents[1] # 2 levels up
 sys.path.append(str(PRJ_DIR))
 
 from dataloader import MCPDataLoader
-from edge import EdgeCalc
+from blr import BlrCalc
 from constants import OUTPUT_DIR
-import pandas as pd
-from scipy.stats import spearmanr
-import matplotlib.pyplot as plt
-import numpy as np
 
-# WTA top 100 players as of 06/15/2026
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import spearmanr
+
+
 players = [ 
     "Aryna Sabalenka",
     "Elena Rybakina",
@@ -115,60 +115,52 @@ players = [
 ]
 
 MIN_MATCHES = 10
-EDGE_SCALE = 1000
 
 dl = MCPDataLoader("w")
-calc = EdgeCalc(dl.points, dl.matches)
+calc = BlrCalc(dl.points, dl.matches)
+_, blrDf = calc.playersBlr(players)
 
-outputDict, outputDf = calc.playersEdge(players)
-# print(f"{len(outputDict)} of {len(players)} players evaluated")
-
+# Add WTA ranks based on player-list order
 wtaRanks = pd.DataFrame(list(range(1, len(players)+1)),
                         columns = ["wta_rank"])                        
-outputDf = pd.concat([outputDf, wtaRanks], axis=1)
-outputDf = outputDf.dropna(subset=["player"])
-# print(outputDf)
+df = pd.concat([drDf, wtaRanks], axis=1)
+df = df.dropna(subset=["player", "BLR", "WTA_rank"])
 
-playersCountBefore = len(outputDf)
-outputDf = outputDf[outputDf["matches"] >= MIN_MATCHES]
-playersCountAfter = len(outputDf)
+playersCountBefore = len(df)
+df = df.loc[ df["matches"] >= MIN_MATCHES ]
+playersCountAfter = len(df)
 print(f"{len(players)-playersCountBefore} players excluded due to insufficient data")
 print (f"{playersCountBefore - playersCountAfter} players excluded due to #matches<{MIN_MATCHES}")
 
-outputDf = outputDf.sort_values("EDGE", ascending=False).reset_index(drop=True)
-outputDf["edge_rank"] = outputDf.index + 1
-print(len(outputDf), "players evaluated")
+df = df.sort_values("BLR", ascending=False).reset_index(drop=True)
+df["blr_rank"] = df.index + 1
+print(len(df), "players evaluated")
 
-correlation, pValue = spearmanr(outputDf["edge_rank"], outputDf["wta_rank"])
-print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}")
+# Spearman correlation: BLR rank vs WTA rank
+corr, pValue = spearmanr(df["blr_rank"], df["wta_rank"])
+
+print(f"Spearman correlation between BLR rank and WTA rank: {corr:.3f}")
 print(f"p-value: {pValue:.4f}")
+print(df[["player", "blr", "blr_rank", "wta_rank", "matches", "points"]])
 
-outputDf["scaled_EDGE"] = outputDf["EDGE"] * EDGE_SCALE
-outputDf.to_csv(OUTPUT_DIR / "edge-wta-rank-corr.csv", index=False)
-print(f"\nOutput written to: {OUTPUT_DIR}/edge-wta-rank-corr.csv")
+OUTPUT_DIR.mkdir(exist_ok=True)
+df.to_csv(OUTPUT_DIR / "blr-wta-rank-correlation.csv", index=False)
 
+# Scatter plot
 plt.figure(figsize=(8, 6))
-plt.scatter( outputDf["scaled_EDGE"], outputDf["wta_rank"] )
+plt.scatter(df["blr_rank"], df["wta_rank"])
 
-# Trend line
-slope, intercept = np.polyfit(outputDf["scaled_EDGE"], outputDf["wta_rank"], 1)
-xLine = np.linspace(outputDf["scaled_EDGE"].min(), outputDf["scaled_EDGE"].max(), 100)
-yLine = slope * xLine + intercept
+plt.xlabel("BLR")
+plt.ylabel("WTA Rank")
+plt.title(f"BLR vs WTA Rank\nSpearman r = {corr:.3f}, p = {pValue:.4f}")
 
-plt.plot(
-    xLine, yLine, linestyle="--",
-    linewidth=1.5, color ="red" )
-
-# WTA rank #1 should appear at the top
+# Rank 1 should appear at the top
 plt.gca().invert_yaxis()
 
-plt.title(
-    f"EDGE Value vs WTA Rank\n"
-    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}, "
-    f"Spearman ρ={correlation:.3f}" )
-plt.xlabel("Scaled EDGE value (EDGE × 1000)")
-plt.ylabel("WTA rank")
-
+plt.grid(True, alpha=0.3)
 plt.tight_layout()
+
+plt.savefig(OUTPUT_DIR / "blr-wta-rank-correlation.png", dpi=300)
 plt.show()
+
 
