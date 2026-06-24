@@ -149,11 +149,7 @@ print(f"\nOutput written to: {OUTPUT_DIR}/wta-rank-corr.csv")
 
 plt.figure(figsize=(8, 6))
 
-plt.scatter(
-    outputDf["scaled_EDGE"],
-    outputDf["wta_rank"],
-#     alpha=0.75
-)
+plt.scatter( outputDf["scaled_EDGE"], outputDf["wta_rank"] )
 
 # Trend line
 slope, intercept = np.polyfit(outputDf["scaled_EDGE"], outputDf["wta_rank"], 1)
