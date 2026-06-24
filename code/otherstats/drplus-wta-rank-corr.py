@@ -164,7 +164,7 @@ plt.plot(
 maxWtaRank = df["wta_rank"].max()
 plt.ylim(maxWtaRank + 5, 0)
 
-plt.xlabel("DR+")
+plt.xlabel("Dominance Ratio Plus (DR+)")
 plt.ylabel("WTA Rank (1 = best)")
 plt.title(
     f"DR+ vs WTA Rank\n"
