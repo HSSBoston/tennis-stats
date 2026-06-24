@@ -9,7 +9,7 @@ from constants import OUTPUT_DIR
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
-
+import numpy as np
 
 players = [ 
     "Aryna Sabalenka",
@@ -123,8 +123,8 @@ _, blrDf = calc.playersBlr(players)
 # Add WTA ranks based on player-list order
 wtaRanks = pd.DataFrame(list(range(1, len(players)+1)),
                         columns = ["wta_rank"])                        
-df = pd.concat([drDf, wtaRanks], axis=1)
-df = df.dropna(subset=["player", "BLR", "WTA_rank"])
+df = pd.concat([blrDf, wtaRanks], axis=1)
+df = df.dropna(subset=["player", "BLR", "wta_rank"])
 
 playersCountBefore = len(df)
 df = df.loc[ df["matches"] >= MIN_MATCHES ]
@@ -141,26 +141,39 @@ corr, pValue = spearmanr(df["blr_rank"], df["wta_rank"])
 
 print(f"Spearman correlation between BLR rank and WTA rank: {corr:.3f}")
 print(f"p-value: {pValue:.4f}")
-print(df[["player", "blr", "blr_rank", "wta_rank", "matches", "points"]])
+print(df[["player", "BLR", "blr_rank", "wta_rank", "matches", "points"]])
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 df.to_csv(OUTPUT_DIR / "blr-wta-rank-correlation.csv", index=False)
 
 # Scatter plot
 plt.figure(figsize=(8, 6))
-plt.scatter(df["blr_rank"], df["wta_rank"])
+plt.scatter(df["BLR"], df["wta_rank"])
 
-plt.xlabel("BLR")
-plt.ylabel("WTA Rank")
-plt.title(f"BLR vs WTA Rank\nSpearman r = {corr:.3f}, p = {pValue:.4f}")
+# Trend line
+slope, intercept = np.polyfit(df["BLR"], df["wta_rank"], 1)
+xLine = np.linspace(df["BLR"].min(), df["BLR"].max(), 100)
+yLine = slope * xLine + intercept
 
-# Rank 1 should appear at the top
-plt.gca().invert_yaxis()
+plt.plot(
+    xLine, yLine, linestyle="--",
+    linewidth=1.5, color ="red", label="Linear trend")
 
+# WTA rank #1 should appear near the top;
+# set 0 exactly at the top edge of the y-axis.
+maxWtaRank = df["wta_rank"].max()
+plt.ylim(maxWtaRank + 5, 0)
+
+plt.xlabel("Balanced Leverage Ratio (BLR)")
+plt.ylabel("WTA Rank (1 = best)")
+plt.title(
+    f"Balanced Leverage Ratio (BLR) vs WTA Rank\n"
+    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(df)}" )
+
+plt.legend()
 plt.grid(True, alpha=0.3)
-plt.tight_layout()
 
-plt.savefig(OUTPUT_DIR / "blr-wta-rank-correlation.png", dpi=300)
+plt.tight_layout()
 plt.show()
 
 

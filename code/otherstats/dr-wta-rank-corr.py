@@ -156,15 +156,19 @@ yLine = slope * xLine + intercept
 
 plt.plot(
     xLine, yLine, linestyle="--",
-    linewidth=1.5, color ="red" )
+    linewidth=1.5, color ="red", label="Linear trend")
 
-# WTA rank #1 should appear at the top
-plt.gca().invert_yaxis()
+# WTA rank #1 should appear near the top;
+# set 0 exactly at the top edge of the y-axis.
+maxWtaRank = df["wta_rank"].max()
+plt.ylim(maxWtaRank + 5, 0)
 
 plt.xlabel("Dominance Ratio (DR)")
-plt.ylabel("WTA Rank")
-plt.title(f"DR vs WTA Rank\nSpearman ρ = {corr:.3f}, p = {pval:.4g}")
-
+plt.ylabel("WTA Rank (1 = best)")
+plt.title(
+    f"Dominance Ratio vs WTA Rank\n"
+    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(df)}" )
+plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()

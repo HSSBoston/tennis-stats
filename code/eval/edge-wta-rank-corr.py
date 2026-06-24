@@ -157,17 +157,20 @@ yLine = slope * xLine + intercept
 
 plt.plot(
     xLine, yLine, linestyle="--",
-    linewidth=1.5, color ="red" )
+    linewidth=1.5, color ="red", label="Linear trend")
 
-# WTA rank #1 should appear at the top
-plt.gca().invert_yaxis()
+# WTA rank #1 should appear near the top;
+# set 0 exactly at the top edge of the y-axis.
+maxWtaRank = outputDf["wta_rank"].max()
+plt.ylim(maxWtaRank + 5, 0)
 
 plt.title(
     f"EDGE Value vs WTA Rank\n"
-    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}, "
-    f"Spearman ρ={correlation:.3f}" )
+    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}")
 plt.xlabel("Scaled EDGE value (EDGE × 1000)")
-plt.ylabel("WTA rank")
+plt.ylabel("WTA rank (1 = best)")
+plt.legend()
+plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
