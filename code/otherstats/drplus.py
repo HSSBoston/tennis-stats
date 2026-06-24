@@ -24,7 +24,7 @@ class DrPlusCalc:
     def drPlus(self,
         playerName: str
     ) -> tuple[float | None, dict | None, pd.DataFrame | None]:
-
+        
         drValue,  drSummaryDict,  _ = self.drCalc.dr(playerName)
         blrValue, blrSummaryDict, _ = self.blrCalc.blr(playerName)
 
