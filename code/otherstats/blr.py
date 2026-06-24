@@ -10,15 +10,15 @@ import pandas as pd
 
 
 class BlrCalc:
-    #   points:  Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
-    #   matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
+    # points:  Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
+    # matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
     #
     def __init__(self,
         points: pd.DataFrame,
         matches: pd.DataFrame
     ) -> None:
-        #   deltaGwePoints: original MCP data + extra columns "server_won_game",
-        #       "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
+        # deltaGwePoints: original MCP data + extra columns "server_won_game",
+        # "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
         self.deltaGwePoints: pd.DataFrame
         self.matches: pd.DataFrame = matches
 

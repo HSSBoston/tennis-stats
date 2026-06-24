@@ -1,3 +1,5 @@
+# EDGE - Event-Driven Gain in Expectancy
+
 from dataloader import MCPDataLoader
 from expectancy import computeGameWinExpectancy
 from eventweights import computeDeltaGameWinExpectancy, computeEventWeights
