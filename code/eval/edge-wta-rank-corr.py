@@ -144,8 +144,8 @@ print(f"\nSpearman correlation between EDGE rank and WTA rank: {correlation:.3f}
 print(f"p-value: {pValue:.4f}")
 
 outputDf["scaled_EDGE"] = outputDf["EDGE"] * EDGE_SCALE
-outputDf.to_csv(OUTPUT_DIR / "wta-rank-corr.csv", index=False)
-print(f"\nOutput written to: {OUTPUT_DIR}/wta-rank-corr.csv")
+outputDf.to_csv(OUTPUT_DIR / "edge-wta-rank-corr.csv", index=False)
+print(f"\nOutput written to: {OUTPUT_DIR}/edge-wta-rank-corr.csv")
 
 plt.figure(figsize=(8, 6))
 
