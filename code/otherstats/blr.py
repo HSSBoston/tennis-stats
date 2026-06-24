@@ -8,7 +8,6 @@ from eventweights import computeDeltaGameWinExpectancy
 from constants import OUTPUT_DIR
 import pandas as pd
 
-
 class BlrCalc:
     # points:  Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
     # matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
@@ -20,7 +19,7 @@ class BlrCalc:
         # deltaGwePoints: original MCP data + extra columns "server_won_game",
         # "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
         self.deltaGwePoints: pd.DataFrame
-        self.matches: pd.DataFrame = matches
+        self.matches:        pd.DataFrame = matches
 
         gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
         self.deltaGwePoints = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
@@ -115,30 +114,25 @@ class BlrCalc:
             blr = (serveLR + returnLR) / 2
 
         summaryDic = {
-            "player": playerName,
-            "BLR": blr,
-            "serve_LR": serveLR,
+            "player":    playerName,
+            "BLR":       blr,
+            "serve_LR":  serveLR,
             "return_LR": returnLR,
-
-            "points": totalPoints,
-            "matches": len(playerMatches),
-
-            "serve_points": len(servePts),
-            "return_points": len(returnPts),
-
-            "serve_points_won": len(serveWonLev),
-            "serve_points_lost": len(serveLostLev),
-            "return_points_won": len(returnWonLev),
+            "points":    totalPoints,
+            "matches":   len(playerMatches),
+            "serve_points":       len(servePts),
+            "return_points":      len(returnPts),
+            "serve_points_won":   len(serveWonLev),
+            "serve_points_lost":  len(serveLostLev),
+            "return_points_won":  len(returnWonLev),
             "return_points_lost": len(returnLostLev),
-
-            "avg_serve_won_LEV": serveWonLev.mean(),
-            "avg_serve_lost_LEV": serveLostLev.mean(),
-            "avg_return_won_LEV": returnWonLev.mean(),
+            "avg_serve_won_LEV":   serveWonLev.mean(),
+            "avg_serve_lost_LEV":  serveLostLev.mean(),
+            "avg_return_won_LEV":  returnWonLev.mean(),
             "avg_return_lost_LEV": returnLostLev.mean(),
         }
 
         summaryDf = pd.DataFrame([summaryDic])
-
         return blr, summaryDic, summaryDf
 
     # Compute BLR for multiple players
@@ -159,10 +153,8 @@ class BlrCalc:
             if blr is None:
                 print(f"  {name}: not enough data — skipped.")
                 continue
-
             outputDict[name] = blr
             outputDf = pd.concat([outputDf, summaryDf], axis=0, ignore_index=True)
-
         return outputDict, outputDf
 
 
