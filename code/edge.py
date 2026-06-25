@@ -39,6 +39,7 @@ class EdgeCalc:
         playerName: str
     ) -> tuple[float | None, dict | None, pd.DataFrame | None]:       
         # Extract rows where the Player 1 or Player 2 column equals playerName
+        #   from the match-level DataFrame
         # Output with playerName = "Aryna Sabalenka":
         #   match_id                                Player 1         Player 2
         #   2026...-Aryna_Sabalenka-Victoria_Mboko  Aryna Sabalenka  Victoria Mboko
@@ -74,7 +75,7 @@ class EdgeCalc:
         #   2026...-Aryna_Sabalenka-Victoria_Mboko  1    1   1    1           1
         #   2026...-Iga_Swiatek-Aryna_Sabalenka     1    1   1    2           0
         df["player_num"] = df["match_id"].map(matchIdToPlayerNumber).astype("Int64")
-        df["is_server"] = (df["player_num"] == df["Svr"])
+        df["is_server"]  = (df["player_num"] == df["Svr"])
         totalPoints = len(df)
         if totalPoints == 0:
             return (None, None, None)    
