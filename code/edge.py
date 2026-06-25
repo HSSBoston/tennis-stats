@@ -5,15 +5,15 @@ from constants import OUTPUT_DIR
 import pandas as pd
 
 class EdgeCalc:
-    #   points:  Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
-    #   matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
+    # points:  Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
+    # matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
     #
     def __init__(self,
         points: pd.DataFrame,
         matches: pd.DataFrame
     ) -> None:
-        #   deltaGwePoints: original MCP DataFrame + extra columns "server_won_game",
-        #       "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
+        #  deltaGwePoints: original MCP DataFrame + extra columns "server_won_game",
+        #    "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
         #   wDict: Maps each event type to average game-win expectancy (delta_V)
         self.deltaGwePoints: pd.DataFrame
         self.wDict:          dict
@@ -31,7 +31,7 @@ class EdgeCalc:
     # Compute EDGE for a given player
     #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
     # Returns:
-    #   edgePerTotalPoint: EDGE
+    #   edgePerTotalPoint: EDGE value
     #   summaryDict:
     #   summaryDf: 
     #
@@ -40,18 +40,19 @@ class EdgeCalc:
     ) -> tuple[float | None, dict | None, pd.DataFrame | None]:       
         # Extract rows where the Player 1 or Player 2 column equals playerName
         # Output with playerName = "Aryna Sabalenka":
-        # match_id                                 Player 1          Player 2
-        # 2026...-Aryna_Sabalenka-Victoria_Mboko   Aryna Sabalenka   Victoria Mboko
-        # 2026...-Iga_Swiatek-Aryna_Sabalenka      Iga Swiatek       Aryna Sabalenka
+        #   match_id                                Player 1         Player 2
+        #   2026...-Aryna_Sabalenka-Victoria_Mboko  Aryna Sabalenka  Victoria Mboko
+        #   2026...-Iga_Swiatek-Aryna_Sabalenka     Iga Swiatek      Aryna Sabalenka
         playerMatches= self.matches.loc[
             (self.matches["Player 1"] == playerName) | (self.matches["Player 2"] == playerName)
         ]
         if playerMatches.empty:
             return (None, None, None)
-
+        
+        # Identify whether PlayerName is Player 1 or 2 in each match
         # Output with playerName = "Aryna Sabalenka": 
-        # { 2026...-Aryna_Sabalenka-Victoria_Mboko, 1,
-        #   2026...-Iga_Swiatek-Aryna_Sabalenka,    2 }
+        #   { 2026...-Aryna_Sabalenka-Victoria_Mboko, 1,
+        #     2026...-Iga_Swiatek-Aryna_Sabalenka,    2 }
         matchIdToPlayerNumber = {
             row["match_id"]: 1 if row["Player 1"] == playerName else 2
                 for _, row in playerMatches.iterrows()
