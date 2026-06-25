@@ -90,9 +90,7 @@ class EdgeCalc:
         # Extract point-level rows where
         #   (1) the event belongs to the server   and playerName serves, OR
         #   (2) the event belongs to the returner and playerName returns
-        # These two cases (two types of points) are used to compute EDGE. In other words,
-        # other cases are ignored; e.g., the event belongs to the server and playerName
-        # returns (e.g. the oponent's ace)
+        # These two cases (two types of points) are used to compute EDGE.
         playerPts = df.loc[
             ( (df["perspective"] == "server")   & (df["is_server"] == 1) ) |
             ( (df["perspective"] == "returner") & (df["is_server"] == 0) )
