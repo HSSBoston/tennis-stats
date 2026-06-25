@@ -5,7 +5,6 @@ from constants import OUTPUT_DIR
 import pandas as pd
 
 class EdgeCalc:
-
     #   points:  Point-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.points
     #   matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
     #
@@ -13,12 +12,12 @@ class EdgeCalc:
         points: pd.DataFrame,
         matches: pd.DataFrame
     ) -> None:
-        #   deltaGwePoints: original MCP data + extra columns "server_won_game", "next_state",
-        #       "V_before", "V_after", "event", "perspective", "delta_V"
+        #   deltaGwePoints: original MCP DataFrame + extra columns "server_won_game",
+        #       "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
         #   wDict: Maps each event type to average game-win expectancy (delta_V)
         self.deltaGwePoints: pd.DataFrame
-        self.wDict:   dict
-        self.matches: pd.DataFrame = matches
+        self.wDict:          dict
+        self.matches:        pd.DataFrame = matches
         
         gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
         self.deltaGwePoints = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
