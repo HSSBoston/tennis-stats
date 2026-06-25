@@ -100,16 +100,15 @@ class EdgeCalc:
             return (None, None, None)
         
         # Count each event type
-        # value_counts() produces a data frame like:
-        #   ace_or_winner  50
+        # value_counts() produces a DataFrame like:
+        #   ace            50
         #   double_fault   10
         #   unforced_error 20
         eventCountsDict = playerPts["event"].value_counts().to_dict()
         
-        missingEvents = set(eventCountsDict) - set(self.wDict)
-        if missingEvents:
-            raise ValueError(f"Missing weights for event types: {sorted(missingEvents)}"
-        )
+        missingEvents = len(self.wDict) - len(eventCountsDict)
+        if missingEvents > 0:
+            return (None, None, None)
 
         positiveNumerator = 0.0
         negativeNumerator = 0.0
@@ -123,8 +122,8 @@ class EdgeCalc:
             elif contribution < 0:
                 negativeNumerator += contribution
 
-        edgeNumerator = positiveNumerator + negativeNumerator
-        edgePerTotalPoint      = edgeNumerator / totalPoints
+        edgeNumerator     = positiveNumerator + negativeNumerator
+        edgePerTotalPoint = edgeNumerator / totalPoints
     #     edgePerClassifiedPoint = edgeNumerator / classifiedPoints
     #     edgePerAttributedPoint = edgeNumerator / attributedPoints
 
