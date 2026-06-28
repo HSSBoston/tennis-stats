@@ -14,4 +14,5 @@ This work proposes a new way to evaluate an individual player's overall performa
 
 ## Presentations
 
-- Presented at [PhysTech 2026](https://phystech-2026.devpost.com/), June 2026.
+- Presented at [PhysTech 2026](https://phystech-2026.devpost.com/), 2nd place and Excellence in Research Award, PhysTech 2026, June 2026.
+
