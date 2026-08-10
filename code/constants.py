@@ -4,6 +4,8 @@ PRJ_DIR    = Path(__file__).parent
 MCP_DIR    = PRJ_DIR / "data" / "tennis_MatchChartingProject"
 OUTPUT_DIR = PRJ_DIR / "output"
 
+RNG_SEED = 20260810
+
 # 18 non-terminal game states (server's point first)
 GAME_STATES = [
     "0-0",  "0-15",  "0-30",  "0-40",

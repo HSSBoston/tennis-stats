@@ -1,6 +1,6 @@
 from pathlib import Path
-import pandas as pd
-from constants import GAME_STATES, MCP_DIR
+import pandas as pd, numpy as np
+from constants import GAME_STATES, MCP_DIR, RNG_SEED
 
 class MCPDataLoader:
     def __init__(self,
@@ -55,8 +55,30 @@ class MCPDataLoader:
         
     def loadMatches(self) -> None:
         self.matches = pd.read_csv(self.matchesPath, dtype=str)
+    
+    def bootstrap(self, seed:int = RNG_SEED) -> pd.DataFrame():
+        rng = np.random.default_rng(seed)
+        
+        matchIds = self.points["match_id"].unique()
+        sampledIds = rng.choice(matchIds, size=len(matchIds), replace=True)
+
+        sampledFrames = []
+
+        for copyNumber, matchId in enumerate(sampledIds):
+            matchPoints = self.points.loc[
+                self.points["match_id"] == matchId
+            ].copy()
+            
+            # Prevent duplicate selections from being grouped together
+            matchPoints["match_id"] = (matchId + f"__bootstrap_{copyNumber}")
+
+            sampledFrames.append(matchPoints)
+
+        return pd.concat(sampledFrames, ignore_index=True)
 
 
 if __name__ == "__main__":
     dataLoader = MCPDataLoader("w")
-    print(dataLoader.points.head())
+    print( dataLoader.points.head() )
+    
+    print( dataLoader.bootstrap().head() )
