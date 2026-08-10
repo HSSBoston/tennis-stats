@@ -95,14 +95,14 @@ if __name__ == "__main__":
     gweSummaryDf = summarizeBootstrap(
         originalGweDict,
         gweBootstrapDf,
-        GAME_STATES,
+        GAME_STATES
     )
     gweSummaryDf.index.name = "score_state"
 
     weightSummaryDf = summarizeBootstrap(
         originalWeightDict,
         weightBootstrapDf,
-        EVENT_TYPES,
+        EVENT_TYPES
     )
     weightSummaryDf.index.name = "event"
 
