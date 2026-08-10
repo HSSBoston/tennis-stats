@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd, numpy as np
-from constants import GAME_STATES, MCP_DIR, RNG_SEED
+from constants import GAME_STATES, MCP_DIR
 
 class MCPDataLoader:
     def __init__(self,
@@ -13,6 +13,7 @@ class MCPDataLoader:
         self.matchesPath: Path
         self.points = pd.DataFrame()
         self.matches = pd.DataFrame()
+        self.pointsByMatch = {}
 
         if tour not in {"w", "m"}:
             raise ValueError("tour must be 'w' or 'm'")
@@ -27,6 +28,11 @@ class MCPDataLoader:
         self.verifyPaths(pointsFiles, matchesFile)
         self.loadPoints()
         self.loadMatches()
+
+        self.pointsByMatch = {
+            matchId: matchPoints
+                for matchId, matchPoints in self.points.groupby("match_id", sort=False)
+        }
 
     def verifyPaths(self, pointsFiles: list[str], matchesFile: str) -> None:
         self.pointsPaths = [MCP_DIR / f for f in pointsFiles]
@@ -56,22 +62,16 @@ class MCPDataLoader:
     def loadMatches(self) -> None:
         self.matches = pd.read_csv(self.matchesPath, dtype=str)
     
-    def bootstrap(self, seed:int = RNG_SEED) -> pd.DataFrame():
-        rng = np.random.default_rng(seed)
-        
+    def bootstrap(self, rng: np.random.Generator) -> pd.DataFrame:
         matchIds = self.points["match_id"].unique()
         sampledIds = rng.choice(matchIds, size=len(matchIds), replace=True)
 
         sampledFrames = []
 
         for copyNumber, matchId in enumerate(sampledIds):
-            matchPoints = self.points.loc[
-                self.points["match_id"] == matchId
-            ].copy()
-            
+            matchPoints = self.pointsByMatch[matchId].copy()            
             # Prevent duplicate selections from being grouped together
             matchPoints["match_id"] = (matchId + f"__bootstrap_{copyNumber}")
-
             sampledFrames.append(matchPoints)
 
         return pd.concat(sampledFrames, ignore_index=True)
@@ -80,5 +80,7 @@ class MCPDataLoader:
 if __name__ == "__main__":
     dataLoader = MCPDataLoader("w")
     print( dataLoader.points.head() )
-    
-    print( dataLoader.bootstrap().head() )
+
+    from constants import RNG_SEED
+    rng = np.random.default_rng(RNG_SEED)
+    print( dataLoader.bootstrap(rng).head() )
