@@ -16,7 +16,7 @@ class MCPDataLoader:
         self.pointsByMatch = {}
 
         if tour not in {"w", "m"}:
-            raise ValueError("tour must be 'w' or 'm'")
+            raise ValueError("Tour must be 'w' or 'm'")
         self.tour = tour
 
         if pointsFiles == None:
@@ -29,6 +29,7 @@ class MCPDataLoader:
         self.loadPoints()
         self.loadMatches()
 
+        # Divide the rows in points into groups (DataFrames) according to their match_id
         self.pointsByMatch = {
             matchId: matchPoints
                 for matchId, matchPoints in self.points.groupby("match_id", sort=False)
