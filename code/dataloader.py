@@ -16,6 +16,7 @@ class MCPDataLoader:
 
         if tour not in {"w", "m"}:
             raise ValueError("tour must be 'w' or 'm'")
+        self.tour = tour
 
         if pointsFiles == None:
             pointsFiles = [f"charting-{tour}-points-2020s.csv"]
@@ -23,8 +24,6 @@ class MCPDataLoader:
             raise ValueError("pointsFiles must contain at least one filename")
         matchesFile = f"charting-{tour}-matches.csv"
         
-        self.tour = tour
-
         self.verifyPaths(pointsFiles, matchesFile)
         self.loadPoints()
         self.loadMatches()
@@ -56,7 +55,6 @@ class MCPDataLoader:
         
     def loadMatches(self) -> None:
         self.matches = pd.read_csv(self.matchesPath, dtype=str)
-
 
 
 if __name__ == "__main__":
