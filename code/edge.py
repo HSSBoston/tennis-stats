@@ -104,11 +104,15 @@ class EdgeCalc:
         #   ace            50
         #   double_fault   10
         #   unforced_error 20
-        eventCountsDict = playerPts["event"].value_counts().to_dict()
-        
-        missingEvents = len(self.wDict) - len(eventCountsDict)
-        if missingEvents > 0:
-            return (None, None, None)
+        counts = playerPts["event"].value_counts()
+        # get(event, 0) returns the event's count if present; otherwise returns 0
+        eventCountsDict = {
+            event: int(counts.get(event, 0)) for event in self.wDict }
+
+#         eventCountsDict = playerPts["event"].value_counts().to_dict()
+#         missingEvents = len(self.wDict) - len(eventCountsDict)
+#         if missingEvents > 0:
+#             return (None, None, None)
 
         positiveNumerator = 0.0
         negativeNumerator = 0.0

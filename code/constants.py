@@ -14,11 +14,12 @@ GAME_STATES = [
 ]
 
 EVENT_TYPES = [
-    "ace",         # service ace or winner — server perspective
-    "double_fault",          #                       — server perspective
+    "ace",                   # service ace (incl. unreturnables) — server perspective
+    "double_fault",          # double fault                      — server perspective
     "forced_return_error_drawn", # forced return error drawn - server perspective
     "unforced_return_error", #                               — returner perspective
-    "winner",                # rally winner (incl. return winner) — hitter perspective
+    "return_winner",         # return winner                    — returner perspective    
+    "winner",                # rally winner (non-return winner) — hitter perspective
     "forced_error_drawn",    # forced error drawn          — drawer (winner) perspective
     "unforced_error",        # unforced error during rally — errorer perspective
 ]

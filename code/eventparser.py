@@ -111,7 +111,7 @@ def classifyEvent(first: str, second: str):
     if last not in ENDING_LETTERS:
         return None
 
-    rallyShotCount = sum(1 for c in afterServe if c in SHOT_LETTERS)
+    rallyShotCount = sum(1 for l in afterServe if l in SHOT_LETTERS)
     totalShotCount= 1 + rallyShotCount            # serve + rally shots
     lastShotByServer = (totalShotCount % 2 == 1)  # odd: server hit the last shot
 
@@ -122,10 +122,12 @@ def classifyEvent(first: str, second: str):
         return None
     # Winner
     if last == "*":
+        if rallyShotCount == 1:
+            return ("return_winner", "returner")
         if lastShotByServer:
-            return ("winner", "server")
+            return ("winner", "server") # rally winner
         else:
-            return ("winner", "returner")
+            return ("winner", "returner")  # rally winner
     # Unforced error — credited (negatively) to the player who hit it
     if last == "@":
         if rallyShotCount == 1:
@@ -163,6 +165,11 @@ if __name__ == "__main__":
     assert classifyEvent("4w", "6d")  == ("double_fault", "server")
     assert classifyEvent("4n", "5n") == ("double_fault", "server")
 
+    # Return winners
+    assert classifyEvent("4b19*", "") == ("return_winner", "returner")
+    assert classifyEvent("4w", "6f39*") == ("return_winner", "returner")
+    assert classifyEvent("4+f;17*", None) == ("return_winner", "returner")
+    
     # Forced error on return
     assert classifyEvent("6b2n#", "") == ("forced_return_error_drawn", "server")
     assert classifyEvent("6f#", "")  == ("forced_return_error_drawn", "server")
