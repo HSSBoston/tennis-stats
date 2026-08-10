@@ -11,52 +11,32 @@ from constants import EVENT_TYPES, GAME_STATES, OUTPUT_DIR, RNG_SEED
 NUM_BOOTSTRAP_SAMPLES = 2000
 CONFIDENCE_LEVEL = 0.95
 
+# Summarize bootstrap estimates for game-win expectancy values (for different
+# score states) or event weights (for different event types). The original
+# full-dataset estimates are also reported.
+#
 def summarizeBootstrap(
-    originalValues: dict,
+    originalValues:  dict,
     bootstrapValues: pd.DataFrame,
-    orderedLabels: list[str],
+    orderedLabels:   list[str],
 ) -> pd.DataFrame:
-    """
-    Summarize bootstrap estimates for GWE states or event weights.
-
-    The original full-dataset estimates remain the reported point
-    estimates. Bootstrap samples provide uncertainty statistics.
-    """
+    
     alpha = 1.0 - CONFIDENCE_LEVEL
 
-    bootstrapValues = bootstrapValues.reindex(
-        columns=orderedLabels
-    )
+    bootstrapValues = bootstrapValues.reindex(columns=orderedLabels)
+    originalSeries  = pd.Series(originalValues, dtype=float).reindex(orderedLabels)
+    bootstrapMean   = bootstrapValues.mean(axis=0)
 
-    originalSeries = pd.Series(
-        originalValues,
-        dtype=float,
-    ).reindex(orderedLabels)
-
-    bootstrapMean = bootstrapValues.mean(axis=0)
-
-    summaryDf = pd.DataFrame({
-        "estimate": originalSeries,
-        "bootstrap_mean": bootstrapMean,
+    summaryDf = pd.DataFrame( {
+        "original":         originalSeries,
+        "bootstrap_mean":   bootstrapMean,
         "bootstrap_median": bootstrapValues.median(axis=0),
-        "bootstrap_bias": bootstrapMean - originalSeries,
-        "bootstrap_se": bootstrapValues.std(
-            axis=0,
-            ddof=1,
-        ),
-        "ci_lower": bootstrapValues.quantile(
-            alpha / 2.0,
-            axis=0,
-        ),
-        "ci_upper": bootstrapValues.quantile(
-            1.0 - alpha / 2.0,
-            axis=0,
-        ),
-        "valid_replicates": bootstrapValues.notna().sum(
-            axis=0
-        ),
-    })
-
+        "bootstrap_bias":   bootstrapMean - originalSeries,
+        "bootstrap_se":     bootstrapValues.std(axis=0, ddof=1),
+        "ci_lower":         bootstrapValues.quantile(alpha/2.0, axis=0),
+        "ci_upper":         bootstrapValues.quantile(1.0 - alpha/2.0, axis=0),
+        "valid_replicates": bootstrapValues.notna().sum(axis=0)
+    } )
     return summaryDf
 
 
