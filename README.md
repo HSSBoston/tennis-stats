@@ -12,9 +12,11 @@ Unlike these deterministic metrics, this project studies a probabilistic metric 
 This work proposes a new way to evaluate an individual player's overall performance in tennis. The proposed metric, called Event-Driven Gain in Expectancy (EDGE), determines the values of both positive and negative point-level events (e.g., aces, winners, double faults, and unforced errors) based on their probabilistic impacts on the probability of winning the current game. EDGE then integrates these event values into a context-aware composite measure of player performance. 
 -->
 
+<!--
 ## Publications
 
 - Hanna Suzuki, “Event-Driven Gain in Expectancy (EDGE): A Probabilistic Composite Metric for Comprehensive Player Perfor-mance in Tennis,” In *Hack What Moves You: Technology Innovations for Fitness, Sports and Active Living from PhysTech 2026*, Binnovative Innovation Book Series, 2026, in press. preprint
+-->
 
 ## Presentations
 
