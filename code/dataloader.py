@@ -60,5 +60,3 @@ class MCPDataLoader:
 if __name__ == "__main__":
     dataLoader = MCPDataLoader("w")
     print(dataLoader.points.head())
-
-
