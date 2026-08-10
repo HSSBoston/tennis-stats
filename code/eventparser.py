@@ -107,7 +107,6 @@ def classifyEvent(first: str, second: str):
     afterServe = shotSequence[i:]
     if afterServe == "":
         return None
-
     last = afterServe[-1]
     if last not in ENDING_LETTERS:
         return None
