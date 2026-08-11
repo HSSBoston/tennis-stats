@@ -9,7 +9,7 @@ from expectancy import computeGameWinExpectancy
 from constants import EVENT_TYPES, GAME_STATES, OUTPUT_DIR, RNG_SEED
 
 # Exploratory analysis               500–1,000
-# Standard errors                    1,000–2,000 |
+# Standard errors                    1,000–2,000
 # 95% confidence intervals           2,000–5,000
 # Publication-quality tail estimates 5,000–10,000+
 # Very small p-values                10,000+
