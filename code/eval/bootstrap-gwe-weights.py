@@ -8,7 +8,12 @@ from eventweights import computeDeltaGameWinExpectancy, computeEventWeights
 from expectancy import computeGameWinExpectancy
 from constants import EVENT_TYPES, GAME_STATES, OUTPUT_DIR, RNG_SEED
 
-NUM_BOOTSTRAP_SAMPLES = 2000
+# Exploratory analysis               500–1,000
+# Standard errors                    1,000–2,000 |
+# 95% confidence intervals           2,000–5,000
+# Publication-quality tail estimates 5,000–10,000+
+# Very small p-values                10,000+
+NUM_BOOTSTRAP_SAMPLES = 5000
 CONFIDENCE_LEVEL = 0.95
 
 # Summarize bootstrap estimates for game-win expectancy values (for different
