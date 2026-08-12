@@ -61,7 +61,8 @@ class MCPDataLoader:
             if len(self.matchesByMatch[matchId]) != 1:
                 raise ValueError(
                     f"Expected one metadata row for {matchId}, "
-                    f"found {len(self.matchesByMatch[matchId])}" )        
+                    f"found {len(self.matchesByMatch[matchId])}",
+                    self.matchesByMatch[matchId])
 
     def loadPoints(self) -> None:
         frames = [pd.read_csv(p, dtype=str) for p in self.pointsPaths]
@@ -103,7 +104,7 @@ class MCPDataLoader:
             sampledPointFrames.append(matchPoints)
             sampledMatchFrames.append(matchMetadata)
 
-        return (pd.concat(sampledFrames, ignore_index=True),
+        return (pd.concat(sampledPointFrames, ignore_index=True),
                 pd.concat(sampledMatchFrames, ignore_index=True) )
 
 
