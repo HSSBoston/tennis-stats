@@ -64,13 +64,6 @@ class MCPDataLoader:
                     f"found {len(self.matchesByMatch[matchId])}",
                     self.matchesByMatch[matchId])
 
-    def validateBootstrappingConsistency(self, bootstrappedPoints, bootstrappedMatches) -> bool:
-        pointMatchIds    = set( bootstrappedPoints["match_id"].unique() )
-        metadataMatchIds = set( bootstrappedMatches["match_id"].unique() )
-        assert pointMatchIds == metadataMatchIds
-        assert ( not bootstrappedMatches["match_id"].duplicated().any() )
-        assert len(bootstrappedMatches) == len(dl.pointsByMatch)
-
     def loadPoints(self) -> None:
         frames = [pd.read_csv(p, dtype=str) for p in self.pointsPaths]
         df = pd.concat(frames, axis=0, ignore_index=True)
@@ -111,12 +104,20 @@ class MCPDataLoader:
             sampledPointFrames.append(matchPoints)
             sampledMatchFrames.append(matchMetadata)
             
-            bootstrappedPoints  = pd.concat(sampledPointFrames, ignore_index=True)
-            bootstrappedMatches = pd.concat(sampledMatchFrames, ignore_index=True)
-            
-            if validateBootstrappingConsistency(bootstrappedPoints, bootstrappedMatches):
-                return bootstrappedPoints, bootstrappedMatches
+        bootstrappedPoints  = pd.concat(sampledPointFrames, ignore_index=True)
+        bootstrappedMatches = pd.concat(sampledMatchFrames, ignore_index=True)
+        self.validateBootstrappingConsistency(bootstrappedPoints, bootstrappedMatches)
+        return bootstrappedPoints, bootstrappedMatches
 
+    def validateBootstrappingConsistency(self,
+        bootstrappedPoints: pd.DataFrame,
+        bootstrappedMatches: pd.DataFrame
+    ) -> bool:
+        pointMatchIds    = set( bootstrappedPoints["match_id"].unique() )
+        metadataMatchIds = set( bootstrappedMatches["match_id"].unique() )
+        assert pointMatchIds == metadataMatchIds
+        assert ( not bootstrappedMatches["match_id"].duplicated().any() )
+        assert len(bootstrappedMatches) == len(self.pointsByMatch)
 
 if __name__ == "__main__":
     dataLoader = MCPDataLoader("w")
