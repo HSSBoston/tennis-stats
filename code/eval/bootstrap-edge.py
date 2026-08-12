@@ -17,108 +17,108 @@ NUM_BOOTSTRAP_SAMPLES = 10
 CONFIDENCE_LEVEL = 0.95
 MIN_MATCHES = 10
 
-# WTA top 100 players as of 06/15/2026
+# WTA top 100 players as of 05/25/2026
 players = [
     "Aryna Sabalenka",
     "Elena Rybakina",
     "Iga Swiatek",
-    "Jessica Pegula",
-    "Mirra Andreeva",
-    "Amanda Anisimova",
     "Coco Gauff",
+    "Jessica Pegula",
+    "Amanda Anisimova",
     "Elina Svitolina",
+    "Mirra Andreeva",
     "Victoria Mboko",
     "Karolina Muchova",
     "Belinda Bencic",
-    "Marta Kostyuk",
     "Linda Noskova",
     "Jasmine Paolini",
+    "Ekaterina Alexandrova",
+    "Marta Kostyuk",
     "Naomi Osaka",
-    "Diana Shnaider",
     "Iva Jovic",
     "Sorana Cirstea",
-    "Ekaterina Alexandrova",
-    "Anna Kalinskaya",
-    "Maja Chwalinska",
-    "Leylah Fernandez",
+    "Madison Keys",
     "Clara Tauson",
     "Elise Mertens",
+    "Leylah Fernandez",
+    "Diana Shnaider",
+    "Anna Kalinskaya",
     "Emma Navarro",
-    "Anastasia Potapova",
-    "Marie Bouzkova",
-    "Madison Keys",
-    "Ann Li",
     "Hailey Baptiste",
-    "Emma Raducanu",
-    "Xinyu Wang",
-    "Donna Vekic",
+    "Liudmila Samsonova",
+    "Marie Bouzkova",
+    "Ann Li",
+    "Anastasia Potapova",
+    "Jelena Ostapenko",
+    "Jaqueline Cristian",
+    "Cristina Bucsa",
+    "Xin Yu Wang", # Xinyu Wang
+    "Sara Bejlek",
     "Katerina Siniakova",
     "Alexandra Eala",
-    "Cristina Bucsa",
-    "Liudmila Samsonova",
-    "Jelena Ostapenko",
-    "Barbora Krejcikova",
-    "Jaqueline Cristian",
-    "Maria Sakkari",
-    "Laura Siegemund",
-    "Janice Tjen",
-    "McCartney Kessler",
-    "Magdalena Frech",
     "Elisabetta Cocciaretto",
-    "Sara Bejlek",
-    "Magda Linette",
+    "Emma Raducanu",
+    "Janice Tjen",
+    "Barbora Krejcikova",
+    "Tereza Valentova",
+    "Lois Boisson",
     "Marketa Vondrousova",
     "Dayana Yastremska",
-    "Oleksandra Oliynykova",
+    "Magdalena Frech",
+    "Laura Siegemund",
+    "Mccartney Kessler",
+    "Maria Sakkari",
+    "Jessica Bouzas Maneiro",
     "Petra Marcinko",
     "Maya Joint",
-    "Caty McNally",
-    "Jessica Bouzas Maneiro",
-    "Katie Boulter",
-    "Antonia Ruzic",
-    "Solana Sierra",
-    "Yuliia Starodubtseva",
-    "Diane Parry",
-    "Zeynep Sonmez",
-    "Nikola Bartunkova",
-    "Tereza Valentova",
-    "Peyton Stearns",
-    "Kamilla Rakhimova",
-    "Talia Gibson",
-    "Shuai Zhang",
-    "Panna Udvardy",
     "Daria Kasatkina",
-    "Camila Osorio",
-    "Anhelina Kalinina",
-    "Varvara Gracheva",
-    "Kimberly Birrell",
+    "Tatjana Maria",
+    "Yuliia Starodubtseva",
+    "Qinwen Zheng",
     "Anna Bondar",
-    "Daria Snigur",
-    "Viktorija Golubic",
-    "Renata Zarazua",
-    "Tamara Korpatsch",
-    "Alycia Parks",
-    "Eva Lys",
-    "Taylor Townsend",
-    "Elsa Jacquemot",
+    "Talia Gibson",
+    "Panna Udvardy",
+    "Anhelina Kalinina",
+    "Shuai Zhang",
     "Sonay Kartal",
-    "Lilli Tagger",
+    "Caty Mcnally",
+    "Antonia Ruzic",
+    "Oleksandra Oliynykova",
+    "Zeynep Sonmez",
+    "Elsa Jacquemot",
+    "Solana Sierra",
+    "Nikola Bartunkova",
+    "Varvara Gracheva",
+    "Katie Boulter",
+    "Donna Vekic",
+    "Magda Linette",
+    "Renata Zarazua",
+    "Taylor Townsend",
     "Yulia Putintseva",
-    "Veronika Erjavec",
-    "Karolina Pliskova",
-    "Simona Waltert",
-    "Oksana Selekhmeteva",
+    "Elena Gabriela Ruse", # Elena-Gabriela Ruse
+    "Peyton Stearns",
+    "Alycia Parks",
     "Anastasia Zakharova",
-    "Maria Timofeeva",
-    "Sinja Kraus",
-    "Lanlana Tararudee",
-    "Ella Seidel",
-    "Ashlyn Krueger",
-    "Ajla Tomljanovic",
-    "Alina Korneeva",
-    "Hanne Vandewinkel",
-    "Francesca Jones",
+    "Eva Lys",
+    "Viktorija Golubic",
+    "Kimberly Birrell",
+    "Veronika Erjavec",
+    "Veronika Kudermetova",
+    "Camila Osorio",
+    "Sofia Kenin",
+    "Oksana Selekhmeteva",
+    "Kamilla Rakhimova",
+    "Lilli Tagger",
+    "Simona Waltert",
+    "Diane Parry",
+    "Daria Snigur",
     "Emiliana Arango",
+    "Tamara Korpatsch",
+    "Ella Seidel",
+    "Lanlana Tararudee",
+    "Sinja Kraus",
+    "Hanne Vandewinkel",
+    "Ajla Tomljanovic"
 ]
 
 # Count the number of matches each player in "players" (e.g. WTA top 100 players) played.
@@ -206,7 +206,7 @@ def summarizePlayerBootstrap(
     summaryDf["edge_ci_lower"]         = edgeBootstrapDf.quantile(lowerQuantile, axis=0)
     summaryDf["edge_ci_upper"]         = edgeBootstrapDf.quantile(upperQuantile, axis=0)
     summaryDf["edge_ci_width"]         = summaryDf["edge_ci_upper"] - summaryDf["edge_ci_lower"]
-    summaryDf["bootstrap_median_rank"] = rankBootstrapDf.median(axis=0)
+    summaryDf["bootstrap_rank_median"] = rankBootstrapDf.median(axis=0)
     summaryDf["rank_ci_lower"]         = rankBootstrapDf.quantile(lowerQuantile, axis=0)
     summaryDf["rank_ci_upper"]         = rankBootstrapDf.quantile(upperQuantile, axis=0)
     summaryDf["rank_ci_width"]         = summaryDf["rank_ci_upper"] - summaryDf["rank_ci_lower"]
@@ -234,7 +234,8 @@ if __name__ == "__main__":
     dl  = MCPDataLoader("w")
     rng = np.random.default_rng(RNG_SEED)
 
-    # Set player eligibility based on the original, non-bootstrapped dataset
+    # Count the number of matches each of WTA top 100 players played based on the
+    # original, non-bootstrapped dataset
     playerToMatchCounts, originalMatches = getOriginalMatchCounts(dl.points, dl.matches)
 
     eligibilityDf = pd.DataFrame({
@@ -243,28 +244,28 @@ if __name__ == "__main__":
         "original_matches": [playerToMatchCounts[player] for player in players] })
     
     eligibilityDf["eligible"] = eligibilityDf["original_matches"] >= MIN_MATCHES
-    eligiblePlayers = eligibilityDf.loc[
+    eligiblePlayersList = eligibilityDf.loc[
         eligibilityDf["eligible"] == True,
         "player"
     ].tolist()
 
-    if not eligiblePlayers:
+    if not eligiblePlayersList:
         raise ValueError("No players satisfy the eligibility requirement.")
     print(
-        f"{len(eligiblePlayers)} of {len(players)} players have "
+        f"{len(eligiblePlayersList)} of {len(players)} players have "
         f"at least {MIN_MATCHES} charted matches.")
 
     # Compute original EDGE values and ranks.
     originalCalc = EdgeCalc( dl.points, originalMatches, saveOutputs=True )
-    originalEdgeDict, _ = originalCalc.playersEdge(eligiblePlayers)
+    originalEdgeDict, _ = originalCalc.playersEdge(eligiblePlayersList)
 
-    missingOriginalPlayers = [ player for player in eligiblePlayers
+    missingOriginalPlayers = [ player for player in eligiblePlayersList
                                  if player not in originalEdgeDict ]
     if missingOriginalPlayers:
         raise ValueError("EDGE could not be calculated from the original data for: "
                          + ", ".join(missingOriginalPlayers) )
 
-    originalEdge = pd.Series(originalEdgeDict, dtype="float64").reindex(eligiblePlayers)
+    originalEdge = pd.Series(originalEdgeDict, dtype="float64").reindex(eligiblePlayersList)
     originalEdge.name = "original_edge"
 
     originalRanks = rankEdgeValues(originalEdge)
@@ -283,9 +284,9 @@ if __name__ == "__main__":
         # Re-compute GWE, event weights, and player EDGE values from
         # this bootstrapped point-by-point data.
         calc = EdgeCalc( bootstrappedPoints, bootstrappedMatches, saveOutputs=False )
-        playerEdgeDict, _ = calc.playersEdge( eligiblePlayers )
+        playerEdgeDict, _ = calc.playersEdge( eligiblePlayersList )
 
-        edgeValues = pd.Series(playerEdgeDict, dtype="float64").reindex(eligiblePlayers)
+        edgeValues = pd.Series(playerEdgeDict, dtype="float64").reindex(eligiblePlayersList)
         bootstrapRanks = rankEdgeValues(edgeValues)
 
         edgeReplicates.append(edgeValues)
@@ -336,7 +337,7 @@ if __name__ == "__main__":
         originalRanks=originalRanks,
         edgeBootstrapDf=edgeBootstrapDf,
         rankBootstrapDf=rankBootstrapDf,
-        matchCounts=playerToMatchCounts.reindex(eligiblePlayers) )
+        matchCounts=playerToMatchCounts.reindex(eligiblePlayersList) )
 
     eligibilityDf.to_csv(
         OUTPUT_DIR / "bootstrap-edge-eligibility.csv", index=False)
