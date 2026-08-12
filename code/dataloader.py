@@ -14,6 +14,7 @@ class MCPDataLoader:
         self.points = pd.DataFrame()
         self.matches = pd.DataFrame()
         self.pointsByMatch = {}
+        self.matchesByMatch = {}
 
         if tour not in {"w", "m"}:
             raise ValueError("Tour must be 'w' or 'm'")
@@ -25,17 +26,24 @@ class MCPDataLoader:
             raise ValueError("pointsFiles must contain at least one filename")
         matchesFile = f"charting-{tour}-matches.csv"
         
-        self.verifyPaths(pointsFiles, matchesFile)
+        self.validatePaths(pointsFiles, matchesFile)
         self.loadPoints()
         self.loadMatches()
 
-        # Divide the rows in points into groups (DataFrames) according to their match_id
+        # Divide point rows into one DataFrame per match_id
         self.pointsByMatch = {
             matchId: matchPoints
                 for matchId, matchPoints in self.points.groupby("match_id", sort=False)
         }
+        # Divide metadata (match) rows into one DataFrame per match_id. Each value should
+        # contain only one row.
+        self.matchesByMatch = {
+            matchId: matchRows
+                for matchId, matchRows in self.matches.groupby("match_id", sort=False)
+        }
+        self.validateMetadata()
 
-    def verifyPaths(self, pointsFiles: list[str], matchesFile: str) -> None:
+    def validatePaths(self, pointsFiles: list[str], matchesFile: str) -> None:
         self.pointsPaths = [MCP_DIR / f for f in pointsFiles]
         self.matchesPath = MCP_DIR / matchesFile
 
@@ -43,7 +51,18 @@ class MCPDataLoader:
         for path in requiredPaths:
             if not path.is_file():
                 raise FileNotFoundError(f"Path does not exist: {path}")
-        print(f"Input file paths verified: {[f for f in pointsFiles] + [matchesFile]}")
+        print(f"Input file paths validated: {[f for f in pointsFiles] + [matchesFile]}")
+
+    def validateMetadata(self) -> None:
+        for matchId in self.pointsByMatch:
+            if matchId not in self.matchesByMatch:
+                raise ValueError(f"No metadata found for match: {matchId}")
+
+            if len(self.matchesByMatch[matchId]) != 1:
+                raise ValueError(
+                    f"Expected one metadata row for {matchId}, "
+                    f"found {len(self.matchesByMatch[matchId])}"
+                )        
 
     def loadPoints(self) -> None:
         frames = [pd.read_csv(p, dtype=str) for p in self.pointsPaths]
