@@ -126,39 +126,43 @@ players = [
 
 # Count matches from the original, non-bootstrapped dataset
 # Restrict the metadata (in "matches") to match IDs that actually appear in
-# the point-by-point data (in "points"). 
+# the point-by-point data (in "points").
+#   points:  original point-by-point data c.f. MCPDataLoader.points
+#   matches: original match data (metadata) c.f. MCPDataLoader.matches
+# Returns:
+#   playerToMatchCounts: Series that maps each player in "players" to her
+#     number of matches
+#   matchesToBeConsideredDf: Match data (metadata) to be used in the bootstrap analysis 
 #
 def getOriginalMatchCounts(
-    points: pd.DataFrame,
+    points:  pd.DataFrame,
     matches: pd.DataFrame
-)-> tuple:
-    pointMatchIds = set(points["match_id"].dropna().unique())
+)-> tuple[pd.Series, pd.DataFrame]:
+    matchIdsInPointData = set(points["match_id"].dropna().unique())
 
-    analysisMatches = matches[
-        matches["match_id"].isin(pointMatchIds)
+    matchesToBeConsideredDf = matches.loc[
+        matches["match_id"].isin(matchIdsInPointData)
     ].copy()
 
-    playerNames = pd.concat(
-        [
-            analysisMatches["Player 1"],
-            analysisMatches["Player 2"],
-        ],
-        ignore_index=True,
-    )
-
+    # Concat two Series; stack the second below the first
+    playerNames = pd.concat([matchesToBeConsideredDf["Player 1"],
+                             matchesToBeConsideredDf["Player 2"]],
+                            ignore_index=True)
+    # Create a DataFrame that shows how many times each distinct player name
+    # occurs in playerNames; e.g.:
+    #   Iga Swiatek     3
+    #   Coco Gauff      2
+    #   Aryna Sabalenka 1
     counts = playerNames.value_counts()
 
-    matchCounts = pd.Series(
-        {
-            player: int(counts.get(player, 0))
-            for player in players
-        },
+    playerToMatchCounts = pd.Series(
+        {player: int(counts.get(player, 0)) for player in players},
         dtype="int64",
         name="original_matches",
     )
-    matchCounts.index.name = "player"
+    playerToMatchCounts.index.name = "player"
 
-    return matchCounts, analysisMatches
+    return playerToMatchCounts, matchesToBeConsideredDf
 
 
 def rankEdgeValues(edgeValues):
