@@ -165,18 +165,16 @@ def getOriginalMatchCounts(
     return playerToMatchCounts, matchesToBeConsideredDf
 
 
+# Rank players from highest EDGE to lowest EDGE.
+#   edgeValues: Series that maps a player to her EDGE value
+# Returns:
+#   Ranked Series that maps a player to her EDGE value
+#
 def rankEdgeValues(edgeValues):
-    """
-    Rank players from highest EDGE to lowest EDGE.
-
-    method="min" gives tied players the same best applicable rank.
-    Exact ties should be uncommon for EDGE values.
-    """
     return edgeValues.rank(
         ascending=False,
-        method="min",
-        na_option="keep",
-    )
+        method="min",    # gives tied players the same best applicable rank
+        na_option="keep" )
 
 
 def summarizePlayerBootstrap(
@@ -311,10 +309,7 @@ if __name__ == "__main__":
         raise ValueError("EDGE could not be calculated from the original data for: "
                          + ", ".join(missingOriginalPlayers) )
 
-    originalEdge = pd.Series(
-        originalEdgeDict,
-        dtype="float64",
-    ).reindex(eligiblePlayers)
+    originalEdge = pd.Series(originalEdgeDict, dtype="float64").reindex(eligiblePlayers)
     originalEdge.name = "original_edge"
 
     originalRanks = rankEdgeValues(originalEdge)
