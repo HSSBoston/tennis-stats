@@ -10,23 +10,25 @@ class EdgeCalc:
     #
     def __init__(self,
         points: pd.DataFrame,
-        matches: pd.DataFrame
+        matches: pd.DataFrame,
+        saveOutputs=True
     ) -> None:
+        self.matches:        pd.DataFrame = matches
         #  deltaGwePoints: original MCP DataFrame + extra columns "server_won_game",
         #    "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
         #   wDict: Maps each event type to average game-win expectancy (delta_V)
         self.deltaGwePoints: pd.DataFrame
         self.wDict:          dict
-        self.matches:        pd.DataFrame = matches
         
         gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
         self.deltaGwePoints = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
         self.wDict, wDf = computeEventWeights(self.deltaGwePoints)
-        
-        OUTPUT_DIR.mkdir(exist_ok=True)
-        gweDf.to_csv(OUTPUT_DIR / "v-game-expectancy.csv")
-        wDf.to_csv(  OUTPUT_DIR / "w-event-weights.csv")
-        print("v-game-expectancy.csv and w-event-weights.csv saved")
+
+        if saveOutputs:
+            OUTPUT_DIR.mkdir(exist_ok=True)
+            gweDf.to_csv(OUTPUT_DIR / "v-game-expectancy.csv")
+            wDf.to_csv(  OUTPUT_DIR / "w-event-weights.csv")
+            print("v-game-expectancy.csv and w-event-weights.csv saved")
 
     # Compute EDGE for a given player
     #   playerName: Player whose EDGE is being calculated. e.g. "Aryna Sabalenka"
