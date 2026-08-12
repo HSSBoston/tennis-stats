@@ -278,7 +278,7 @@ def summarizePlayerBootstrap(
 if __name__ == "__main__":
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    dl = MCPDataLoader("w")
+    dl  = MCPDataLoader("w")
     rng = np.random.default_rng(RNG_SEED)
 
     # Set player eligibility based on the original, non-bootstrapped dataset
