@@ -162,14 +162,14 @@ def getOriginalMatchCounts(
     return playerToMatchCounts, matchesToBeConsideredDf
 
 
-# Rank players from highest EDGE to lowest EDGE.
-#   edgeValues: Series that maps a player to her EDGE value
+# Convert player EDGE values to rank values
+#   edgeValues: Series that maps players to their EDGE values
 # Returns:
-#   Ranked Series that maps a player to her EDGE value
+#   Series that maps players to their rank values in float (1.0: best).
 #
 def rankEdgeValues(edgeValues):
     return edgeValues.rank(
-        ascending=False,
+        ascending=False, # Following the descending order of EDGE values (highest EDGE: best rank)
         method="min",    # gives tied players the same best applicable rank
         na_option="keep" )
 
@@ -243,6 +243,7 @@ if __name__ == "__main__":
         "wta_rank":         range(1, len(players) + 1),
         "original_matches": [playerToMatchCounts[player] for player in players] })
     
+    # Determine which players are eligible for bootstrap analysis (>= MIN_MATCHES)
     eligibilityDf["eligible"] = eligibilityDf["original_matches"] >= MIN_MATCHES
     eligiblePlayersList = eligibilityDf.loc[
         eligibilityDf["eligible"] == True,
@@ -255,7 +256,7 @@ if __name__ == "__main__":
         f"{len(eligiblePlayersList)} of {len(players)} players have "
         f"at least {MIN_MATCHES} charted matches.")
 
-    # Compute original EDGE values and ranks.
+    # Compute original EDGE values and ranks based on the original, non-bootstrapped dataset
     originalCalc = EdgeCalc( dl.points, originalMatches, saveOutputs=True )
     originalEdgeDict, _ = originalCalc.playersEdge(eligiblePlayersList)
 
@@ -265,12 +266,10 @@ if __name__ == "__main__":
         raise ValueError("EDGE could not be calculated from the original data for: "
                          + ", ".join(missingOriginalPlayers) )
 
-    originalEdge = pd.Series(originalEdgeDict, dtype="float64").reindex(eligiblePlayersList)
-    originalEdge.name = "original_edge"
-
+    originalEdge  = pd.Series(originalEdgeDict, dtype="float64").reindex(eligiblePlayersList)
     originalRanks = rankEdgeValues(originalEdge)
-    originalRanks.name = "original_edge_rank"
 
+    # Select EDGE top 10 and 20 player names
     originalTop10 = set( originalRanks[originalRanks <= 10].index )
     originalTop20 = set( originalRanks[originalRanks <= 20].index )
 
@@ -292,8 +291,8 @@ if __name__ == "__main__":
         edgeReplicates.append(edgeValues)
         rankReplicates.append(bootstrapRanks)
 
-        # calculates the correlation between the original player rankings and
-        # one bootstrap sample’s rankings, using only players with valid ranks in both
+        # Calculates the correlation between the original EDGE rankings and
+        # one bootstrap sample’s EDGE rankings, using only players with valid ranks in both
         validRankMask = originalRanks.notna() & bootstrapRanks.notna()
         if validRankMask.sum() >= 2:
             # sum() returns the number of players with valid ranks in both Series.
@@ -308,8 +307,8 @@ if __name__ == "__main__":
         bootstrapTop20 = set( bootstrapRanks[bootstrapRanks <= 20].index )
 
         globalStabilityRows.append( {
-            "bootstrap_iteration":  iteration + 1,
-            "valid_players":        int(validRankMask.sum()),
+            "bootstrap_iteration":            iteration + 1,
+            "valid_players":                  int(validRankMask.sum()),
             "rank_correlation_with_original": rankCorrelation,
             "top_10_overlap_count": len(originalTop10 & bootstrapTop10),
             "top_10_overlap_rate":  (len(originalTop10 & bootstrapTop10) / len(originalTop10)
@@ -317,7 +316,7 @@ if __name__ == "__main__":
             "top_20_overlap_count": len(originalTop20 & bootstrapTop20),
             "top_20_overlap_rate":  (len(originalTop20 & bootstrapTop20) / len(originalTop20)
                                      if originalTop20 else np.nan)
-            })
+            } )
 
         if( (iteration+1)%100==0 or iteration==0 or (iteration+1)==NUM_BOOTSTRAP_SAMPLES):
             print(f"Completed {iteration+1} of {NUM_BOOTSTRAP_SAMPLES} bootstrap samples.")
