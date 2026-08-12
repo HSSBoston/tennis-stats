@@ -61,8 +61,7 @@ class MCPDataLoader:
             if len(self.matchesByMatch[matchId]) != 1:
                 raise ValueError(
                     f"Expected one metadata row for {matchId}, "
-                    f"found {len(self.matchesByMatch[matchId])}"
-                )        
+                    f"found {len(self.matchesByMatch[matchId])}" )        
 
     def loadPoints(self) -> None:
         frames = [pd.read_csv(p, dtype=str) for p in self.pointsPaths]
@@ -82,19 +81,30 @@ class MCPDataLoader:
     def loadMatches(self) -> None:
         self.matches = pd.read_csv(self.matchesPath, dtype=str)
     
-    def bootstrap(self, rng: np.random.Generator) -> pd.DataFrame:
+    def bootstrap(self, rng: np.random.Generator) -> tuple[pd.DataFrame, pd.DataFrame]:
         matchIds = self.points["match_id"].unique()
         sampledIds = rng.choice(matchIds, size=len(matchIds), replace=True)
 
-        sampledFrames = []
+        sampledPointFrames = []
+        sampledMatchFrames = []
 
-        for copyNumber, matchId in enumerate(sampledIds):
-            matchPoints = self.pointsByMatch[matchId].copy()            
+        for copyNumber, sourceMatchId in enumerate(sampledIds):
+            matchPoints   = self.pointsByMatch[sourceMatchId].copy()
+            matchMetadata = self.matchesByMatch[sourceMatchId].copy()
+
             # Prevent duplicate selections from being grouped together
-            matchPoints["match_id"] = (matchId + f"__bootstrap_{copyNumber}")
-            sampledFrames.append(matchPoints)
+            bootstrapMatchId = f"{sourceMatchId}__bootstrap_{copyNumber}"
+            matchPoints["match_id"]   = bootstrapMatchId
+            matchMetadata["match_id"] = bootstrapMatchId
+            
+            matchPoints["source_match_id"]   = sourceMatchId
+            matchMetadata["source_match_id"] = sourceMatchId
 
-        return pd.concat(sampledFrames, ignore_index=True)
+            sampledPointFrames.append(matchPoints)
+            sampledMatchFrames.append(matchMetadata)
+
+        return (pd.concat(sampledFrames, ignore_index=True),
+                pd.concat(sampledMatchFrames, ignore_index=True) )
 
 
 if __name__ == "__main__":
