@@ -194,10 +194,10 @@ def summarizePlayerBootstrap(
     summaryDf = pd.DataFrame(index=originalEdge.index)
     summaryDf.index.name = "player"
 
-    summaryDf["wta_rank_2026_06_15"] = [ players.index(player) + 1 for player in summaryDf.index ]
-    summaryDf["original_matches"]    = matchCounts
-    summaryDf["original_edge"]       = originalEdge
-    summaryDf["original_edge_rank"]  = originalRanks
+    summaryDf["wta_rank"]           = [ players.index(player) + 1 for player in summaryDf.index ]
+    summaryDf["original_matches"]   = matchCounts
+    summaryDf["original_edge"]      = originalEdge
+    summaryDf["original_edge_rank"] = originalRanks
 
     summaryDf["bootstrap_edge_mean"]   = edgeBootstrapDf.mean(axis=0)
     summaryDf["bootstrap_edge_median"] = edgeBootstrapDf.median(axis=0)
