@@ -180,7 +180,7 @@ def summarizePlayerBootstrap(
     edgeBootstrapDf,
     rankBootstrapDf,
     matchCounts
-) -> None:
+) -> pd.DataFrame:
     alpha = 1.0 - CONFIDENCE_LEVEL
     lowerQuantile = alpha / 2.0
     upperQuantile = 1.0 - alpha / 2.0
@@ -291,27 +291,24 @@ if __name__ == "__main__":
         edgeReplicates.append(edgeValues)
         rankReplicates.append(bootstrapRanks)
 
-        # Calculates the correlation between the original EDGE rankings and
-        # one bootstrap sample’s EDGE rankings, using only players with valid ranks in both
-#         validRankMask = originalRanks.notna() & bootstrapRanks.notna()
+        # Calculate Spearman rank correlation using players with valid
+        # EDGE values in both the original and bootstrap samples.
         validMask = originalEdge.notna() & edgeValues.notna()
-        if validRankMask.sum() >= 2:
-            # sum() returns the number of players with valid ranks in both Series.
-            # Because these are already rank values, their ordinary correlation is
-            # the rank correlation.
-#             rankCorrelation = originalRanks[validRankMask].corr(
-#                 bootstrapRanks[validRankMask])
-            rankCorrelation = rankEdgeValues(originalEdge[validMask]).corr(
-                rankEdgeValues(edgeValues[validMask]) )
+        if validMask.sum() >= 2:
+            # sum() returns the number of players with valid EDGE values in both Series.
+            rankCorrelation = originalEdge[validMask].corr(
+                edgeValues[validMask],
+                method="spearman",
+            )
         else:
             rankCorrelation = np.nan
-
+                
         bootstrapTop10 = set( bootstrapRanks[bootstrapRanks <= 10].index )
         bootstrapTop20 = set( bootstrapRanks[bootstrapRanks <= 20].index )
 
         globalStabilityRows.append( {
             "bootstrap_iteration":            iteration + 1,
-            "valid_players":                  int(validRankMask.sum()),
+            "valid_players":                  int(validMask.sum()),
             "rank_correlation_with_original": rankCorrelation,
             "top_10_overlap_count": len(originalTop10 & bootstrapTop10),
             "top_10_overlap_rate":  (len(originalTop10 & bootstrapTop10) / len(originalTop10)
