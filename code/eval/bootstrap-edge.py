@@ -124,7 +124,7 @@ players = [
     "Emiliana Arango",
 ]
 
-# Count matches from the original, non-bootstrapped dataset
+# Count the number of matches each player in "players" (e.g. WTA top 100 players) played.
 # Restrict the metadata (in "matches") to match IDs that actually appear in
 # the point-by-point data (in "points").
 #   points:  original point-by-point data c.f. MCPDataLoader.points
@@ -282,57 +282,34 @@ if __name__ == "__main__":
     rng = np.random.default_rng(RNG_SEED)
 
     # Set player eligibility based on the original, non-bootstrapped dataset
-    matchCounts, originalMatches = getOriginalMatchCounts(dl.points, dl.matches)
+    playerToMatchCounts, originalMatches = getOriginalMatchCounts(dl.points, dl.matches)
 
-    eligibilityDf = pd.DataFrame(
-        {
-            "player": players,
-            "wta_rank_2026_06_15": range(1, len(players) + 1),
-            "original_matches": [
-                matchCounts[player] for player in players
-            ],
-        }
-    )
-    eligibilityDf["eligible"] = (
-        eligibilityDf["original_matches"] >= MIN_MATCHES
-    )
-
+    eligibilityDf = pd.DataFrame({
+        "player":           players,
+        "wta_rank":         range(1, len(players) + 1),
+        "original_matches": [playerToMatchCounts[player] for player in players] })
+    
+    eligibilityDf["eligible"] = eligibilityDf["original_matches"] >= MIN_MATCHES
     eligiblePlayers = eligibilityDf.loc[
-        eligibilityDf["eligible"],
-        "player",
+        eligibilityDf["eligible"] == True,
+        "player"
     ].tolist()
 
     if not eligiblePlayers:
-        raise ValueError(
-            "No players satisfy the eligibility requirement."
-        )
-
+        raise ValueError("No players satisfy the eligibility requirement.")
     print(
         f"{len(eligiblePlayers)} of {len(players)} players have "
-        f"at least {MIN_MATCHES} charted matches."
-    )
+        f"at least {MIN_MATCHES} charted matches.")
 
     # Compute original EDGE values and ranks.
-    originalCalc = EdgeCalc(
-        dl.points,
-        originalMatches,
-        saveOutputs=True,
-    )
-    originalEdgeDict, _ = originalCalc.playersEdge(
-        eligiblePlayers
-    )
+    originalCalc = EdgeCalc( dl.points, originalMatches, saveOutputs=True )
+    originalEdgeDict, _ = originalCalc.playersEdge(eligiblePlayers)
 
-    missingOriginalPlayers = [
-        player
-        for player in eligiblePlayers
-        if player not in originalEdgeDict
-    ]
-
+    missingOriginalPlayers = [ player for player in eligiblePlayers
+                                 if player not in originalEdgeDict ]
     if missingOriginalPlayers:
-        raise ValueError(
-            "EDGE could not be calculated from the original data for: "
-            + ", ".join(missingOriginalPlayers)
-        )
+        raise ValueError("EDGE could not be calculated from the original data for: "
+                         + ", ".join(missingOriginalPlayers) )
 
     originalEdge = pd.Series(
         originalEdgeDict,
@@ -466,7 +443,7 @@ if __name__ == "__main__":
         originalRanks=originalRanks,
         edgeBootstrapDf=edgeBootstrapDf,
         rankBootstrapDf=rankBootstrapDf,
-        matchCounts=matchCounts.reindex(eligiblePlayers),
+        matchCounts=playerToMatchCounts.reindex(eligiblePlayers),
     )
 
     eligibilityDf.to_csv(
