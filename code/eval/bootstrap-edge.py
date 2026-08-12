@@ -293,13 +293,16 @@ if __name__ == "__main__":
 
         # Calculates the correlation between the original EDGE rankings and
         # one bootstrap sample’s EDGE rankings, using only players with valid ranks in both
-        validRankMask = originalRanks.notna() & bootstrapRanks.notna()
+#         validRankMask = originalRanks.notna() & bootstrapRanks.notna()
+        validMask = originalEdge.notna() & edgeValues.notna()
         if validRankMask.sum() >= 2:
             # sum() returns the number of players with valid ranks in both Series.
             # Because these are already rank values, their ordinary correlation is
             # the rank correlation.
-            rankCorrelation = originalRanks[validRankMask].corr(
-                bootstrapRanks[validRankMask])
+#             rankCorrelation = originalRanks[validRankMask].corr(
+#                 bootstrapRanks[validRankMask])
+            rankCorrelation = rankEdgeValues(originalEdge[validMask]).corr(
+                rankEdgeValues(edgeValues[validMask]) )
         else:
             rankCorrelation = np.nan
 
