@@ -110,14 +110,21 @@ class MCPDataLoader:
         return bootstrappedPoints, bootstrappedMatches
 
     def validateBootstrappingConsistency(self,
-        bootstrappedPoints: pd.DataFrame,
+        bootstrappedPoints:  pd.DataFrame,
         bootstrappedMatches: pd.DataFrame
-    ) -> bool:
+    ) -> None:
         pointMatchIds    = set( bootstrappedPoints["match_id"].unique() )
         metadataMatchIds = set( bootstrappedMatches["match_id"].unique() )
-        assert pointMatchIds == metadataMatchIds
-        assert ( not bootstrappedMatches["match_id"].duplicated().any() )
-        assert len(bootstrappedMatches) == len(self.pointsByMatch)
+        
+        if pointMatchIds != metadataMatchIds:
+            raise ValueError("Bootstrapped point match IDs and bootstrapped metadata match IDs differ")
+
+        if bootstrappedMatches["match_id"].duplicated().any():
+            raise ValueError("Duplicate bootstrap match IDs found")
+
+        if len(bootstrappedMatches) != len(self.pointsByMatch):
+            raise ValueError("Incorrect number of bootstrapped matches")
+
 
 if __name__ == "__main__":
     dataLoader = MCPDataLoader("w")
