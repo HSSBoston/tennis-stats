@@ -17,9 +17,6 @@ NUM_BOOTSTRAP_SAMPLES = 10
 CONFIDENCE_LEVEL = 0.95
 MIN_MATCHES = 10
 
-TOP_10 = 10
-TOP_20 = 20
-
 # WTA top 100 players as of 06/15/2026
 players = [
     "Aryna Sabalenka",
@@ -315,107 +312,56 @@ if __name__ == "__main__":
     originalRanks = rankEdgeValues(originalEdge)
     originalRanks.name = "original_edge_rank"
 
-    originalTop10 = set(
-        originalRanks[originalRanks <= TOP_10].index
-    )
-    originalTop20 = set(
-        originalRanks[originalRanks <= TOP_20].index
-    )
+    originalTop10 = set( originalRanks[originalRanks <= 10].index )
+    originalTop20 = set( originalRanks[originalRanks <= 20].index )
 
     edgeReplicates = []
     rankReplicates = []
     globalStabilityRows = []
 
     for iteration in range(NUM_BOOTSTRAP_SAMPLES):
-        bootstrappedPoints, bootstrappedMatches = (
-            dl.bootstrap(rng)
-        )
+        bootstrappedPoints, bootstrappedMatches = dl.bootstrap(rng)
 
-        # Re-estimate GWE, event weights, and player EDGE values from
-        # this complete match-level bootstrap sample.
-        calc = EdgeCalc(
-            bootstrappedPoints,
-            bootstrappedMatches,
-            saveOutputs=False,
-        )
-        playerEdgeDict, _ = calc.playersEdge(
-            eligiblePlayers
-        )
+        # Re-compute GWE, event weights, and player EDGE values from
+        # this bootstrapped point-by-point data.
+        calc = EdgeCalc( bootstrappedPoints, bootstrappedMatches, saveOutputs=False )
+        playerEdgeDict, _ = calc.playersEdge( eligiblePlayers )
 
-        edgeValues = pd.Series(
-            playerEdgeDict,
-            dtype="float64",
-        ).reindex(eligiblePlayers)
-
+        edgeValues = pd.Series(playerEdgeDict, dtype="float64").reindex(eligiblePlayers)
         bootstrapRanks = rankEdgeValues(edgeValues)
 
         edgeReplicates.append(edgeValues)
         rankReplicates.append(bootstrapRanks)
 
-        validRankMask = (
-            originalRanks.notna()
-            & bootstrapRanks.notna()
-        )
-
+        # calculates the correlation between the original player rankings and
+        # one bootstrap sample’s rankings, using only players with valid ranks in both
+        validRankMask = originalRanks.notna() & bootstrapRanks.notna()
         if validRankMask.sum() >= 2:
-            # Because these are already rank values, their ordinary
-            # correlation is the rank correlation.
-            rankCorrelation = originalRanks[
-                validRankMask
-            ].corr(
-                bootstrapRanks[validRankMask]
-            )
+            # sum() returns the number of players with valid ranks in both Series.
+            # Because these are already rank values, their ordinary correlation is
+            # the rank correlation.
+            rankCorrelation = originalRanks[validRankMask].corr(
+                bootstrapRanks[validRankMask])
         else:
             rankCorrelation = np.nan
 
-        bootstrapTop10 = set(
-            bootstrapRanks[
-                bootstrapRanks <= TOP_10
-            ].index
-        )
-        bootstrapTop20 = set(
-            bootstrapRanks[
-                bootstrapRanks <= TOP_20
-            ].index
-        )
+        bootstrapTop10 = set( bootstrapRanks[bootstrapRanks <= 10].index )
+        bootstrapTop20 = set( bootstrapRanks[bootstrapRanks <= 20].index )
 
-        globalStabilityRows.append(
-            {
-                "bootstrap_iteration": iteration + 1,
-                "valid_players": int(validRankMask.sum()),
-                "rank_correlation_with_original": (
-                    rankCorrelation
-                ),
-                "top_10_overlap_count": len(
-                    originalTop10 & bootstrapTop10
-                ),
-                "top_10_overlap_rate": (
-                    len(originalTop10 & bootstrapTop10)
-                    / len(originalTop10)
-                    if originalTop10
-                    else np.nan
-                ),
-                "top_20_overlap_count": len(
-                    originalTop20 & bootstrapTop20
-                ),
-                "top_20_overlap_rate": (
-                    len(originalTop20 & bootstrapTop20)
-                    / len(originalTop20)
-                    if originalTop20
-                    else np.nan
-                ),
-            }
-        )
+        globalStabilityRows.append( {
+            "bootstrap_iteration":  iteration + 1,
+            "valid_players":        int(validRankMask.sum()),
+            "rank_correlation_with_original": rankCorrelation,
+            "top_10_overlap_count": len(originalTop10 & bootstrapTop10),
+            "top_10_overlap_rate":  (len(originalTop10 & bootstrapTop10) / len(originalTop10)
+                                     if originalTop10 else np.nan),
+            "top_20_overlap_count": len(originalTop20 & bootstrapTop20),
+            "top_20_overlap_rate":  (len(originalTop20 & bootstrapTop20) / len(originalTop20)
+                                     if originalTop20 else np.nan)
+            })
 
-        if (
-            (iteration + 1) % 100 == 0
-            or iteration == 0
-            or iteration + 1 == NUM_BOOTSTRAP_SAMPLES
-        ):
-            print(
-                f"Completed {iteration + 1} of "
-                f"{NUM_BOOTSTRAP_SAMPLES} bootstrap samples."
-            )
+        if( (iteration+1)%100==0 or iteration==0 or (iteration+1)==NUM_BOOTSTRAP_SAMPLES):
+            print(f"Completed {iteration+1} of {NUM_BOOTSTRAP_SAMPLES} bootstrap samples.")
 
     edgeBootstrapDf = pd.DataFrame(edgeReplicates)
     edgeBootstrapDf.index = range(
