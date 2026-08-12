@@ -113,4 +113,7 @@ if __name__ == "__main__":
 
     from constants import RNG_SEED
     rng = np.random.default_rng(RNG_SEED)
-    print( dataLoader.bootstrap(rng).head() )
+
+    bootstrappedPoints, bootstrappedMatches = dataLoader.bootstrap(rng)
+    print(bootstrappedPoints.head())
+    print(bootstrappedMatches.head())
