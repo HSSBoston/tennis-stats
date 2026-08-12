@@ -124,15 +124,14 @@ players = [
     "Emiliana Arango",
 ]
 
-
-def getOriginalMatchCounts(points, matches):
-    """
-    Count matches from the original, non-bootstrapped analysis dataset.
-
-    Restrict the metadata to match IDs that actually appear in points.
-    This prevents matches outside the loaded point dataset from affecting
-    eligibility.
-    """
+# Count matches from the original, non-bootstrapped dataset
+# Restrict the metadata (in "matches") to match IDs that actually appear in
+# the point-by-point data (in "points"). 
+#
+def getOriginalMatchCounts(
+    points: pd.DataFrame,
+    matches: pd.DataFrame
+)-> tuple:
     pointMatchIds = set(points["match_id"].dropna().unique())
 
     analysisMatches = matches[
@@ -278,11 +277,8 @@ if __name__ == "__main__":
     dl = MCPDataLoader("w")
     rng = np.random.default_rng(RNG_SEED)
 
-    # Establish eligibility once from the original dataset.
-    matchCounts, originalMatches = getOriginalMatchCounts(
-        dl.points,
-        dl.matches,
-    )
+    # Set player eligibility based on the original, non-bootstrapped dataset
+    matchCounts, originalMatches = getOriginalMatchCounts(dl.points, dl.matches)
 
     eligibilityDf = pd.DataFrame(
         {

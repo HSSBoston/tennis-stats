@@ -9,7 +9,7 @@ class EdgeCalc:
     # matches: Match-level MCP data (DataFrame). c.f. dataloader.MCPDataLoader.matches
     #
     def __init__(self,
-        points: pd.DataFrame,
+        points:  pd.DataFrame,
         matches: pd.DataFrame,
         saveOutputs=True
     ) -> None:
