@@ -110,7 +110,7 @@ class MCPDataLoader:
             if validateBootstrappingConsistency(bootstrappedPoints, bootstrappedMatches):
                 return bootstrappedPoints, bootstrappedMatches
     
-    def validateBootstrappingConsistency(self):
+    def validateBootstrappingConsistency(self) -> bool:
         pointMatchIds    = set( bootstrappedPoints["match_id"].unique() )
         metadataMatchIds = set( bootstrappedMatches["match_id"].unique() )
         assert pointMatchIds == metadataMatchIds
