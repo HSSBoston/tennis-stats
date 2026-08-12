@@ -179,8 +179,8 @@ def summarizePlayerBootstrap(
     originalRanks,
     edgeBootstrapDf,
     rankBootstrapDf,
-    matchCounts,
-):
+    matchCounts
+) -> None:
     alpha = 1.0 - CONFIDENCE_LEVEL
     lowerQuantile = alpha / 2.0
     upperQuantile = 1.0 - alpha / 2.0
@@ -188,84 +188,42 @@ def summarizePlayerBootstrap(
     validEdgeReplicates = edgeBootstrapDf.notna().sum(axis=0)
     validRankReplicates = rankBootstrapDf.notna().sum(axis=0)
 
-    top10Count = rankBootstrapDf.le(TOP_10).sum(axis=0)
-    top20Count = rankBootstrapDf.le(TOP_20).sum(axis=0)
+    top10Count = rankBootstrapDf.le(10).sum(axis=0)
+    top20Count = rankBootstrapDf.le(20).sum(axis=0)
 
     summaryDf = pd.DataFrame(index=originalEdge.index)
     summaryDf.index.name = "player"
 
-    summaryDf["wta_rank_2026_06_15"] = [
-        players.index(player) + 1
-        for player in summaryDf.index
-    ]
-    summaryDf["original_matches"] = matchCounts
-    summaryDf["original_edge"] = originalEdge
-    summaryDf["original_edge_rank"] = originalRanks
+    summaryDf["wta_rank_2026_06_15"] = [ players.index(player) + 1 for player in summaryDf.index ]
+    summaryDf["original_matches"]    = matchCounts
+    summaryDf["original_edge"]       = originalEdge
+    summaryDf["original_edge_rank"]  = originalRanks
 
-    summaryDf["bootstrap_edge_mean"] = edgeBootstrapDf.mean(axis=0)
+    summaryDf["bootstrap_edge_mean"]   = edgeBootstrapDf.mean(axis=0)
     summaryDf["bootstrap_edge_median"] = edgeBootstrapDf.median(axis=0)
-    summaryDf["bootstrap_edge_bias"] = (
-        summaryDf["bootstrap_edge_mean"]
-        - summaryDf["original_edge"]
-    )
-    summaryDf["bootstrap_edge_se"] = edgeBootstrapDf.std(
-        axis=0,
-        ddof=1,
-    )
-    summaryDf["edge_ci_lower"] = edgeBootstrapDf.quantile(
-        lowerQuantile,
-        axis=0,
-    )
-    summaryDf["edge_ci_upper"] = edgeBootstrapDf.quantile(
-        upperQuantile,
-        axis=0,
-    )
-    summaryDf["edge_ci_width"] = (
-        summaryDf["edge_ci_upper"]
-        - summaryDf["edge_ci_lower"]
-    )
-
-    summaryDf["bootstrap_median_rank"] = rankBootstrapDf.median(
-        axis=0
-    )
-    summaryDf["rank_ci_lower"] = rankBootstrapDf.quantile(
-        lowerQuantile,
-        axis=0,
-    )
-    summaryDf["rank_ci_upper"] = rankBootstrapDf.quantile(
-        upperQuantile,
-        axis=0,
-    )
-    summaryDf["rank_ci_width"] = (
-        summaryDf["rank_ci_upper"]
-        - summaryDf["rank_ci_lower"]
-    )
+    summaryDf["bootstrap_edge_bias"]   = summaryDf["bootstrap_edge_mean"] - summaryDf["original_edge"]
+    summaryDf["bootstrap_edge_se"]     = edgeBootstrapDf.std(axis=0, ddof=1)
+    summaryDf["edge_ci_lower"]         = edgeBootstrapDf.quantile(lowerQuantile, axis=0)
+    summaryDf["edge_ci_upper"]         = edgeBootstrapDf.quantile(upperQuantile, axis=0)
+    summaryDf["edge_ci_width"]         = summaryDf["edge_ci_upper"] - summaryDf["edge_ci_lower"]
+    summaryDf["bootstrap_median_rank"] = rankBootstrapDf.median(axis=0)
+    summaryDf["rank_ci_lower"]         = rankBootstrapDf.quantile(lowerQuantile, axis=0)
+    summaryDf["rank_ci_upper"]         = rankBootstrapDf.quantile(upperQuantile, axis=0)
+    summaryDf["rank_ci_width"]         = summaryDf["rank_ci_upper"] - summaryDf["rank_ci_lower"]
 
     # Conditional probabilities: among replicates in which the player
     # received a valid EDGE value and rank.
-    summaryDf["probability_top_10_given_valid"] = (
-        top10Count
-        / validRankReplicates.replace(0, np.nan)
-    )
-    summaryDf["probability_top_20_given_valid"] = (
-        top20Count
-        / validRankReplicates.replace(0, np.nan)
-    )
+    summaryDf["probability_top_10_given_valid"] = top10Count / validRankReplicates.replace(0, np.nan)
+    summaryDf["probability_top_20_given_valid"] = top20Count / validRankReplicates.replace(0, np.nan)
 
     # Unconditional probabilities: missing bootstrap estimates count
     # as failures to finish in the top 10 or top 20.
-    summaryDf["probability_top_10_unconditional"] = (
-        top10Count / NUM_BOOTSTRAP_SAMPLES
-    )
-    summaryDf["probability_top_20_unconditional"] = (
-        top20Count / NUM_BOOTSTRAP_SAMPLES
-    )
+    summaryDf["probability_top_10_unconditional"] = top10Count / NUM_BOOTSTRAP_SAMPLES
+    summaryDf["probability_top_20_unconditional"] = top20Count / NUM_BOOTSTRAP_SAMPLES
 
     summaryDf["valid_edge_replicates"] = validEdgeReplicates
     summaryDf["valid_rank_replicates"] = validRankReplicates
-    summaryDf["availability_rate"] = (
-        validEdgeReplicates / NUM_BOOTSTRAP_SAMPLES
-    )
+    summaryDf["availability_rate"]     = validEdgeReplicates / NUM_BOOTSTRAP_SAMPLES
 
     return summaryDf.reset_index()
 
@@ -364,17 +322,11 @@ if __name__ == "__main__":
             print(f"Completed {iteration+1} of {NUM_BOOTSTRAP_SAMPLES} bootstrap samples.")
 
     edgeBootstrapDf = pd.DataFrame(edgeReplicates)
-    edgeBootstrapDf.index = range(
-        1,
-        NUM_BOOTSTRAP_SAMPLES + 1,
-    )
+    edgeBootstrapDf.index = range(1, NUM_BOOTSTRAP_SAMPLES + 1)
     edgeBootstrapDf.index.name = "bootstrap_iteration"
 
     rankBootstrapDf = pd.DataFrame(rankReplicates)
-    rankBootstrapDf.index = range(
-        1,
-        NUM_BOOTSTRAP_SAMPLES + 1,
-    )
+    rankBootstrapDf.index = range(1, NUM_BOOTSTRAP_SAMPLES + 1)
     rankBootstrapDf.index.name = "bootstrap_iteration"
 
     globalStabilityDf = pd.DataFrame(globalStabilityRows)
@@ -384,42 +336,23 @@ if __name__ == "__main__":
         originalRanks=originalRanks,
         edgeBootstrapDf=edgeBootstrapDf,
         rankBootstrapDf=rankBootstrapDf,
-        matchCounts=playerToMatchCounts.reindex(eligiblePlayers),
-    )
+        matchCounts=playerToMatchCounts.reindex(eligiblePlayers) )
 
     eligibilityDf.to_csv(
-        OUTPUT_DIR / "bootstrap-edge-eligibility.csv",
-        index=False,
-    )
+        OUTPUT_DIR / "bootstrap-edge-eligibility.csv", index=False)
     edgeBootstrapDf.to_csv(
-        OUTPUT_DIR / "bootstrap-edge-value-replicates.csv",
-    )
+        OUTPUT_DIR / "bootstrap-edge-value-replicates.csv")
     rankBootstrapDf.to_csv(
-        OUTPUT_DIR / "bootstrap-edge-rank-replicates.csv",
-    )
+        OUTPUT_DIR / "bootstrap-edge-rank-replicates.csv")
     playerSummaryDf.to_csv(
-        OUTPUT_DIR / "bootstrap-edge-player-summary.csv",
-        index=False,
-    )
+        OUTPUT_DIR / "bootstrap-edge-player-summary.csv", index=False)
     globalStabilityDf.to_csv(
-        OUTPUT_DIR / "bootstrap-edge-global-stability.csv",
-        index=False,
-    )
+        OUTPUT_DIR / "bootstrap-edge-global-stability.csv", index=False)
 
     print("\nBootstrap analysis complete.")
-    print(
-        playerSummaryDf.sort_values(
-            "original_edge_rank"
-        ).to_string(index=False)
-    )
+#    print( playerSummaryDf.sort_values("original_edge_rank").to_string(index=False) )
 
     print("\nMean global ranking stability:")
-    print(
-        globalStabilityDf[
-            [
-                "rank_correlation_with_original",
-                "top_10_overlap_rate",
-                "top_20_overlap_rate",
-            ]
-        ].mean()
-    )
+    print(globalStabilityDf[ ["rank_correlation_with_original",
+                              "top_10_overlap_rate",
+                              "top_20_overlap_rate"] ].mean() )
