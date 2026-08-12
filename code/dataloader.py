@@ -103,9 +103,19 @@ class MCPDataLoader:
 
             sampledPointFrames.append(matchPoints)
             sampledMatchFrames.append(matchMetadata)
-
-        return (pd.concat(sampledPointFrames, ignore_index=True),
-                pd.concat(sampledMatchFrames, ignore_index=True) )
+            
+            bootstrappedPoints  = pd.concat(sampledPointFrames, ignore_index=True)
+            bootstrappedMatches = pd.concat(sampledMatchFrames, ignore_index=True)
+            
+            if validateBootstrappingConsistency(bootstrappedPoints, bootstrappedMatches):
+                return bootstrappedPoints, bootstrappedMatches
+    
+    def validateBootstrappingConsistency(self):
+        pointMatchIds    = set( bootstrappedPoints["match_id"].unique() )
+        metadataMatchIds = set( bootstrappedMatches["match_id"].unique() )
+        assert pointMatchIds == metadataMatchIds
+        assert ( not bootstrappedMatches["match_id"].duplicated().any() )
+        assert len(bootstrappedMatches) == len(dl.pointsByMatch)
 
 
 if __name__ == "__main__":
@@ -118,3 +128,6 @@ if __name__ == "__main__":
     bootstrappedPoints, bootstrappedMatches = dataLoader.bootstrap(rng)
     print(bootstrappedPoints.head())
     print(bootstrappedMatches.head())
+    
+
+    
