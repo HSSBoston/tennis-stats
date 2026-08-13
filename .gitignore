@@ -2,7 +2,7 @@
 data/
 output/
 temp/
-eval/data/
+code/eval/bootstrap/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
