@@ -3,6 +3,8 @@ code/data/
 code/output/
 code/temp/
 
+*.xlsx
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
