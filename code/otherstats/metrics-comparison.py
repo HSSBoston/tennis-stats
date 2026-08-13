@@ -146,12 +146,35 @@ resultDf = (
     .merge(drDf,     on="player", how="left")
     .merge(drPlusDf, on="player", how="left") )
 
+# Rank each metric from highest (best) to lowest.  Nullable integers
+# preserve missing metric values as blank cells in the output CSV.
+resultDf["EDGE_rank"] = resultDf["EDGE"].rank(
+    ascending=False,
+    method="min",
+    na_option="keep"
+).astype("Int64")
+
+resultDf["DR_rank"] = resultDf["DR"].rank(
+    ascending=False,
+    method="min",
+    na_option="keep"
+).astype("Int64")
+
+resultDf["DRPlus_rank"] = resultDf["DR+"].rank(
+    ascending=False,
+    method="min",
+    na_option="keep"
+).astype("Int64")
+
 resultDf = resultDf[ [
     "player",
     "WTA_rank",
     "EDGE",
+    "EDGE_rank",
     "DR",
+    "DR_rank",
     "DR+",
+    "DRPlus_rank",
     "EDGE_matches",
     "DR_matches",
     "DRPlus_matches" ]]
