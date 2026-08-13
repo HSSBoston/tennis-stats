@@ -192,13 +192,8 @@ resultDf = resultDf[ [
     "DR+",
     "DRPlus_rank" ]]
 
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
-
 print(resultDf)
-
 
 outputFile = OUTPUT_DIR / "edge-dr-drplus-wta-comparison.csv"
 resultDf.to_csv(outputFile, index=False)
-
 print(f"\nSaved to: {outputFile}")
