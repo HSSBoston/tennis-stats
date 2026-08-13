@@ -11,8 +11,14 @@ class DrCalc:
         points: pd.DataFrame,
         matches: pd.DataFrame
     ) -> None:
-        self.points:  pd.DataFrame = points
-        self.matches: pd.DataFrame = matches
+        self.points: pd.DataFrame = points
+        self.matches: pd.DataFrame
+
+        # Retain metadata only for matches represented in the supplied point-by-point data.
+        pointMatchIds = set( points["match_id"].dropna().unique() )
+        self.matches = matches.loc[ 
+            matches["match_id"].isin(pointMatchIds)
+        ].copy()        
 
     # Compute DR for a given player
     def dr(self,

@@ -14,19 +14,28 @@ class BlrCalc:
     #
     def __init__(self,
         points: pd.DataFrame,
-        matches: pd.DataFrame
+        matches: pd.DataFrame,
+        saveOutputs=True
     ) -> None:
         # deltaGwePoints: original MCP data + extra columns "server_won_game",
         # "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
         self.deltaGwePoints: pd.DataFrame
-        self.matches:        pd.DataFrame = matches
+        self.matches:        pd.DataFrame
+
+        # Retain metadata only for matches represented in the supplied point-by-point data.
+        pointMatchIds = set( points["match_id"].dropna().unique() )
+
+        self.matches = matches.loc[
+            matches["match_id"].isin(pointMatchIds)
+        ].copy()
 
         gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
         self.deltaGwePoints = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
 
-        OUTPUT_DIR.mkdir(exist_ok=True)
-        gweDf.to_csv(OUTPUT_DIR / "v-game-expectancy.csv")
-        print("v-game-expectancy.csv saved")
+        if saveOutputs:
+            OUTPUT_DIR.mkdir(exist_ok=True)
+            gweDf.to_csv( OUTPUT_DIR / "v-game-expectancy.csv")
+            print("v-game-expectancy.csv saved")
 
     # Compute leverage ratio (LR)
     #   wonLev:  LEV values of points won by the player
