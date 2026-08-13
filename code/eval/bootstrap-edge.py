@@ -15,7 +15,7 @@ from edge import EdgeCalc
 # Very small p-values                10,000+
 NUM_BOOTSTRAP_SAMPLES = 5000
 CONFIDENCE_LEVEL = 0.95
-MIN_MATCHES = 10
+MIN_MATCHES = 20
 
 # WTA top 100 players as of 05/25/2026
 players = [
