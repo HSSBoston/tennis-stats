@@ -204,32 +204,27 @@ if __name__ == "__main__":
     print("\nOverall bootstrap diagnostics")
     print(overallResults.to_string())
 
-    minimumAvailabilityPercent = 99.0
-    minimumPlayerProportion = 0.90
+    minAvailabilityPercent = 99.0
+    minPlayerProportion = 0.90
 
     meetsAvailabilityRequirement = (
-        playerAvailabilityDf["valid_edge_percentage"] >= minimumAvailabilityPercent)
+        playerAvailabilityDf["valid_edge_percentage"] >= minAvailabilityPercent)
 
-    numMeetingAvailRequirement = int(meetsAvailabilityRequirement.sum())
+    numMeetingAvailRequirement        = int(meetsAvailabilityRequirement.sum())
     proportionMeetingAvailRequirement = meetsAvailabilityRequirement.mean()
-
-    passesRequirement = proportionMeetingAvailRequirement >= minimumPlayerProportion
-
+    
+    passesRequirement = proportionMeetingAvailRequirement >= minPlayerProportion
+    
+    if passesRequirement:
+        print("\nAvailability requirement satisfied:")
+    else:
+        print("\nAvailability requirement NOT satisfied:")
     print(
-        f"{numberMeetingRequirement} of "
+        f"{numMeetingAvailRequirement} of "
         f"{len(playerAvailabilityDf)} eligible players "
-        f"({proportionMeetingRequirement:.1%}) had valid EDGE "
+        f"({proportionMeetingAvailRequirement:.1%}) had valid EDGE "
         f"estimates in at least "
-        f"{minimumAvailabilityPercent:.0f}% of bootstrap iterations."
-    )
-
-    print(
-        "Requirement satisfied:"
-        if passesRequirement
-        else "Requirement not satisfied:",
-        passesRequirement,
-    )    
-
+        f"{minAvailabilityPercent:.0f}% of bootstrap iterations." )
 
     print("\nPlayer-level EDGE availability")
     print(playerAvailabilityDf.to_string(index=False,
