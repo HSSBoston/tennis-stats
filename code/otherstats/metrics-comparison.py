@@ -10,6 +10,8 @@ from dr import DrCalc
 from drplus import DrPlusCalc
 from constants import OUTPUT_DIR
 
+MIN_MATCHES = 10
+
 # WTA top 100 players as of 05/25/2026
 players = [
     "Aryna Sabalenka",
@@ -192,8 +194,25 @@ resultDf = resultDf[ [
     "DR+",
     "DRPlus_rank" ]]
 
-print(resultDf)
+#print(resultDf)
 
-outputFile = OUTPUT_DIR / "edge-dr-drplus-wta-comparison.csv"
-resultDf.to_csv(outputFile, index=False)
+eligibleDf = resultDf[
+    resultDf["matches"] >= MIN_MATCHES
+].copy()
+
+print(f"WTA top 100 players: {len(resultDf)}")
+print(f"Players with >= {MIN_MATCHES} matches: {len(eligibleDf)}")
+
+outputFile = "edge-dr-drplus-wta-top100-all.csv"
+resultDf.to_csv(
+    OUTPUT_DIR / outputFile,
+    index=False
+)
+print(f"\nSaved to: {outputFile}")
+
+outputFile = f"edge-dr-drplus-wta-top100-min{MIN_MATCHES}.csv"
+eligibleDf.to_csv(
+    OUTPUT_DIR / outputFile,
+    index=False
+)
 print(f"\nSaved to: {outputFile}")
