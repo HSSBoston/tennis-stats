@@ -12,13 +12,21 @@ class DrPlusCalc:
     # matches: Match-level MCP data
     def __init__(self,
         points: pd.DataFrame,
-        matches: pd.DataFrame
+        matches: pd.DataFrame,
+        saveOutputs=True
     ) -> None:
         self.points:  pd.DataFrame = points
-        self.matches: pd.DataFrame = matches
+        self.matches: pd.DataFrame
 
-        self.drCalc  = DrCalc(points, matches)
-        self.blrCalc = BlrCalc(points, matches)
+        # Retain metadata only for matches represented in the supplied point-by-point data.
+        pointMatchIds = set( points["match_id"].dropna().unique() )
+
+        self.matches = matches.loc[
+            matches["match_id"].isin(pointMatchIds)
+        ].copy()
+
+        self.drCalc  = DrCalc(  self.points, self.matches)
+        self.blrCalc = BlrCalc( self.points, self.matches, saveOutputs=saveOutputs)
 
     # Compute DR+ for a given player
     def drPlus(self,
@@ -30,6 +38,12 @@ class DrPlusCalc:
 
         if drValue is None or blrValue is None:
             return (None, None, None)
+
+        if drSummaryDict["matches"] != blrSummaryDict["matches"]:
+            raise ValueError(
+                f"DR and BLR match counts differ for {playerName}: "
+                f'{drSummaryDict["matches"]} versus '
+                f'{blrSummaryDict["matches"]}' )
 
         drPlusValue = drValue * blrValue
 
