@@ -146,7 +146,22 @@ resultDf = (
     .merge(drDf,     on="player", how="left")
     .merge(drPlusDf, on="player", how="left") )
 
-# Rank each metric from highest (best) to lowest.  Nullable integers
+# Verify "EDGE_matches", "DR_matches", and "DRPlus_matches" have the same number
+inconsistentPlayers = resultDf.loc[
+    resultDf[
+        ["EDGE_matches", "DR_matches", "DRPlus_matches"]
+    ].nunique(axis=1, dropna=False) != 1,
+    ["player", "EDGE_matches", "DR_matches", "DRPlus_matches"],
+]
+
+if not inconsistentPlayers.empty:
+    raise ValueError( f"Match counts differ:\n{inconsistentPlayers}")
+
+resultDf["matches"] = (
+    resultDf["EDGE_matches"].astype("Int64")
+)
+
+# Rank each metric from highest (best) to lowest. Nullable integers
 # preserve missing metric values as blank cells in the output CSV.
 resultDf["EDGE_rank"] = resultDf["EDGE"].rank(
     ascending=False,
@@ -169,15 +184,13 @@ resultDf["DRPlus_rank"] = resultDf["DR+"].rank(
 resultDf = resultDf[ [
     "player",
     "WTA_rank",
+    "matches",
     "EDGE",
     "EDGE_rank",
     "DR",
     "DR_rank",
     "DR+",
-    "DRPlus_rank",
-    "EDGE_matches",
-    "DR_matches",
-    "DRPlus_matches" ]]
+    "DRPlus_rank" ]]
 
 pd.set_option("display.max_rows", None)
 pd.set_option("display.max_columns", None)
