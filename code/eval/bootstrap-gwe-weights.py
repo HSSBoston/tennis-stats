@@ -13,7 +13,7 @@ from constants import EVENT_TYPES, GAME_STATES, OUTPUT_DIR, RNG_SEED
 # 95% confidence intervals           2,000–5,000
 # Publication-quality tail estimates 5,000–10,000+
 # Very small p-values                10,000+
-NUM_BOOTSTRAP_SAMPLES = 10
+NUM_BOOTSTRAP_SAMPLES = 5000
 CONFIDENCE_LEVEL = 0.95
 
 # Summarize bootstrap estimates for game-win expectancy values (for different
