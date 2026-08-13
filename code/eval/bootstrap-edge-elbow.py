@@ -153,6 +153,16 @@ if __name__ == "__main__":
     top20Stability = summarizeDistribution( globalStabilityDf["top_20_overlap_rate"])
 
     # ---------------------------------------------------------------
+    # 9. Scale-relative EDGE confidence-interval width
+    # ---------------------------------------------------------------
+
+    originalEdge = playerSummaryDf["original_edge"].dropna()
+    crossPlayerOriginalEdgeSd = originalEdge.std(ddof=1)
+    relativeEdgeCiWidth = edgeCiWidth / crossPlayerOriginalEdgeSd
+    medianRelativeEdgeCiWidth = relativeEdgeCiWidth.median()
+    percentile90RelativeEdgeCiWidth = relativeEdgeCiWidth.quantile(0.90)
+
+    # ---------------------------------------------------------------
     # Reconcile recalculated player quantities with the summary file
     # ---------------------------------------------------------------
 
@@ -181,23 +191,25 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------
 
     overallResults = pd.Series( {
-        "bootstrap_replicates": int(numBootstrapSamples),
-        "number_eligible_players": int(numEligiblePlayers),
-        "median_bootstrap_edge_se": medianEdgeSe,
-        "median_edge_ci_width": medianEdgeCiWidth,
-        "90th_percentile_edge_ci_width": percentile90EdgeCiWidth,
-        "median_rank_ci_width": medianRankCiWidth,
-        "mean_spearman_rank_correlation": overallRankingStability["mean"],
-        "median_spearman_rank_correlation": overallRankingStability["median"],
-        "spearman_correlation_2.5_percentile": overallRankingStability["ci_lower"],
+        "bootstrap_replicates":          numBootstrapSamples,
+        "number_eligible_players":        numEligiblePlayers,
+        "median_bootstrap_edge_se":       medianEdgeSe,
+        "median_edge_ci_width":           medianEdgeCiWidth,
+        "90th_percentile_edge_ci_width":  percentile90EdgeCiWidth,
+        "median_relative_edge_ci_width":  medianRelativeEdgeCiWidth,
+        "90th_percentile_relative_edge_ci_width": percentile90RelativeEdgeCiWidth,
+        "median_rank_ci_width":           medianRankCiWidth,
+        "mean_spearman_rank_correlation":       overallRankingStability["mean"],
+        "median_spearman_rank_correlation":     overallRankingStability["median"],
+        "spearman_correlation_2.5_percentile":  overallRankingStability["ci_lower"],
         "spearman_correlation_97.5_percentile": overallRankingStability["ci_upper"],
-        "mean_top_10_overlap_rate": top10Stability["mean"],
-        "median_top_10_overlap_rate": top10Stability["median"],
-        "top_10_overlap_2.5_percentile": top10Stability["ci_lower"],
+        "mean_top_10_overlap_rate":       top10Stability["mean"],
+        "median_top_10_overlap_rate":     top10Stability["median"],
+        "top_10_overlap_2.5_percentile":  top10Stability["ci_lower"],
         "top_10_overlap_97.5_percentile": top10Stability["ci_upper"],
-        "mean_top_20_overlap_rate": top20Stability["mean"],
-        "median_top_20_overlap_rate": top20Stability["median"],
-        "top_20_overlap_2.5_percentile": top20Stability["ci_lower"],
+        "mean_top_20_overlap_rate":       top20Stability["mean"],
+        "median_top_20_overlap_rate":     top20Stability["median"],
+        "top_20_overlap_2.5_percentile":  top20Stability["ci_lower"],
         "top_20_overlap_97.5_percentile": top20Stability["ci_upper"]
         } )
 
@@ -225,6 +237,20 @@ if __name__ == "__main__":
         f"({proportionMeetingAvailRequirement:.1%}) had valid EDGE "
         f"estimates in at least "
         f"{minAvailabilityPercent:.0f}% of bootstrap iterations." )
+
+    # tolerance 1.0: stricter; current cohort fails;
+    # tolerance 2.0: current cohort passes;
+    # tolerance 3.0: relatively permissive.
+    MAX_MEDIAN_RELATIVE_CI_WIDTH = 2.0
+
+    passesCiRequirement = medianRelativeEdgeCiWidth <= MAX_MEDIAN_RELATIVE_CI_WIDTH
+    if passesCiRequirement:
+        print("\nPrecision requirement satisfied.")
+    else:
+        print("\nPrecision requirement NOT satisfied.")
+    print(
+        "Median relative EDGE CI width: "
+        f"{medianRelativeEdgeCiWidth:.3f}")
 
     print("\nPlayer-level EDGE availability")
     print(playerAvailabilityDf.to_string(index=False,
