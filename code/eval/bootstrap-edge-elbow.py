@@ -158,6 +158,7 @@ if __name__ == "__main__":
 
     originalEdge = playerSummaryDf["original_edge"].dropna()
     crossPlayerOriginalEdgeSd = originalEdge.std(ddof=1)
+    
     relativeEdgeCiWidth = edgeCiWidth / crossPlayerOriginalEdgeSd
     medianRelativeEdgeCiWidth = relativeEdgeCiWidth.median()
     percentile90RelativeEdgeCiWidth = relativeEdgeCiWidth.quantile(0.90)

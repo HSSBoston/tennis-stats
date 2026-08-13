@@ -2,7 +2,6 @@
 code/data/
 code/output/
 code/temp/
-code/eval/bootstrap/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
