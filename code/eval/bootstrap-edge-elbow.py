@@ -181,8 +181,8 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------
 
     overallResults = pd.Series( {
-        "bootstrap_replicates": numBootstrapSamples,
-        "number_eligible_players": numEligiblePlayers,
+        "bootstrap_replicates": int(numBootstrapSamples),
+        "number_eligible_players": int(numEligiblePlayers),
         "median_bootstrap_edge_se": medianEdgeSe,
         "median_edge_ci_width": medianEdgeCiWidth,
         "90th_percentile_edge_ci_width": percentile90EdgeCiWidth,
@@ -204,12 +204,35 @@ if __name__ == "__main__":
     print("\nOverall bootstrap diagnostics")
     print(overallResults.to_string())
 
-    print("\nPlayer-level EDGE availability")
+    minimumAvailabilityPercent = 99.0
+    minimumPlayerProportion = 0.90
+
+    meetsAvailabilityRequirement = (
+        playerAvailabilityDf["valid_edge_percentage"] >= minimumAvailabilityPercent)
+
+    numMeetingAvailRequirement = int(meetsAvailabilityRequirement.sum())
+    proportionMeetingAvailRequirement = meetsAvailabilityRequirement.mean()
+
+    passesRequirement = proportionMeetingAvailRequirement >= minimumPlayerProportion
+
     print(
-        playerAvailabilityDf.to_string(
-            index=False,
-            formatters={
-                "valid_edge_percentage": "{:.2f}".format,
-            },
-        )
+        f"{numberMeetingRequirement} of "
+        f"{len(playerAvailabilityDf)} eligible players "
+        f"({proportionMeetingRequirement:.1%}) had valid EDGE "
+        f"estimates in at least "
+        f"{minimumAvailabilityPercent:.0f}% of bootstrap iterations."
     )
+
+    print(
+        "Requirement satisfied:"
+        if passesRequirement
+        else "Requirement not satisfied:",
+        passesRequirement,
+    )    
+
+
+    print("\nPlayer-level EDGE availability")
+    print(playerAvailabilityDf.to_string(index=False,
+                                         formatters={"valid_edge_percentage": "{:.2f}".format}))
+    
+    
