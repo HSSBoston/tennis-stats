@@ -1,7 +1,7 @@
 .DS_Store
-data/
-output/
-temp/
+code/data/
+code/output/
+code/temp/
 code/eval/bootstrap/
 
 # Byte-compiled / optimized / DLL files
