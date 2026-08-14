@@ -183,17 +183,6 @@ resultDf["DRPlus_rank"] = resultDf["DR+"].rank(
     na_option="keep"
 ).astype("Int64")
 
-resultDf = resultDf[ [
-    "player",
-    "WTA_rank",
-    "matches",
-    "EDGE",
-    "EDGE_rank",
-    "DR",
-    "DR_rank",
-    "DR+",
-    "DRPlus_rank" ]]
-
 #print(resultDf)
 
 eligibleDf = resultDf[
@@ -217,6 +206,19 @@ for metricColumn, rankColumn in rankColumns.items():
         method="min",
         na_option="keep"
     ).astype("Int64")
+
+eligibleDf = eligibleDf[[
+    "player",
+    "WTA_rank",
+    "WTA_eligible_rank",
+    "matches",
+    "EDGE",
+    "EDGE_rank",
+    "DR",
+    "DR_rank",
+    "DR+",
+    "DRPlus_rank",
+]]
 
 print(f"WTA top 100 players: {len(resultDf)}")
 print(f"Players with >= {MIN_MATCHES} matches: {len(eligibleDf)}")
