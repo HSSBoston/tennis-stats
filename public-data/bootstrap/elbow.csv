@@ -1,0 +1,22 @@
+MIN_MATCHES,10,15,20
+bootstrap_replicates ,5000,5000,5000
+number_eligible_players,68,59,43
+% eligible players with valid EDGE in >=99% bootstrap itrs,100,100,100
+median_bootstrap_edge_se ,0.003026,0.002889,0.002751
+median_edge_ci_width ,0.011888,0.01151,0.010928
+90th_percentile_edge_ci_width ,0.020457,0.017625,0.015053
+median_relative_edge_ci_width ,1.66031,1.7461,1.849404
+90th_percentile_relative_edge_ci_width ,2.856975,2.673756,2.547511
+median_rank_ci_width ,32,29,21
+mean_spearman_rank_correlation ,0.894624,0.89094,0.886986
+median_spearman_rank_correlation ,0.897755,0.894886,0.891951
+spearman_correlation_2.5_percentile ,0.832916,0.820977,0.809416
+spearman_correlation_97.5_percentile ,0.937817,0.937056,0.940048
+mean_top_10_overlap_rate ,0.68232,0.70426,0.73416
+median_top_10_overlap_rate ,0.7,0.7,0.7
+top_10_overlap_2.5_percentile ,0.5,0.5,0.5
+top_10_overlap_97.5_percentile ,0.9,0.9,0.9
+mean_top_20_overlap_rate ,0.80674,0.82493,0.86928
+median_top_20_overlap_rate,0.8,0.85,0.85
+top_20_overlap_2.5_percentile ,0.7,0.7,0.75
+top_20_overlap_97.5_percentile ,0.9,0.95,0.95
