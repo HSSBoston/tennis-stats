@@ -4,6 +4,7 @@ PRJ_DIR = pathlib.Path(__file__).parents[1]  # 2 levels up
 sys.path.append(str(PRJ_DIR))
 
 import pandas as pd
+from scipy.stats import spearmanr
 from dataloader import MCPDataLoader
 from edge import EdgeCalc
 from dr import DrCalc
@@ -13,12 +14,13 @@ from constants import OUTPUT_DIR
 
 MIN_MATCHES = 5
 MIN_RECENT_MATCHES = 3
-ELO_INCLUDE_QUAL_ITF = False
 
 WTA_RANKING_DATE = pd.Timestamp("2026-05-25")
 ANALYSIS_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=2)
 ANALYSIS_END_DATE = WTA_RANKING_DATE - pd.Timedelta(days=1)
 FINAL_YEAR_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=1)
+
+ELO_INCLUDE_QUAL_ITF = False
 
 # WTA top 100 players as of 05/25/2026
 players = [
@@ -375,26 +377,42 @@ eligibleDf = eligibleDf[[
     "Elo_rank",
 ]]
 
-print(
-    "Analysis window: "
-    f"{ANALYSIS_START_DATE:%Y-%m-%d} through "
-    f"{ANALYSIS_END_DATE:%Y-%m-%d}"
-)
-print(
-    "Final-year window: "
-    f"{FINAL_YEAR_START_DATE:%Y-%m-%d} through "
-    f"{ANALYSIS_END_DATE:%Y-%m-%d}"
-)
+# Calculate rank-based Spearman correlations for the final eligible
+# cohort. Using WTA_rank here is appropriate even though it contains
+# gaps: Spearman correlation ranks each input internally, making this
+# equivalent to using WTA_eligible_rank.
+correlationRows = []
+
+for metricColumn, rankColumn in rankColumns.items():
+    correlationInputDf = eligibleDf[
+        [rankColumn, "WTA_rank"]
+    ].dropna()
+
+    if len(correlationInputDf) < 2:
+        raise ValueError(f"Not enough players to calculate {metricColumn} Spearman correlation")
+
+    correlation, _ = spearmanr(
+        correlationInputDf[rankColumn],
+        correlationInputDf["WTA_rank"] )
+
+    if pd.isna(correlation):
+        raise ValueError(f"Undefined Spearman correlation for {metricColumn}")
+
+    correlationRows.append( {
+        "Metric": metricColumn,
+        "Spearman_rho_with_WTA_rank": float(correlation) } )
+
+correlationDf = pd.DataFrame(correlationRows)
+
+print(f"Analysis window: {ANALYSIS_START_DATE:%Y-%m-%d} through {ANALYSIS_END_DATE:%Y-%m-%d}")
+print(f"Final-year window: {FINAL_YEAR_START_DATE:%Y-%m-%d} through {ANALYSIS_END_DATE:%Y-%m-%d}")
+
 print(f"WTA top 100 players: {len(resultDf)}")
 print(
     f"Players with >= {MIN_MATCHES} matches and >= "
-    f"{MIN_RECENT_MATCHES} final-year matches: {len(eligibleDf)}"
-)
+    f"{MIN_RECENT_MATCHES} final-year matches: {len(eligibleDf)}" )
 
-windowLabel = (
-    f"{ANALYSIS_START_DATE:%Y%m%d}-"
-    f"{ANALYSIS_END_DATE:%Y%m%d}"
-)
+windowLabel = f"{ANALYSIS_START_DATE:%Y%m%d}-{ANALYSIS_END_DATE:%Y%m%d}"
 
 outputFile = "edge-dr-drplus-elo-wta-top100-all.csv"
 resultDf.to_csv(
@@ -412,3 +430,14 @@ eligibleDf.to_csv(
     index=False
 )
 print(f"Saved to: {outputFile}")
+
+correlationOutputFile = (
+    f"edge-dr-drplus-elo-wta-top100-{windowLabel}"
+    f"-min{MIN_MATCHES}-recent{MIN_RECENT_MATCHES}-corr.csv"
+)
+correlationDf.to_csv(
+    OUTPUT_DIR / correlationOutputFile,
+    index=False,
+    float_format="%.6f",
+)
+print(f"Saved to: {correlationOutputFile}")
