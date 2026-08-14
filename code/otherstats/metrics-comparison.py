@@ -8,10 +8,12 @@ from dataloader import MCPDataLoader
 from edge import EdgeCalc
 from dr import DrCalc
 from drplus import DrPlusCalc
+from elo import EloCalc
 from constants import OUTPUT_DIR
 
 MIN_MATCHES = 5
 MIN_RECENT_MATCHES = 3
+ELO_INCLUDE_QUAL_ITF = False
 
 WTA_RANKING_DATE = pd.Timestamp("2026-05-25")
 ANALYSIS_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=2)
@@ -242,12 +244,35 @@ _, drPlusDf = DrPlusCalc(
 drPlusDf = drPlusDf[ ["player", "DR+", "matches"] ].copy()
 drPlusDf = drPlusDf.rename( columns={"matches": "DRPlus_matches"} )
 
+# Calculate Elo from all tour-level main-draw results before the
+# WTA ranking date. Elo does not use the MCP point data or its
+# two-year analysis window.
+
+eloCalc = EloCalc.fromArchive(
+    cutoffDate=WTA_RANKING_DATE,
+    includeQualItf=ELO_INCLUDE_QUAL_ITF,
+)
+_, eloDf = eloCalc.playersElo(players)
+eloDf = eloDf[ ["player", "Elo"] ].copy()
+
+missingEloPlayers = eloDf.loc[
+    eloDf["Elo"].isna(),
+    "player",
+].tolist()
+
+if missingEloPlayers:
+    raise ValueError(
+        "No Elo value found for: "
+        f"{missingEloPlayers}"
+    )
+
 resultDf = (
     rankDf
     .merge(playerDatesDf, on="player", how="left")
     .merge(edgeDf,   on="player", how="left")
     .merge(drDf,     on="player", how="left")
-    .merge(drPlusDf, on="player", how="left") )
+    .merge(drPlusDf, on="player", how="left")
+    .merge(eloDf,    on="player", how="left") )
 
 # Verify "EDGE_matches", "DR_matches", and "DRPlus_matches" have the same number
 inconsistentPlayers = resultDf.loc[
@@ -284,6 +309,12 @@ resultDf["DRPlus_rank"] = resultDf["DR+"].rank(
     na_option="keep"
 ).astype("Int64")
 
+resultDf["Elo_rank"] = resultDf["Elo"].rank(
+    ascending=False,
+    method="min",
+    na_option="keep"
+).astype("Int64")
+
 resultDf = resultDf[[
     "player",
     "WTA_rank",
@@ -297,6 +328,8 @@ resultDf = resultDf[[
     "DR_rank",
     "DR+",
     "DRPlus_rank",
+    "Elo",
+    "Elo_rank",
 ]]
 #print(resultDf)
 
@@ -314,7 +347,8 @@ eligibleDf["WTA_eligible_rank"] = eligibleDf["WTA_rank"].rank(
 rankColumns = {
     "EDGE": "EDGE_rank",
     "DR":   "DR_rank",
-    "DR+":  "DRPlus_rank" }
+    "DR+":  "DRPlus_rank",
+    "Elo":  "Elo_rank" }
 
 for metricColumn, rankColumn in rankColumns.items():
     eligibleDf[rankColumn] = eligibleDf[metricColumn].rank(
@@ -337,6 +371,8 @@ eligibleDf = eligibleDf[[
     "DR_rank",
     "DR+",
     "DRPlus_rank",
+    "Elo",
+    "Elo_rank",
 ]]
 
 print(
@@ -360,7 +396,7 @@ windowLabel = (
     f"{ANALYSIS_END_DATE:%Y%m%d}"
 )
 
-outputFile = "edge-dr-drplus-wta-top100-all.csv"
+outputFile = "edge-dr-drplus-elo-wta-top100-all.csv"
 resultDf.to_csv(
     OUTPUT_DIR / outputFile,
     index=False
@@ -368,7 +404,7 @@ resultDf.to_csv(
 print(f"\nSaved to: {outputFile}")
 
 outputFile = (
-    f"edge-dr-drplus-wta-top100-{windowLabel}"
+    f"edge-dr-drplus-elo-wta-top100-{windowLabel}"
     f"-min{MIN_MATCHES}-recent{MIN_RECENT_MATCHES}.csv"
 )
 eligibleDf.to_csv(
