@@ -11,9 +11,12 @@ from drplus import DrPlusCalc
 from constants import OUTPUT_DIR
 
 MIN_MATCHES = 5
+MIN_RECENT_MATCHES = 3
+
 WTA_RANKING_DATE = pd.Timestamp("2026-05-25")
 ANALYSIS_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=2)
 ANALYSIS_END_DATE = WTA_RANKING_DATE - pd.Timedelta(days=1)
+FINAL_YEAR_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=1)
 
 # WTA top 100 players as of 05/25/2026
 players = [
@@ -184,13 +187,26 @@ playerDatesDf = pd.concat(
     ignore_index=True
 )
 
+playerDatesDf["in_final_year"] = (
+    playerDatesDf["match_date"].between(
+        FINAL_YEAR_START_DATE,
+        ANALYSIS_END_DATE,
+        inclusive="both"
+    )
+)
+
 playerDatesDf = (
     playerDatesDf
-    .groupby("player", as_index=False)["match_date"]
+    .groupby("player", as_index=False)
     .agg(
-        FIRST_MATCH_DATE="min",
-        LAST_MATCH_DATE="max"
+        FIRST_MATCH_DATE=("match_date", "min"),
+        LAST_MATCH_DATE=("match_date", "max"),
+        LAST_YEAR_MATCHES=("in_final_year", "sum")
     )
+)
+
+playerDatesDf["LAST_YEAR_MATCHES"] = (
+    playerDatesDf["LAST_YEAR_MATCHES"].astype("Int64")
 )
 
 for dateColumn in ["FIRST_MATCH_DATE", "LAST_MATCH_DATE"]:
@@ -272,6 +288,7 @@ resultDf = resultDf[[
     "player",
     "WTA_rank",
     "matches",
+    "LAST_YEAR_MATCHES",
     "FIRST_MATCH_DATE",
     "LAST_MATCH_DATE",
     "EDGE",
@@ -284,7 +301,8 @@ resultDf = resultDf[[
 #print(resultDf)
 
 eligibleDf = resultDf[
-    resultDf["matches"] >= MIN_MATCHES
+    (resultDf["matches"] >= MIN_MATCHES)
+    & (resultDf["LAST_YEAR_MATCHES"] >= MIN_RECENT_MATCHES)
 ].copy()
 
 eligibleDf["WTA_eligible_rank"] = eligibleDf["WTA_rank"].rank(
@@ -310,6 +328,7 @@ eligibleDf = eligibleDf[[
     "WTA_rank",
     "WTA_eligible_rank",
     "matches",
+    "LAST_YEAR_MATCHES",
     "FIRST_MATCH_DATE",
     "LAST_MATCH_DATE",
     "EDGE",
@@ -325,8 +344,16 @@ print(
     f"{ANALYSIS_START_DATE:%Y-%m-%d} through "
     f"{ANALYSIS_END_DATE:%Y-%m-%d}"
 )
+print(
+    "Final-year window: "
+    f"{FINAL_YEAR_START_DATE:%Y-%m-%d} through "
+    f"{ANALYSIS_END_DATE:%Y-%m-%d}"
+)
 print(f"WTA top 100 players: {len(resultDf)}")
-print(f"Players with >= {MIN_MATCHES} matches: {len(eligibleDf)}")
+print(
+    f"Players with >= {MIN_MATCHES} matches and >= "
+    f"{MIN_RECENT_MATCHES} final-year matches: {len(eligibleDf)}"
+)
 
 windowLabel = (
     f"{ANALYSIS_START_DATE:%Y%m%d}-"
@@ -340,7 +367,10 @@ resultDf.to_csv(
 )
 print(f"\nSaved to: {outputFile}")
 
-outputFile = f"edge-dr-drplus-wta-top100-{windowLabel}-min{MIN_MATCHES}.csv"
+outputFile = (
+    f"edge-dr-drplus-wta-top100-{windowLabel}"
+    f"-min{MIN_MATCHES}-recent{MIN_RECENT_MATCHES}.csv"
+)
 eligibleDf.to_csv(
     OUTPUT_DIR / outputFile,
     index=False

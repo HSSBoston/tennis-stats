@@ -2,6 +2,49 @@ from constants import EVENT_TYPES
 from eventparser import classifyEvent
 import pandas as pd
 
+
+SERVER_WIN_STATE = {
+    "0-0":   "15-0",
+    "0-15":  "15-15",
+    "0-30":  "15-30",
+    "0-40":  "15-40",
+    "15-0":  "30-0",
+    "15-15": "30-15",
+    "15-30": "30-30",
+    "15-40": "30-40",
+    "30-0":  "40-0",
+    "30-15": "40-15",
+    "30-30": "40-30",
+    "30-40": "40-40",
+    "40-0":  "GAME_WON",
+    "40-15": "GAME_WON",
+    "40-30": "GAME_WON",
+    "40-40": "AD-40",
+    "AD-40": "GAME_WON",
+    "40-AD": "40-40",
+}
+
+SERVER_LOSS_STATE = {
+    "0-0":   "0-15",
+    "0-15":  "0-30",
+    "0-30":  "0-40",
+    "0-40":  "GAME_LOST",
+    "15-0":  "15-15",
+    "15-15": "15-30",
+    "15-30": "15-40",
+    "15-40": "GAME_LOST",
+    "30-0":  "30-15",
+    "30-15": "30-30",
+    "30-30": "30-40",
+    "30-40": "GAME_LOST",
+    "40-0":  "40-15",
+    "40-15": "40-30",
+    "40-30": "40-40",
+    "40-40": "40-AD",
+    "AD-40": "40-40",
+    "40-AD": "GAME_LOST",
+}
+
 # Add an event label and calculates the change in game win expectancy (delta V) 
 # caused by each point.
 #   df:    Point-by-point DataFrame that has been created by
@@ -64,6 +107,48 @@ def computeDeltaGameWinExpectancy(df: pd.DataFrame, vDict: dict) -> pd.DataFrame
         "returner": -1.0,
     })
     df["delta_V"] = multiplier * serverDeltaV
+
+    return df
+
+
+# Add counterfactual game leverage to each point.
+#
+# Game leverage is the difference between the server's probability of winning
+# the current game after winning the next point and that probability after
+# losing the next point. Unlike delta_V, it does not depend on the point result
+# that actually occurred or on an EDGE event classification.
+#
+#   df:    Point-by-point DataFrame containing the pre-point score in "Pts".
+#   vDict: Maps each non-terminal game state to the server's game-win
+#          expectancy. Obtain it via expectancy.computeGameWinExpectancy().
+# Returns:
+#   df: Input DataFrame + extra columns "server_win_state",
+#       "server_loss_state", "V_if_server_wins_point",
+#       "V_if_server_loses_point", and "LEV".
+#
+def computeGameLeverage(df: pd.DataFrame, vDict: dict) -> pd.DataFrame:
+    df = df.copy()
+
+    df["server_win_state"] = df["Pts"].map(SERVER_WIN_STATE)
+    df["server_loss_state"] = df["Pts"].map(SERVER_LOSS_STATE)
+
+    df["V_if_server_wins_point"] = df["server_win_state"].map(vDict)
+    df["V_if_server_loses_point"] = df["server_loss_state"].map(vDict)
+
+    df.loc[
+        df["server_win_state"] == "GAME_WON",
+        "V_if_server_wins_point"
+    ] = 1.0
+
+    df.loc[
+        df["server_loss_state"] == "GAME_LOST",
+        "V_if_server_loses_point"
+    ] = 0.0
+
+    df["LEV"] = (
+        df["V_if_server_wins_point"]
+        - df["V_if_server_loses_point"]
+    ).abs()
 
     return df
 

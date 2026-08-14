@@ -4,7 +4,7 @@ sys.path.append(str(PRJ_DIR))
 
 from dataloader import MCPDataLoader
 from expectancy import computeGameWinExpectancy
-from eventweights import computeDeltaGameWinExpectancy
+from eventweights import computeGameLeverage
 from constants import OUTPUT_DIR
 import pandas as pd
 
@@ -17,9 +17,10 @@ class BlrCalc:
         matches: pd.DataFrame,
         saveOutputs=True
     ) -> None:
-        # deltaGwePoints: original MCP data + extra columns "server_won_game",
-        # "next_state", "V_before", "V_after", "event", "perspective", "delta_V"
-        self.deltaGwePoints: pd.DataFrame
+        # gameLeveragePoints: original MCP data + extra columns
+        # "server_win_state", "server_loss_state",
+        # "V_if_server_wins_point", "V_if_server_loses_point", and "LEV"
+        self.gameLeveragePoints: pd.DataFrame
         self.matches:        pd.DataFrame
 
         # Retain metadata only for matches represented in the supplied point-by-point data.
@@ -30,7 +31,7 @@ class BlrCalc:
         ].copy()
 
         gweDict, gweDf, pointsGwe = computeGameWinExpectancy(points)
-        self.deltaGwePoints = computeDeltaGameWinExpectancy(pointsGwe, gweDict)
+        self.gameLeveragePoints = computeGameLeverage(pointsGwe, gweDict)
 
         if saveOutputs:
             OUTPUT_DIR.mkdir(exist_ok=True)
@@ -80,7 +81,7 @@ class BlrCalc:
         }
 
         # Extract point-level rows where playerName played
-        df = self.deltaGwePoints.copy()
+        df = self.gameLeveragePoints.copy()
         df = df.loc[
             df["match_id"].isin(matchIdToPlayerNumber.keys())
         ]
@@ -93,13 +94,10 @@ class BlrCalc:
         df["won_point"]  = (df["player_num"] == df["PtWinner"])
 
         # Keep rows with enough information
-        df = df.dropna(subset=["Svr", "PtWinner", "delta_V"])
+        df = df.dropna(subset=["Pts", "Svr", "PtWinner", "LEV"])
         totalPoints = len(df)
         if totalPoints == 0:
             return (None, None, None)
-
-        # For BLR, leverage (LEV) is the magnitude of game win expectancy (delta_V)
-        df["LEV"] = df["delta_V"].abs()
 
         servePts  = df.loc[df["is_server"] == 1]
         returnPts = df.loc[df["is_server"] == 0]
@@ -185,4 +183,3 @@ if __name__ == "__main__":
     )
     print(outputDict)
     print(outputDf)
-
