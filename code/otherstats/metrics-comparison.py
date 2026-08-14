@@ -10,7 +10,10 @@ from dr import DrCalc
 from drplus import DrPlusCalc
 from constants import OUTPUT_DIR
 
-MIN_MATCHES = 15
+MIN_MATCHES = 5
+WTA_RANKING_DATE = pd.Timestamp("2026-05-25")
+ANALYSIS_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=2)
+ANALYSIS_END_DATE = WTA_RANKING_DATE - pd.Timedelta(days=1)
 
 # WTA top 100 players as of 05/25/2026
 players = [
@@ -118,32 +121,114 @@ players = [
 
 dl = MCPDataLoader("w")
 
+# Restrict both match metadata and point data to the same rolling
+# two-year window preceding the WTA ranking date.
+loadedPointMatchIds = set(
+    dl.points["match_id"].dropna().unique()
+)
+
+analysisMatches = dl.matches.loc[
+    dl.matches["match_id"].isin(loadedPointMatchIds)
+].copy()
+analysisMatches["match_date"] = pd.to_datetime(
+    analysisMatches["Date"],
+    format="%Y%m%d",
+    errors="raise"
+)
+
+analysisMatches = analysisMatches.loc[
+    analysisMatches["match_date"].between(
+        ANALYSIS_START_DATE,
+        ANALYSIS_END_DATE,
+        inclusive="both"
+    )
+].copy()
+
+analysisMatchIds = set(
+    analysisMatches["match_id"].dropna().unique()
+)
+
+analysisPoints = dl.points.loc[
+    dl.points["match_id"].isin(analysisMatchIds)
+].copy()
+
+# Remove metadata for matches that do not have point data in the
+# loaded MCP point file.
+pointMatchIds = set(
+    analysisPoints["match_id"].dropna().unique()
+)
+
+analysisMatches = analysisMatches.loc[
+    analysisMatches["match_id"].isin(pointMatchIds)
+].copy()
+
+if analysisPoints.empty or analysisMatches.empty:
+    raise ValueError("No MCP data found within the analysis window")
+
 rankDf = pd.DataFrame( {
     "player":   players,
     "WTA_rank": range(1, len(players) + 1)
 } )
 
+# Record the first and last charted matches actually used for each
+# player within the common analysis window.
+playerDatesDf = pd.concat(
+    [
+        analysisMatches[
+            ["Player 1", "match_date"]
+        ].rename(columns={"Player 1": "player"}),
+        analysisMatches[
+            ["Player 2", "match_date"]
+        ].rename(columns={"Player 2": "player"}),
+    ],
+    ignore_index=True
+)
+
+playerDatesDf = (
+    playerDatesDf
+    .groupby("player", as_index=False)["match_date"]
+    .agg(
+        FIRST_MATCH_DATE="min",
+        LAST_MATCH_DATE="max"
+    )
+)
+
+for dateColumn in ["FIRST_MATCH_DATE", "LAST_MATCH_DATE"]:
+    playerDatesDf[dateColumn] = (
+        playerDatesDf[dateColumn].dt.strftime("%Y-%m-%d")
+    )
+
 # Calculate EDGE
 
-_, edgeDf = EdgeCalc(dl.points, dl.matches).playersEdge(players)
+_, edgeDf = EdgeCalc(
+    analysisPoints,
+    analysisMatches
+).playersEdge(players)
 edgeDf = edgeDf[ ["player", "EDGE", "matches"] ].copy()
 edgeDf = edgeDf.rename( columns={"matches": "EDGE_matches"} )
 
 
 # Calculate DR
 
-_, drDf = DrCalc(dl.points, dl.matches).playersDr(players)
+_, drDf = DrCalc(
+    analysisPoints,
+    analysisMatches
+).playersDr(players)
 drDf = drDf[ ["player", "DR", "matches"] ].copy()
 drDf = drDf.rename( columns={"matches": "DR_matches"} )
 
 # Calculate DR+
 
-_, drPlusDf = DrPlusCalc(dl.points, dl.matches).playersDrPlus(players)
+_, drPlusDf = DrPlusCalc(
+    analysisPoints,
+    analysisMatches
+).playersDrPlus(players)
 drPlusDf = drPlusDf[ ["player", "DR+", "matches"] ].copy()
 drPlusDf = drPlusDf.rename( columns={"matches": "DRPlus_matches"} )
 
 resultDf = (
     rankDf
+    .merge(playerDatesDf, on="player", how="left")
     .merge(edgeDf,   on="player", how="left")
     .merge(drDf,     on="player", how="left")
     .merge(drPlusDf, on="player", how="left") )
@@ -212,6 +297,8 @@ eligibleDf = eligibleDf[[
     "WTA_rank",
     "WTA_eligible_rank",
     "matches",
+    "FIRST_MATCH_DATE",
+    "LAST_MATCH_DATE",
     "EDGE",
     "EDGE_rank",
     "DR",
@@ -220,6 +307,11 @@ eligibleDf = eligibleDf[[
     "DRPlus_rank",
 ]]
 
+print(
+    "Analysis window: "
+    f"{ANALYSIS_START_DATE:%Y-%m-%d} through "
+    f"{ANALYSIS_END_DATE:%Y-%m-%d}"
+)
 print(f"WTA top 100 players: {len(resultDf)}")
 print(f"Players with >= {MIN_MATCHES} matches: {len(eligibleDf)}")
 
