@@ -200,6 +200,8 @@ eligibleDf = resultDf[
     resultDf["matches"] >= MIN_MATCHES
 ].copy()
 
+eligibleDf["WTA_eligible_rank"] = eligibleDf["WTA_rank"].rank(method="min").astype("Int64")
+
 rankColumns = {
     "EDGE": "EDGE_rank",
     "DR":   "DR_rank",
