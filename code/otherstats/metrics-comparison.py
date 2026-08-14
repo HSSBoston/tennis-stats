@@ -268,6 +268,19 @@ resultDf["DRPlus_rank"] = resultDf["DR+"].rank(
     na_option="keep"
 ).astype("Int64")
 
+resultDf = resultDf[[
+    "player",
+    "WTA_rank",
+    "matches",
+    "FIRST_MATCH_DATE",
+    "LAST_MATCH_DATE",
+    "EDGE",
+    "EDGE_rank",
+    "DR",
+    "DR_rank",
+    "DR+",
+    "DRPlus_rank",
+]]
 #print(resultDf)
 
 eligibleDf = resultDf[
@@ -315,6 +328,11 @@ print(
 print(f"WTA top 100 players: {len(resultDf)}")
 print(f"Players with >= {MIN_MATCHES} matches: {len(eligibleDf)}")
 
+windowLabel = (
+    f"{ANALYSIS_START_DATE:%Y%m%d}-"
+    f"{ANALYSIS_END_DATE:%Y%m%d}"
+)
+
 outputFile = "edge-dr-drplus-wta-top100-all.csv"
 resultDf.to_csv(
     OUTPUT_DIR / outputFile,
@@ -322,7 +340,7 @@ resultDf.to_csv(
 )
 print(f"\nSaved to: {outputFile}")
 
-outputFile = f"edge-dr-drplus-wta-top100-min{MIN_MATCHES}.csv"
+outputFile = f"edge-dr-drplus-wta-top100-{windowLabel}-min{MIN_MATCHES}.csv"
 eligibleDf.to_csv(
     OUTPUT_DIR / outputFile,
     index=False
