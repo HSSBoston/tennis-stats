@@ -200,6 +200,18 @@ eligibleDf = resultDf[
     resultDf["matches"] >= MIN_MATCHES
 ].copy()
 
+rankColumns = {
+    "EDGE": "EDGE_rank",
+    "DR":   "DR_rank",
+    "DR+":  "DRPlus_rank" }
+
+for metricColumn, rankColumn in rankColumns.items():
+    eligibleDf[rankColumn] = eligibleDf[metricColumn].rank(
+        ascending=False,
+        method="min",
+        na_option="keep"
+    ).astype("Int64")
+
 print(f"WTA top 100 players: {len(resultDf)}")
 print(f"Players with >= {MIN_MATCHES} matches: {len(eligibleDf)}")
 
@@ -215,4 +227,4 @@ eligibleDf.to_csv(
     OUTPUT_DIR / outputFile,
     index=False
 )
-print(f"\nSaved to: {outputFile}")
+print(f"Saved to: {outputFile}")
