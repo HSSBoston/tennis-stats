@@ -1,49 +1,7 @@
 from constants import EVENT_TYPES
 from eventparser import classifyEvent
 import pandas as pd
-
-
-SERVER_WIN_STATE = {
-    "0-0":   "15-0",
-    "0-15":  "15-15",
-    "0-30":  "15-30",
-    "0-40":  "15-40",
-    "15-0":  "30-0",
-    "15-15": "30-15",
-    "15-30": "30-30",
-    "15-40": "30-40",
-    "30-0":  "40-0",
-    "30-15": "40-15",
-    "30-30": "40-30",
-    "30-40": "40-40",
-    "40-0":  "GAME_WON",
-    "40-15": "GAME_WON",
-    "40-30": "GAME_WON",
-    "40-40": "AD-40",
-    "AD-40": "GAME_WON",
-    "40-AD": "40-40",
-}
-
-SERVER_LOSS_STATE = {
-    "0-0":   "0-15",
-    "0-15":  "0-30",
-    "0-30":  "0-40",
-    "0-40":  "GAME_LOST",
-    "15-0":  "15-15",
-    "15-15": "15-30",
-    "15-30": "15-40",
-    "15-40": "GAME_LOST",
-    "30-0":  "30-15",
-    "30-15": "30-30",
-    "30-30": "30-40",
-    "30-40": "GAME_LOST",
-    "40-0":  "40-15",
-    "40-15": "40-30",
-    "40-30": "40-40",
-    "40-40": "40-AD",
-    "AD-40": "40-40",
-    "40-AD": "GAME_LOST",
-}
+from constants import SERVER_WIN_STATE, SERVER_LOSS_STATE
 
 # Add an event label and calculates the change in game win expectancy (delta V) 
 # caused by each point.
