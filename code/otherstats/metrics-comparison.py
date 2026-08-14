@@ -10,7 +10,7 @@ from dr import DrCalc
 from drplus import DrPlusCalc
 from constants import OUTPUT_DIR
 
-MIN_MATCHES = 10
+MIN_MATCHES = 15
 
 # WTA top 100 players as of 05/25/2026
 players = [
