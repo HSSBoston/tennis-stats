@@ -404,6 +404,33 @@ for metricColumn, rankColumn in rankColumns.items():
 
 correlationDf = pd.DataFrame(correlationRows)
 
+# Compare EDGE directly with other metrics. Spearman
+# correlation ranks the raw metric values internally, so the explicit
+# rank columns are not needed for these pairwise comparisons.
+correlationDf["Spearman_rho_with_EDGE"] = float("nan")
+
+for metricColumn in ["DR", "DR+", "Elo"]:
+    correlationInputDf = eligibleDf[
+        ["EDGE", metricColumn]
+    ].dropna()
+
+    if len(correlationInputDf) < 2:
+        raise ValueError(
+            f"Not enough players to calculate EDGE vs {metricColumn} " "Spearman correlation")
+
+    correlation, _ = spearmanr(
+        correlationInputDf["EDGE"],
+        correlationInputDf[metricColumn]
+    )
+
+    if pd.isna(correlation):
+        raise ValueError(f"Undefined Spearman correlation for EDGE vs {metricColumn}")
+
+    correlationDf.loc[
+        correlationDf["Metric"].eq(metricColumn),
+        "Spearman_rho_with_EDGE",
+    ] = float(correlation)
+
 print(f"Analysis window: {ANALYSIS_START_DATE:%Y-%m-%d} through {ANALYSIS_END_DATE:%Y-%m-%d}")
 print(f"Final-year window: {FINAL_YEAR_START_DATE:%Y-%m-%d} through {ANALYSIS_END_DATE:%Y-%m-%d}")
 
