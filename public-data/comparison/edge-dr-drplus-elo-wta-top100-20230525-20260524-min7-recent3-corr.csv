@@ -1,5 +1,5 @@
-Metric,Spearman_rho_with_WTA_rank
-EDGE,0.520232
-DR,0.721258
-DR+,0.721873
-Elo,0.877444
+Metric,Spearman_rho_with_WTA_rank,Spearman_rho_with_EDGE
+EDGE,0.520232,
+DR,0.721258,0.614012
+DR+,0.721873,0.627068
+Elo,0.877444,0.449282

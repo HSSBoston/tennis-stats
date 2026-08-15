@@ -359,6 +359,19 @@ for metricColumn, rankColumn in rankColumns.items():
         na_option="keep"
     ).astype("Int64")
 
+# Rank discrepancies use EDGE rank as the reference. Negative values
+# mean EDGE ranks the player better; positive values mean EDGE ranks
+# the player worse than the comparison measure.
+rankDifferenceColumns = {
+    "EDGE-DR rank diff":  "DR_rank",
+    "EDGE-DR+ rank diff": "DRPlus_rank",
+    "EDGE-Elo rank diff": "Elo_rank",
+    "EDGE-WTA rank diff": "WTA_eligible_rank",
+}
+
+for differenceColumn, comparisonRankColumn in rankDifferenceColumns.items():
+    eligibleDf[differenceColumn] = eligibleDf["EDGE_rank"] - eligibleDf[comparisonRankColumn]
+
 eligibleDf = eligibleDf[[
     "player",
     "WTA_rank",
@@ -375,6 +388,7 @@ eligibleDf = eligibleDf[[
     "DRPlus_rank",
     "Elo",
     "Elo_rank",
+    *rankDifferenceColumns.keys(),
 ]]
 
 # Calculate rank-based Spearman correlations for the final eligible
