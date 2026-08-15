@@ -15,9 +15,9 @@ from constants import OUTPUT_DIR
 MIN_MATCHES = 5
 MIN_RECENT_MATCHES = 3
 
-WTA_RANKING_DATE = pd.Timestamp("2026-05-25")
-ANALYSIS_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=2)
-ANALYSIS_END_DATE = WTA_RANKING_DATE - pd.Timedelta(days=1)
+WTA_RANKING_DATE      = pd.Timestamp("2026-05-25")
+ANALYSIS_START_DATE   = WTA_RANKING_DATE - pd.DateOffset(years=2)
+ANALYSIS_END_DATE     = WTA_RANKING_DATE - pd.Timedelta(days=1)
 FINAL_YEAR_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=1)
 
 ELO_INCLUDE_QUAL_ITF = False
