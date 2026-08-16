@@ -12,16 +12,16 @@ from drplus import DrPlusCalc
 from elo import EloCalc
 from constants import OUTPUT_DIR
 
-MIN_MATCHES = 5
+MIN_MATCHES = 6
 MIN_RECENT_MATCHES = 3
 
 WTA_RANKING_DATE = pd.Timestamp("2026-05-25")
 
-ANALYSIS_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=2)
-ANALYSIS_END_DATE   = WTA_RANKING_DATE - pd.Timedelta(days=1)
+# ANALYSIS_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=2)
+# ANALYSIS_END_DATE   = WTA_RANKING_DATE - pd.Timedelta(days=1)
 
-# ANALYSIS_START_DATE = pd.Timestamp("2020-01-01")
-# ANALYSIS_END_DATE   = pd.Timestamp("2025-05-24")
+ANALYSIS_START_DATE = pd.Timestamp("2024-01-01")
+ANALYSIS_END_DATE   = pd.Timestamp("2026-05-24")
 
 FINAL_YEAR_START_DATE = WTA_RANKING_DATE - pd.DateOffset(years=1)
 
