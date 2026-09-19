@@ -2,6 +2,9 @@
   <img src="images/logo.jpg" width="750" />
 </p>
 
+## Short Summary: 
+
+## Summary: 
 Traditional tennis statistics, such as aces, double faults, winners, and unforced errors, provide intuitive box-score summaries of player performance. However, these metrics evaluate isolated aspects of performance rather than summarizing a player's overall performance in a single measure. As a result, comparing individual players often requires tables, radar charts, or other visualizations that present multiple metrics together. This makes interpretation less direct.
 
 Composite metrics address this limitation by combining multiple aspects of play into a single numerical measure. For example, metrics such as Dominance Ratio (DR) and hold-plus-break percentage summarize performance more directly by combining serve and return outcomes. However, these metrics are deterministic summaries of observed outcomes and do not explicitly account for how the value of a point outcome varies with score context. Therefore, they do not distinguish, for example, a winner on break point from a winner at 40–0, even though the two outcomes can have different effects on the probability of winning the current game. 
