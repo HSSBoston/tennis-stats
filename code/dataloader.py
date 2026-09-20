@@ -83,6 +83,7 @@ class MCPDataLoader:
         
     def loadMatches(self) -> None:
         self.matches = pd.read_csv(self.matchesPath, dtype=str)
+        print(len(self.matches), "matches loaded")
     
     def bootstrap(self, rng: np.random.Generator) -> tuple[pd.DataFrame, pd.DataFrame]:
         matchIds = self.points["match_id"].unique()
