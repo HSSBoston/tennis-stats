@@ -1,3 +1,5 @@
+# Load charting-w-points-2020s.csv by default
+
 from pathlib import Path
 import pandas as pd, numpy as np
 from constants import GAME_STATES, MCP_DIR
