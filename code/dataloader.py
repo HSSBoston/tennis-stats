@@ -44,6 +44,9 @@ class MCPDataLoader:
                 for matchId, matchRows in self.matches.groupby("match_id", sort=False)
         }
         self.validateMetadata()
+        
+        print(len(self.points),        "points loaded")
+        print(len(self.pointsByMatch), "matches loaded")
 
     def validatePaths(self, pointsFiles: list[str], matchesFile: str) -> None:
         self.pointsPaths = [MCP_DIR / f for f in pointsFiles]
@@ -79,11 +82,9 @@ class MCPDataLoader:
             # Sort rows by "match_id" and then "Pt"
             # drop=True: Discard old index numbers
         self.points = df
-        print(len(self.points), "points loaded")
         
     def loadMatches(self) -> None:
         self.matches = pd.read_csv(self.matchesPath, dtype=str)
-        print(len(self.matches), "matches loaded")
     
     def bootstrap(self, rng: np.random.Generator) -> tuple[pd.DataFrame, pd.DataFrame]:
         matchIds = self.points["match_id"].unique()
