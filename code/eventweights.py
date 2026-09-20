@@ -150,7 +150,8 @@ def computeEventWeights(df: pd.DataFrame) -> pd.DataFrame:
 if __name__ == "__main__":
     from dataloader import MCPDataLoader
     from expectancy import computeGameWinExpectancy
-
+    from constants import OUTPUT_DIR
+    
     points = MCPDataLoader("w").points
     gweDict, gweDf, pts = computeGameWinExpectancy(points)
     gweDfSorted = gweDf.sort_values(["game_win_expectancy"])
@@ -159,3 +160,7 @@ if __name__ == "__main__":
     wDict, wDf = computeEventWeights( computeDeltaGameWinExpectancy(pts, gweDict) )
     print(wDf)
     print(wDict)
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    gweDf.to_csv(OUTPUT_DIR / "v-game-expectancy.csv")
+    wDf.to_csv(OUTPUT_DIR / "w-event-weights.csv")

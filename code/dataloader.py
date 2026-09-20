@@ -137,7 +137,4 @@ if __name__ == "__main__":
 
     bootstrappedPoints, bootstrappedMatches = dataLoader.bootstrap(rng)
     print(bootstrappedPoints.head())
-    print(bootstrappedMatches.head())
-    
-
-    
+    print(bootstrappedMatches.head())   
