@@ -8,112 +8,112 @@ import pandas as pd
 from pprint import pprint
 import matplotlib.pyplot as plt
 
-# WTA top 100 players as of 06/15/2026
-players = [ 
+MIN_MATCHES = 15
+EDGE_SCALE = 1000
+
+# WTA top 100 players as of 05/25/2026
+players = [
     "Aryna Sabalenka",
     "Elena Rybakina",
     "Iga Swiatek",
-    "Jessica Pegula",
-    "Mirra Andreeva",
-    "Amanda Anisimova",
     "Coco Gauff",
+    "Jessica Pegula",
+    "Amanda Anisimova",
     "Elina Svitolina",
+    "Mirra Andreeva",
     "Victoria Mboko",
     "Karolina Muchova",
     "Belinda Bencic",
-    "Marta Kostyuk",
     "Linda Noskova",
     "Jasmine Paolini",
+    "Ekaterina Alexandrova",
+    "Marta Kostyuk",
     "Naomi Osaka",
-    "Diana Shnaider",
     "Iva Jovic",
     "Sorana Cirstea",
-    "Ekaterina Alexandrova",
-    "Anna Kalinskaya",
-    "Maja Chwalinska",
-    "Leylah Fernandez",
+    "Madison Keys",
     "Clara Tauson",
     "Elise Mertens",
+    "Leylah Fernandez",
+    "Diana Shnaider",
+    "Anna Kalinskaya",
     "Emma Navarro",
-    "Anastasia Potapova",
-    "Marie Bouzkova",
-    "Madison Keys",
-    "Ann Li",
     "Hailey Baptiste",
-    "Emma Raducanu",
-    "Xinyu Wang",
-    "Donna Vekic",
+    "Liudmila Samsonova",
+    "Marie Bouzkova",
+    "Ann Li",
+    "Anastasia Potapova",
+    "Jelena Ostapenko",
+    "Jaqueline Cristian",
+    "Cristina Bucsa",
+    "Xin Yu Wang", # Xinyu Wang
+    "Sara Bejlek",
     "Katerina Siniakova",
     "Alexandra Eala",
-    "Cristina Bucsa",
-    "Liudmila Samsonova",
-    "Jelena Ostapenko",
-    "Barbora Krejcikova",
-    "Jaqueline Cristian",
-    "Maria Sakkari",
-    "Laura Siegemund",
-    "Janice Tjen",
-    "McCartney Kessler",
-    "Magdalena Frech",
     "Elisabetta Cocciaretto",
-    "Sara Bejlek",
-    "Magda Linette",
+    "Emma Raducanu",
+    "Janice Tjen",
+    "Barbora Krejcikova",
+    "Tereza Valentova",
+    "Lois Boisson",
     "Marketa Vondrousova",
     "Dayana Yastremska",
-    "Oleksandra Oliynykova",
+    "Magdalena Frech",
+    "Laura Siegemund",
+    "Mccartney Kessler",
+    "Maria Sakkari",
+    "Jessica Bouzas Maneiro",
     "Petra Marcinko",
     "Maya Joint",
-    "Caty McNally",
-    "Jessica Bouzas Maneiro",
-    "Katie Boulter",
-    "Antonia Ruzic",
-    "Solana Sierra",
-    "Yuliia Starodubtseva",
-    "Diane Parry",
-    "Zeynep Sonmez",
-    "Nikola Bartunkova",
-    "Tereza Valentova",
-    "Peyton Stearns",
-    "Kamilla Rakhimova",
-    "Talia Gibson",
-    "Shuai Zhang",
-    "Panna Udvardy",
     "Daria Kasatkina",
-    "Camila Osorio",
-    "Anhelina Kalinina",
-    "Varvara Gracheva",
-    "Kimberly Birrell",
+    "Tatjana Maria",
+    "Yuliia Starodubtseva",
+    "Qinwen Zheng",
     "Anna Bondar",
-    "Daria Snigur",
-    "Viktorija Golubic",
-    "Renata Zarazua",
-    "Tamara Korpatsch",
-    "Alycia Parks",
-    "Eva Lys",
-    "Taylor Townsend",
-    "Elsa Jacquemot",
+    "Talia Gibson",
+    "Panna Udvardy",
+    "Anhelina Kalinina",
+    "Shuai Zhang",
     "Sonay Kartal",
-    "Lilli Tagger",
+    "Caty Mcnally",
+    "Antonia Ruzic",
+    "Oleksandra Oliynykova",
+    "Zeynep Sonmez",
+    "Elsa Jacquemot",
+    "Solana Sierra",
+    "Nikola Bartunkova",
+    "Varvara Gracheva",
+    "Katie Boulter",
+    "Donna Vekic",
+    "Magda Linette",
+    "Renata Zarazua",
+    "Taylor Townsend",
     "Yulia Putintseva",
-    "Veronika Erjavec",
-    "Karolina Pliskova",
-    "Simona Waltert",
-    "Oksana Selekhmeteva",
+    "Elena Gabriela Ruse", # Elena-Gabriela Ruse
+    "Peyton Stearns",
+    "Alycia Parks",
     "Anastasia Zakharova",
-    "Maria Timofeeva",
-    "Sinja Kraus",
-    "Lanlana Tararudee",
-    "Ella Seidel",
-    "Ashlyn Krueger",
-    "Ajla Tomljanovic",
-    "Alina Korneeva",
-    "Hanne Vandewinkel",
-    "Francesca Jones",
+    "Eva Lys",
+    "Viktorija Golubic",
+    "Kimberly Birrell",
+    "Veronika Erjavec",
+    "Veronika Kudermetova",
+    "Camila Osorio",
+    "Sofia Kenin",
+    "Oksana Selekhmeteva",
+    "Kamilla Rakhimova",
+    "Lilli Tagger",
+    "Simona Waltert",
+    "Diane Parry",
+    "Daria Snigur",
     "Emiliana Arango",
+    "Tamara Korpatsch",
+    "Ella Seidel",
+    "Lanlana Tararudee",
+    "Sinja Kraus",
+    "Hanne Vandewinkel",
+    "Ajla Tomljanovic"
 ]
-
-MIN_MATCHES = 10
-EDGE_SCALE = 1000
 
 dl = MCPDataLoader("w")
 calc = EdgeCalc(dl.points, dl.matches)
@@ -138,7 +138,7 @@ print()
 scaledEdgeValues = outputDf["EDGE"] * EDGE_SCALE
 meanEdge   = scaledEdgeValues.mean()
 medianEdge = scaledEdgeValues.median()
-stdEdge = scaledEdgeValues.std()
+stdEdge    = scaledEdgeValues.std()
 minEdge    = scaledEdgeValues.min()
 maxEdge    = scaledEdgeValues.max()
 print(f"Mean:    {meanEdge:.2f}")
@@ -179,11 +179,11 @@ else:
     print("No IQR-based outliers found")
 
 plt.figure(figsize=(8, 5))
-plt.hist(scaledEdgeValues, bins=11, edgecolor="black")
+plt.hist(scaledEdgeValues, bins=10, edgecolor="black")
 
 plt.axvline(
     meanEdge, linestyle="-", linewidth=1.5,
-    label=f"Mean: {meanEdge:.2f}" )
+    label=f"Mean: {meanEdge:.2f}")
 
 plt.axvline(
     medianEdge, linestyle=":", linewidth=1.5,
@@ -201,12 +201,13 @@ plt.axvline(
     upperBound, linestyle="--", linewidth=1.5,
     label=f"Upper bound: {upperBound:.2f}" )
 
-plt.title(
-    f"Distribution of Player EDGE Values\n"
-    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(scaledEdgeValues)}" )
-plt.xlabel("Scaled EDGE value (EDGE × 1000)")
-plt.ylabel("Number of players")
-plt.legend()
+# plt.title(
+#     f"Distribution of Player EDGE Values\n"
+#     f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(scaledEdgeValues)}" )
+plt.xlabel("Scaled EDGE value (EDGE × 1000)", fontsize=16)
+plt.ylabel("Number of players", fontsize=16)
+plt.tick_params(axis="both", labelsize=14)
+plt.legend(fontsize=12)
 
 plt.tight_layout()
 plt.show()

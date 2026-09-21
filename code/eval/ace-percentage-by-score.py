@@ -81,14 +81,15 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(7, 6))
     image = ax.imshow(maskedHeatmap, cmap="Wistia")
-
+    
     ax.set_xticks(range(5))
     ax.set_xticklabels(scoreLabels)
     ax.set_yticks(range(5))
     ax.set_yticklabels(scoreLabels)
+    ax.tick_params(axis="both", labelsize=14)
 
-    ax.set_xlabel("Returner Score")
-    ax.set_ylabel("Server Score")
+    ax.set_xlabel("Returner Score", fontsize=16)
+    ax.set_ylabel("Server Score",   fontsize=16)
 #     ax.set_title("Ace Percentage by Score State")
 
     # Add the percentage value to each valid cell.
@@ -97,10 +98,12 @@ if __name__ == "__main__":
             if not np.isnan(heatmap[i, j]):
                 ax.text(j, i,
                         f"{heatmap[i, j]:.2f}%",
-                        ha="center", va="center")
+                        ha="center", va="center",
+                        fontsize=14)
 
     colorbar = fig.colorbar(image, ax=ax, pad=0.01)
-    colorbar.set_label("Ace Percentage (%)")
+    colorbar.set_label("Ace Percentage (%)", fontsize=16)
+    colorbar.ax.tick_params(labelsize=14)
 
     fig.tight_layout()
     plt.show()
