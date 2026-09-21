@@ -168,8 +168,9 @@ plt.ylim(maxWtaRank + 5, 0)
 plt.title(
     f"EDGE Value vs WTA Rank\n"
     f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}")
-plt.xlabel("Scaled EDGE value (EDGE × 1000)")
-plt.ylabel("WTA rank (1 = best)")
+plt.xlabel("Scaled EDGE value (EDGE × 1000)", fontsize=16)
+plt.ylabel("WTA rank (1 = best)", fontsize=16)
+plt.tick_params(axis="both", labelsize=14)
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
