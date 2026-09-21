@@ -10,6 +10,9 @@ from scipy.stats import spearmanr
 import matplotlib.pyplot as plt
 import numpy as np
 
+MIN_MATCHES = 15
+EDGE_SCALE = 1000
+
 # WTA top 100 players as of 05/25/2026
 players = [
     "Aryna Sabalenka",
@@ -114,8 +117,6 @@ players = [
     "Ajla Tomljanovic"
 ]
 
-MIN_MATCHES = 10
-EDGE_SCALE = 1000
 
 dl = MCPDataLoader("w")
 calc = EdgeCalc(dl.points, dl.matches)

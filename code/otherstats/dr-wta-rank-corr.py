@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
 import numpy as np
 
-MIN_MATCHES = 10
+MIN_MATCHES = 15
 
 # WTA top 100 players as of 05/25/2026
 players = [
@@ -156,7 +156,7 @@ yLine = slope * xLine + intercept
 
 plt.plot(
     xLine, yLine, linestyle="--",
-    linewidth=1.5, color ="red", label="Linear trend")
+    linewidth=1.5, color ="red")
 
 # WTA rank #1 should appear near the top;
 # set 0 exactly at the top edge of the y-axis.
