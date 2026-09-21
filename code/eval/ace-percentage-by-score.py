@@ -12,7 +12,7 @@ import pathlib, sys
 PRJ_DIR = pathlib.Path(__file__).parents[1]
 sys.path.append(str(PRJ_DIR))
 
-import pandas as pd
+import pandas as pd, numpy as np, matplotlib.pyplot as plt
 from constants import GAME_STATES, OUTPUT_DIR
 from dataloader import MCPDataLoader
 from eventparser import classifyEvent
@@ -62,3 +62,56 @@ if __name__ == "__main__":
     summaryDf.to_csv(outputPath, float_format="%.2f")
     print("\nOutput written to:")
     print(outputPath)
+
+    # Generate a heat map with a 5 x 5 grid to emphasize advantage states
+    heatmap = np.full( (5, 5), np.nan )    
+
+    scoreLabels = ["0", "15", "30", "40", "AD"]
+    scoreToIndex = { score: i for i, score in enumerate(scoreLabels) }
+
+    for _, row in summaryDf.iterrows():
+        serverScore, returnerScore = scoreState.split("-")
+        if (serverScore in scoreToIndex and returnerScore in scoreToIndex):
+            i = scoreToIndex[serverScore]
+            j = scoreToIndex[returnerScore]
+            heatmap[i, j] = row["ace_percentage"]
+
+    # Mask invalid tennis score states so they remain blank.
+    heatmap = np.ma.masked_invalid(heatmap)
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+    image = ax.imshow(heatmap)
+
+    ax.set_xticks(range(5))
+    ax.set_xticklabels(scoreLabels)
+    ax.set_yticks(range(5))
+    ax.set_yticklabels(scoreLabels)
+
+    ax.set_xlabel("Returner Score")
+    ax.set_ylabel("Server Score")
+#     ax.set_title("Ace Percentage by Score State")
+
+    # Add the percentage value to each valid cell.
+    for i in range(5):
+        for j in range(5):
+            if not np.isnan(heatmap[i, j]):
+                ax.text(j, i,
+                        f"{heatmap[i, j]:.2f}%",
+                        ha="center", va="center")
+
+    colorbar = fig.colorbar(image, ax=ax)
+    colorbar.set_label("Ace Percentage (%)")
+
+    fig.tight_layout()
+    plt.show()
+
+#     output_path = (
+#         Path(__file__).resolve().parent.parent
+#         / "output"
+#         / "ace-percentage-by-score-heatmap.png"
+#     )
+# 
+#     fig.savefig(output_path, dpi=300, bbox_inches="tight")
+#     plt.close(fig)
+# 
+#     print(f"Saved heat map to: {output_path}")
