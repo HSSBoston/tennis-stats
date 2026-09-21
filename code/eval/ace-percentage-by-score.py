@@ -23,7 +23,7 @@ def computeAcePercentage(df: pd.DataFrame) -> pd.DataFrame:
     # denominator, rather than conditioning on a recognized event or a serve in.
     points = df[["Pts", "1st", "2nd"]].copy()
     if not points["Pts"].isin(GAME_STATES).all():
-        raise ValueError("Expected only GAME_STATES; use MCPDataLoader.points")
+        raise ValueError("Unexpected/unrecognizable score state")
 
     events = [classifyEvent(first, second) for first, second in zip(
         points["1st"].tolist(), points["2nd"].tolist())]
@@ -35,6 +35,7 @@ def computeAcePercentage(df: pd.DataFrame) -> pd.DataFrame:
         ace_count = ("is_ace", "sum"),
         unclassified_points = ("is_unclassified", "sum"),
     ).reindex(GAME_STATES, fill_value=0).astype(int)
+    
     denominator = summaryDf["total_server_points"]
     summaryDf["ace_percentage"] = (
         100.0 * summaryDf["ace_count"] / denominator.where(denominator > 0)
