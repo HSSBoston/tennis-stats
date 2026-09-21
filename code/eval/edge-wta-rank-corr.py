@@ -158,7 +158,7 @@ yLine = slope * xLine + intercept
 
 plt.plot(
     xLine, yLine, linestyle="--",
-    linewidth=1.5, color ="red", label="Linear trend")
+    linewidth=1.5, color ="red")
 
 # WTA rank #1 should appear near the top;
 # set 0 exactly at the top edge of the y-axis.
@@ -170,7 +170,6 @@ plt.title(
     f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}")
 plt.xlabel("Scaled EDGE value (EDGE × 1000)")
 plt.ylabel("WTA rank (1 = best)")
-plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
