@@ -69,7 +69,7 @@ if __name__ == "__main__":
     scoreLabels = ["0", "15", "30", "40", "AD"]
     scoreToIndex = { score: i for i, score in enumerate(scoreLabels) }
 
-    for _, row in summaryDf.iterrows():
+    for scoreState, row in summaryDf.iterrows():
         serverScore, returnerScore = scoreState.split("-")
         if (serverScore in scoreToIndex and returnerScore in scoreToIndex):
             i = scoreToIndex[serverScore]
@@ -77,10 +77,10 @@ if __name__ == "__main__":
             heatmap[i, j] = row["ace_percentage"]
 
     # Mask invalid tennis score states so they remain blank.
-    heatmap = np.ma.masked_invalid(heatmap)
+    maskedHeatmap = np.ma.masked_invalid(heatmap)
 
     fig, ax = plt.subplots(figsize=(7, 6))
-    image = ax.imshow(heatmap)
+    image = ax.imshow(maskedHeatmap)
 
     ax.set_xticks(range(5))
     ax.set_xticklabels(scoreLabels)
