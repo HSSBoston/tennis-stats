@@ -168,7 +168,6 @@ plt.ylabel("WTA Rank (1 = best)")
 plt.title(
     f"Dominance Ratio vs WTA Rank\n"
     f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(df)}" )
-plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
