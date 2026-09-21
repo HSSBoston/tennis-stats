@@ -1,8 +1,4 @@
-"""Tabulate ace percentages using the same point sample as the EDGE analysis.
-
-Run from any directory with Python and the project's pandas/numpy dependencies.
-The default is the women's 2020s MCP file, with no additional date cutoff.
-Edit TOUR and POINTS_FILES below to select another MCP sample.
+"""Tabulate ace percentages
 
 Scores are pre-point scores, server first. Ace includes unreturnable serve
 winners, as defined by eventparser.classifyEvent, on either serve. Each loaded
@@ -20,9 +16,6 @@ import pandas as pd
 from constants import GAME_STATES, OUTPUT_DIR
 from dataloader import MCPDataLoader
 from eventparser import classifyEvent
-
-TOUR = "w"
-POINTS_FILES = None  # None uses charting-{TOUR}-points-2020s.csv
 
 
 def computeAcePercentage(df: pd.DataFrame) -> pd.DataFrame:
@@ -51,7 +44,7 @@ def computeAcePercentage(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    dl = MCPDataLoader(TOUR, pointsFiles=POINTS_FILES)
+    dl = MCPDataLoader("w")
     summaryDf = computeAcePercentage(dl.points)
 
     print("\nAce includes unreturnable serve winners (EDGE convention).")
