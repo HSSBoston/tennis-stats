@@ -99,7 +99,7 @@ if __name__ == "__main__":
                         f"{heatmap[i, j]:.2f}%",
                         ha="center", va="center")
 
-    colorbar = fig.colorbar(image, ax=ax)
+    colorbar = fig.colorbar(image, ax=ax, pad=0.01)
     colorbar.set_label("Ace Percentage (%)")
 
     fig.tight_layout()
