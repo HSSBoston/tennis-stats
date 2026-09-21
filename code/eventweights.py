@@ -162,7 +162,7 @@ if __name__ == "__main__":
 #     print(wDict)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    gweDf.round({"game_win_expectancy": 3}).to_csv(
+    gweDf.round({"game_win_expectancy": 4}).to_csv(
         OUTPUT_DIR / "v-game-expectancy.csv")
     wDf.round({"w": 3}).to_csv(
         OUTPUT_DIR / "w-event-weights.csv")
