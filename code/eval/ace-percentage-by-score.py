@@ -47,12 +47,10 @@ if __name__ == "__main__":
     dl = MCPDataLoader("w")
     summaryDf = computeAcePercentage(dl.points)
 
-    print("\nAce includes unreturnable serve winners (EDGE convention).")
-    print("Percentage = 100 * ace_count / total_server_points.")
-    print("The loader's sample is preserved, including tiebreak openings at 0-0.")
     duplicateCount = dl.points.duplicated(["match_id", "Pt"]).sum()
     if duplicateCount:
         print(f"Warning: {duplicateCount} duplicate match/point rows retained.")
+        
     unclassifiedCount = summaryDf["unclassified_points"].sum()
     print(f"{unclassifiedCount} unclassified points retained in denominators.")
     print()
