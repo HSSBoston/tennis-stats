@@ -1,12 +1,12 @@
-"""Tabulate ace percentages
-
-Scores are pre-point scores, server first. Ace includes unreturnable serve
-winners, as defined by eventparser.classifyEvent, on either serve. Each loaded
-point counts once in the denominator, including unclassified/penalty points.
-No deduplication or additional score filtering is applied beyond MCPDataLoader.
-In particular, the loader retains tiebreak opening points labeled 0-0.
-Absent score states have zero counts and a blank (undefined) percentage.
-"""
+# Generate a CSV file that records ace percentage at each score state. 
+# Ace includes unreturnable serve winners, as defined by eventparser.classifyEvent.
+#
+# Each loaded point counts once in the denominator, including unclassified/penalty points.
+#
+# No deduplication or additional score filtering is applied beyond MCPDataLoader.
+# In particular, the loader retains tiebreak opening points labeled 0-0.
+#
+# Absent score states have zero counts and a blank (undefined) percentage.
 
 import pathlib, sys
 PRJ_DIR = pathlib.Path(__file__).parents[1]
