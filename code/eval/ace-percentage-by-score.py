@@ -80,7 +80,7 @@ if __name__ == "__main__":
     maskedHeatmap = np.ma.masked_invalid(heatmap)
 
     fig, ax = plt.subplots(figsize=(7, 6))
-    image = ax.imshow(maskedHeatmap)
+    image = ax.imshow(maskedHeatmap, cmap="Wistia")
 
     ax.set_xticks(range(5))
     ax.set_xticklabels(scoreLabels)
