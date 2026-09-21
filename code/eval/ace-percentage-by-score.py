@@ -60,6 +60,6 @@ if __name__ == "__main__":
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     outputPath = OUTPUT_DIR / "ace-percentage-by-score.csv"
-    summaryDf.to_csv(outputPath, float_format="%.2 f")
+    summaryDf.to_csv(outputPath, float_format="%.2f")
     print("\nOutput written to:")
     print(outputPath)
