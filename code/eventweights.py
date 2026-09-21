@@ -159,7 +159,7 @@ if __name__ == "__main__":
     
     wDict, wDf = computeEventWeights( computeDeltaGameWinExpectancy(pts, gweDict) )
     print(wDf)
-    print(wDict)
+#     print(wDict)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     gweDf.round({"game_win_expectancy": 3}).to_csv(

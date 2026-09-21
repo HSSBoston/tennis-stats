@@ -6,7 +6,10 @@ import pandas as pd
 #   df: Point-by-point dataset from the MCP project. Each row represents one point.
 #       Obtain the dataset via DataLoader.points.
 #   Returns:
-#     vDict: Maps each game state to the server's game win expectancy
+#     vDict: Maps each game state to the server's game win expectancy.
+#            "count":               total count for a score state
+#            "sum":                 count for game-wins
+#            "game_win_expectancy": sum/count
 #     vDf:   DataFrame with columns=["Pts", "game_win_expectancy", ...] where "Pts" means
 #            game state
 #     df:    Original (MCP) DataFrame + extra columns "server_won_game" (1 or 0) and
