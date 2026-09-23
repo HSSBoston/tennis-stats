@@ -4,7 +4,11 @@
 
 ## Short Summary: 
 
-Event-Driven Gain in Expectancy (EDGE) is a tennis metric for evaluating a player's overall performance. Rather than treating all point outcomes equally, EDGE accounts for how points are won and lost. Using tour-wide point-by-point match data, it assigns probabilistically derived values to positive and negative point-level event types, such as aces, winners, double faults, and unforced errors, based on their average impact on the probability of winning the current game. played into a single measure of on-court performance. EDGE can be used to compare players on a common scale and to identify differences in performance that may not be apparent from traditional statistics or tour rankings.
+Event-Driven Gain in Expectancy (EDGE) is a tennis metric for evaluating a player's overall performance. It is based on a simple concept: not all point-level events are equally valuable. EDGE estimates the value of each event type, such as aces, winners, double faults, and unforced errors, and uses these values to weight the positive and negative events produced by a player. By combining multiple point-level events into a single numerical score, EDGE can be used to compare players on a common scale and to identify differences in performance that may not be apparent from traditional statistics or tour rankings.
+
+<!--
+Rather than treating all point outcomes equally, EDGE accounts for how points are won and lost. Using tour-wide point-by-point match data, it assigns probabilistically derived values to positive and negative point-level event types, such as aces, winners, double faults, and unforced errors, based on their average impact on the probability of winning the current game. played into a single measure of on-court performance. EDGE can be used to compare players on a common scale and to identify differences in performance that may not be apparent from traditional statistics or tour rankings.
+-->
 
 ## Summary: 
 
