@@ -148,31 +148,58 @@ outputDf["scaled_EDGE"] = outputDf["EDGE"] * EDGE_SCALE
 outputDf.to_csv(OUTPUT_DIR / "edge-wta-rank-corr.csv", index=False)
 print(f"\nOutput written to: {OUTPUT_DIR}/edge-wta-rank-corr.csv")
 
-plt.figure(figsize=(8, 6))
-plt.scatter( outputDf["scaled_EDGE"], outputDf["wta_rank"] )
+def showCorrEdgeValWtaRank():
+    plt.figure(figsize=(8, 6))
+    plt.scatter( outputDf["scaled_EDGE"], outputDf["wta_rank"] )
 
-# Trend line
-slope, intercept = np.polyfit(outputDf["scaled_EDGE"], outputDf["wta_rank"], 1)
-xLine = np.linspace(outputDf["scaled_EDGE"].min(), outputDf["scaled_EDGE"].max(), 100)
-yLine = slope * xLine + intercept
+    # Trend line
+    slope, intercept = np.polyfit(outputDf["scaled_EDGE"], outputDf["wta_rank"], 1)
+    xLine = np.linspace(outputDf["scaled_EDGE"].min(), outputDf["scaled_EDGE"].max(), 100)
+    yLine = slope * xLine + intercept
 
-plt.plot(
-    xLine, yLine, linestyle="--",
-    linewidth=1.5, color ="red")
+    plt.plot(xLine, yLine, linestyle="--",
+             linewidth=1.5, color ="red")
 
-# WTA rank #1 should appear near the top;
-# set 0 exactly at the top edge of the y-axis.
-maxWtaRank = outputDf["wta_rank"].max()
-plt.ylim(maxWtaRank + 5, 0)
+    # WTA rank #1 should appear near the top;
+    # set 0 exactly at the top edge of the y-axis.
+    maxWtaRank = outputDf["wta_rank"].max()
+    plt.ylim(maxWtaRank + 5, 0)
 
-plt.title(
-    f"EDGE Value vs WTA Rank\n"
-    f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}")
-plt.xlabel("Scaled EDGE value (EDGE × 1000)", fontsize=16)
-plt.ylabel("WTA rank (1 = best)", fontsize=16)
-plt.tick_params(axis="both", labelsize=14)
-plt.grid(True, alpha=0.3)
+    plt.title(
+        f"EDGE Value vs WTA Rank\n"
+        f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}")
+    plt.xlabel("Scaled EDGE value (EDGE × 1000)", fontsize=16)
+    plt.ylabel("WTA rank (1 = best)", fontsize=16)
+    plt.tick_params(axis="both", labelsize=14)
+    plt.grid(True, alpha=0.3)
 
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
+
+def showCorrEdgeRankWtaRank():
+    plt.figure(figsize=(8, 6))
+    plt.scatter(outputDf["edge_rank"], outputDf["wta_rank"])
+
+    # Trend line
+    slope, intercept = np.polyfit( outputDf["edge_rank"], outputDf["wta_rank"], 1 )
+    xLine = np.linspace( outputDf["edge_rank"].min(), outputDf["edge_rank"].max(), 100 )
+    yLine = slope * xLine + intercept
+
+    plt.plot(xLine, yLine, linestyle="--",
+             linewidth=1.5, color="red")
+
+#     plt.title(
+#         f"EDGE Rank vs WTA Rank\n"
+#         f"WTA Top 100, matches >= {MIN_MATCHES}, n={len(outputDf)}" )
+    plt.xlabel("EDGE rank (1 = best)", fontsize=16)
+    plt.ylabel("WTA rank (1 = best)", fontsize=16)
+    plt.tick_params(axis="both", labelsize=14)
+    plt.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    showCorrEdgeRankWtaRank()
+
 
