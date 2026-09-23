@@ -8,7 +8,7 @@ Event-Driven Gain in Expectancy (EDGE) is a composite metric for evaluating a pl
 
 ## Summary: 
 
-Traditional tennis statistics, such as aces, double faults, winners, and unforced errors, provide intuitive box-score summaries of player performance. However, these metrics evaluate isolated aspects of performance rather than summarizing a player's overall performance in a single measure. As a result, comparing individual players often requires tables, radar charts, or other visualizations that present multiple metrics together. This makes interpretation less direct.
+Traditional tennis statistics, such as aces, double faults, winners, and unforced errors, provide intuitive box-score summaries of player performance. However, these metrics evaluate isolated aspects of performance rather than combining those performance aspects. As a result, for assessing a player’s overall performance, it is often required to examine many statistics simultaneously, typically through tables, radar charts, or other visualizations. This makes interpretation and comparison less direct. 
 
 Composite metrics address this limitation by combining multiple aspects of play into a single numerical measure. For example, metrics such as Dominance Ratio (DR) and hold-plus-break percentage summarize performance more directly by combining serve and return outcomes. However, these metrics are deterministic summaries of observed outcomes and do not explicitly account for score context when valuating point-level outcomes. Therefore, they do not distinguish, for example, the score-dependent impact of a winner on break point from that of a winner at 40–0, even though the two outcomes can have different effects on the probability of winning the game. 
 
