@@ -30,7 +30,6 @@ This work proposes a new way to evaluate an individual player's overall performa
 
 - [Presented](https://docs.google.com/presentation/d/1mzA0FCy4g_jT0kZku6xM4jBGxMvK38PTatvQpHTtNis/edit?usp=sharing) and won 2nd Place Award and Excellence in Research Award at the [PhysTech 2026](https://phystech-2026.devpost.com/) hackathon, June 2026.
 
--->
 
 <!--
 EDGE measures a player’s overall performance. It is calculated by weighting positive and negative point-level events, such as aces, winners, double faults, and unforced errors by their estimated values, taking a linear weighted sum of event occurrences, and dividing the resulting sum by the total number of points played. 
