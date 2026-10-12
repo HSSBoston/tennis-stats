@@ -24,7 +24,7 @@ This work proposes a new way to evaluate an individual player's overall performa
 
 ## Publications
 
-- H. Suzuki, "Event-Driven Gain in Expectancy (EDGE): A Probabilistic Metric for Comprehensive Player Performance in Tennis", In *Hack What Moves You: Technology Innovations for Fitness, Sports and Active Living from PhysTech 2026*, Binnovative Innovation Book Series, Chapter 4, pp. 43 - 63, ISBN: 9798-1948-1565-4, October 2026. [preprint](https://github.com/HSSBoston/tennis-stats/blob/main/doc/edge-bookchapter.pdf), [project page](https://github.com/HSSBoston/tennis-stats)
+- H. Suzuki, "Event-Driven Gain in Expectancy (EDGE): A Probabilistic Metric for Comprehensive Player Performance in Tennis", In *Hack What Moves You: Technology Innovations for Fitness, Sports and Active Living from PhysTech 2026*, Binnovative Innovation Book Series, Chapter 4, pp. 43 - 63, ISBN: 9798-1948-1565-4, October 2026. [preprint](https://github.com/HSSBoston/tennis-stats/blob/main/doc/edge-bookchapter.pdf)
 
 ## Presentations
 
